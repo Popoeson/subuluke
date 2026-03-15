@@ -1,234 +1,679 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>LuminaStore Admin Panel</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
 <style>
-  /* --- RESET & GLOBAL --- */
-  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-  body { background-color: #FDF6F0; color: #333333; }
+:root{
+  --bg-main: #F5F0E1;
+  --bg-soft: #EFE9D8;
+  --glass-bg: rgba(255,255,255,0.55);
+  --glass-border: rgba(255,255,255,0.35);
+  --glass-dark: rgba(25,25,25,0.55);
+  --text-dark: #2A2A2A;
+  --text-muted: #6F6F6F;
+  --text-light: #FFFFFF;
+  --accent-olive: #6B8E23;
+  --accent-olive-soft: rgba(107,142,35,0.15);
+  --success: #6FAE7B;
+  --warning: #D6B85A;
+  --info: #6C8CBF;
+  --purple: #8B7BBE;
+  --blur: blur(18px);
+}
 
-  a { text-decoration: none; color: inherit; }
+*{margin:0; padding:0; box-sizing:border-box;}
 
-  /* --- SIDEBAR --- */
-  .sidebar {
-    position: fixed;
-    left: 0;
-    top: 0;
-    width: 240px;
-    height: 100vh;
-    background-color: rgba(0, 77, 64, 0.8); /* Emerald with opacity */
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    padding-top: 20px;
-    transition: transform 0.3s ease;
-    color: #FDF6F0;
-    font-family: 'Playfair Display', serif;
-    box-shadow: 4px 0 20px rgba(0,0,0,0.2);
-  }
-  .sidebar.hide { transform: translateX(-100%); }
-  .sidebar .logo { text-align: center; font-size: 1.7em; margin-bottom: 40px; color: #D4AF37; text-shadow: 0 1px 3px rgba(0,0,0,0.3); }
-  .sidebar nav a {
-    display: flex;
-    align-items: center;
-    padding: 12px 20px;
-    margin: 5px 10px;
-    border-radius: 10px;
-    transition: background 0.2s, color 0.2s;
-    backdrop-filter: blur(5px);
-  }
-  .sidebar nav a:hover, .sidebar nav a.active { background: #D4AF37; color: #004D40; font-weight: 500; }
+body{
+  min-height:100vh;
+  background: var(--bg-main);
+  color: var(--text-dark);
+  font-family: "Inter", sans-serif;
+}
 
-  /* --- TOPBAR --- */
-  .topbar {
-    display: none; /* shown only on mobile */
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 60px;
-    background-color: rgba(0, 77, 64, 0.85); /* Emerald glass */
-    display: flex;
-    align-items: center;
-    padding: 0 15px;
-    justify-content: space-between;
-    z-index: 1000;
-    color: #FDF6F0;
-    font-family: 'Playfair Display', serif;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-  }
-  .hamburger { font-size: 1.5em; cursor: pointer; color: #D4AF37; }
+/* ===================== LAYOUT ===================== */
+.admin-wrapper{
+  display:flex;
+  min-height:100vh;
+}
 
-  /* --- MAIN CONTENT --- */
-  .main {
-    margin-left: 240px;
-    padding: 20px;
-    transition: margin-left 0.3s ease;
-    min-height: 100vh;
-  }
-  .main.full { margin-left: 0; }
+/* ===================== SIDEBAR ===================== */
+.sidebar{
+  width:260px;
+  position:fixed;
+  inset:0 auto 0 0;
+  background: var(--glass-dark);
+  backdrop-filter: var(--blur);
+  border-right:1px solid rgba(255,255,255,0.2);
+  padding:28px 18px;
+  color: var(--text-light);
+  z-index:1000;
+  transition: transform .3s ease;
+}
 
-  /* --- CARDS / CONTENT --- */
-  .card {
-    background: rgba(255, 255, 255, 0.3); /* translucent ivory */
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    padding: 20px;
-    border-radius: 15px;
-    margin-bottom: 20px;
-    border-left: 5px solid #D4AF37; /* Gold accent */
-    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-    transition: transform 0.2s, box-shadow 0.2s;
-  }
-  .card:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(0,0,0,0.25); }
-  .card h2 { margin-bottom: 10px; color: #004D40; font-family: 'Playfair Display', serif; text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
-  .cards-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+.sidebar h2{
+  font-family:"Playfair Display", serif;
+  letter-spacing:1px;
+  margin-bottom:40px;
+}
 
-  /* --- BUTTONS --- */
-  .btn {
-    background: #D4AF37; /* Gold */
-    border: none;
-    padding: 10px 15px;
-    border-radius: 8px;
-    color: #004D40; /* Emerald text */
-    cursor: pointer;
-    font-weight: 500;
-    transition: transform 0.2s, background 0.2s;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  }
-  .btn:hover { background: #FFC107; transform: scale(1.05); }
+.sidebar ul{ list-style:none; }
+.sidebar li{
+  padding:14px 16px;
+  border-radius:14px;
+  margin-bottom:10px;
+  cursor:pointer;
+}
+.sidebar li.active,
+.sidebar li:hover{
+  background: rgba(255,255,255,0.18);
+}
 
-  /* --- MEDIA QUERIES --- */
-  @media (max-width: 768px) {
-    .sidebar { transform: translateX(-100%); position: fixed; z-index: 999; }
-    .topbar { display: flex; }
-    .main { margin-left: 0; padding-top: 70px; }
-  }
+/* ===================== OVERLAY ===================== */
+#overlay{
+  position:fixed;
+  inset:0;
+  background: rgba(0,0,0,0.35);
+  backdrop-filter: blur(2px);
+  opacity:0;
+  pointer-events:none;
+  transition:.3s;
+  z-index:900;
+}
+#overlay.show{
+  opacity:1;
+  pointer-events:auto;
+}
+
+/* ===================== MAIN ===================== */
+.main{
+  margin-left:260px;
+  padding:28px;
+  width:100%;
+}
+
+/* ===================== TOPBAR ===================== */
+.topbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:18px 22px;
+  margin-bottom:28px;
+}
+.topbar strong{
+  font-family:"Playfair Display", serif;
+  letter-spacing:.8px;
+}
+.hamburger{
+  display:none;
+  font-size:22px;
+  cursor:pointer;
+}
+
+/* ===================== GLASS ===================== */
+.glass{
+  background: var(--glass-bg);
+  backdrop-filter: var(--blur);
+  border:1px solid var(--glass-border);
+  border-radius:22px;
+}
+
+/* ===================== DASHBOARD ===================== */
+.metrics{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:22px;
+  margin-bottom:32px;
+}
+.metric{
+  padding:22px;
+}
+.metric h4{
+  font-size:13px;
+  text-transform:uppercase;
+  letter-spacing:.8px;
+  color: var(--text-muted);
+}
+.metric p{
+  font-size:28px;
+  font-weight:600;
+  margin-top:8px;
+}
+
+/* ===================== TABLE ===================== */
+.table-wrapper{
+  overflow-x:auto;
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:600px;
+}
+th,td{
+  padding:16px;
+  text-align:left;
+  font-size:14px;
+}
+th{
+  color: var(--text-muted);
+  font-weight:500;
+}
+tr:not(:last-child){
+  border-bottom:1px solid rgba(0,0,0,0.08);
+}
+
+/* ===================== BUTTON ===================== */
+.btn{
+  padding:10px 22px;
+  border-radius:999px;
+  border:none;
+  cursor:pointer;
+  background: var(--accent-olive);
+  color:#fff;
+  font-weight:500;
+}
+.btn:hover{
+  background:#5E7F1F;
+}
+
+/* ===================== PAGES ===================== */
+.page{display:none;}
+.page.active{display:block;}
+
+/* ===================== FOOTER ===================== */
+.footer{
+  margin-top:40px;
+  padding:16px;
+  text-align:center;
+  font-size:14px;
+  color: var(--text-muted);
+}
+
+/* ===================== MODAL ===================== */
+.modal{
+  position:fixed;
+  inset:0;
+  background: rgba(0,0,0,.45);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:2000;
+}
+.modal-content{
+  width:90%;
+  max-width:480px;
+  padding:26px;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+.modal-content h3{
+  font-family:"Playfair Display", serif;
+  margin-bottom:8px;
+}
+.modal-content input,
+.modal-content textarea,
+.modal-content select{
+  width:100%;
+  padding:12px;
+  border-radius:12px;
+  border:1px solid rgba(0,0,0,0.1);
+  background:#fff;
+}
+
+/* ===================== TOAST ===================== */
+.toast {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  padding: 14px 22px;
+  border-radius: 14px;
+  background: var(--glass-bg);
+  backdrop-filter: var(--blur);
+  border: 1px solid var(--glass-border);
+  font-weight: 500;
+  z-index: 5000;
+  animation: slideIn .3s ease;
+}
+.toast.success { color: var(--accent-olive); }
+.toast.error { color: #C0392B; }
+@keyframes slideIn {
+  from { transform: translateY(-10px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* ===================== GLOBAL LOADING OVERLAY ===================== */
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(3px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 6000;
+}
+.loading-overlay .spinner { margin:0; }
+.spinner {
+  width: 38px;
+  height: 38px;
+  border: 4px solid rgba(0,0,0,0.1);
+  border-top-color: var(--accent-olive);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 12px auto;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ===================== IMAGE PREVIEW ===================== */
+.preview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 70px);
+  gap: 10px;
+}
+.preview {
+  position: relative;
+}
+.preview img {
+  width: 70px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 12px;
+}
+.preview span {
+  position: absolute;
+  bottom: 4px;
+  left: 4px;
+  font-size: 9px;
+  background: var(--accent-olive);
+  color: #fff;
+  padding: 2px 6px;
+  border-radius: 8px;
+}
+.preview button {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  font-size: 10px;
+  border:none;
+  background:#C0392B;
+  color:#fff;
+  border-radius:50%;
+  width:16px;
+  height:16px;
+  cursor:pointer;
+}
+
+/* ===================== RESPONSIVE ===================== */
+@media(max-width:900px){
+  .metrics{grid-template-columns:repeat(2,1fr);}
+}
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%);}
+  .sidebar.show{transform:translateX(0);}
+  .main{margin-left:0;}
+  .hamburger{display:block;}
+}
 </style>
 </head>
-<body>
+<body> 
 
-<!-- SIDEBAR -->
-<div class="sidebar" id="sidebar">
-  <div class="logo">LuminaStore</div>
-  <nav>
-    <a href="#" class="active" data-page="dashboard"><i>🏠</i> Dashboard</a>
-    <a href="#" data-page="orders"><i>📦</i> Orders</a>
-    <a href="#" data-page="products"><i>🛍️</i> Products</a>
-    <a href="#" data-page="hero"><i>🖼️</i> Hero Images</a>
-    <a href="#" data-page="storefront"><i>🔗</i> Back to Store</a>
-  </nav>
+<div class="admin-wrapper">
+  <aside class="sidebar" id="sidebar">
+    <h2>LuminaStore</h2>
+    <ul>
+      <li class="active" onclick="showPage('dashboard', this)">Dashboard</li>
+      <li onclick="showPage('products', this)">Products</li>
+      <li onclick="showPage('orders', this)">Orders</li>
+      <li onclick="window.location.href='hero.html'">Hero Images</li>
+    </ul>
+  </aside>
+
+  <div id="overlay"></div>
+
+  <main class="main">
+    <div class="topbar glass">
+      <span class="hamburger" onclick="toggleSidebar()">☰</span>
+      <strong>LuminaStore Admin Panel</strong>
+    </div>
+
+    <!-- DASHBOARD -->
+    <section id="dashboard" class="page active">
+      <div class="metrics">
+        <div class="metric glass"><h4>Total Revenue</h4><p id="totalRevenue">₦0</p></div>
+        <div class="metric glass"><h4>Total Orders</h4><p id="totalOrders">0</p></div>
+        <div class="metric glass"><h4>Total Products</h4><p id="totalProducts">0</p></div>
+        <div class="metric glass"><h4>Avg Order Value</h4><p id="avgOrder">₦0</p></div>
+      </div>
+      <div class="glass table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Order</th>
+              <th>Customer</th>
+              <th>Status</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody id="ordersTable"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- PRODUCTS -->
+    <section id="products" class="page">
+      <div style="display:flex; justify-content:space-between; margin-bottom:18px; align-items:center;">
+        <h3 style="font-family:'Playfair Display',serif;">Products</h3>
+        <button class="btn" onclick="openModal('add')">+ Add Product</button>
+      </div>
+
+      <!-- FILTERS -->
+      <div style="display:flex; gap:12px; margin-bottom:12px;">
+        <input type="text" id="searchName" placeholder="Search by name" style="padding:8px; border-radius:12px; border:1px solid #ccc;">
+        <select id="searchCategory" style="padding:8px; border-radius:12px; border:1px solid #ccc;">
+          <option value="">All Categories</option>
+          <option>Gown</option>
+          <option>Short</option>
+          <option>Top</option>
+        </select>
+        <select id="searchFeatured" style="padding:8px; border-radius:12px; border:1px solid #ccc;">
+          <option value="">All</option>
+          <option value="true">Featured</option>
+          <option value="false">Not Featured</option>
+        </select>
+        <button class="btn" onclick="applyProductFilter()">Filter</button>
+      </div>
+
+      <div class="glass table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Images</th>
+              <th>Name</th>
+              <th>Category</th>
+              <th>Price</th>
+              <th>Quantity</th>
+              <th>Featured</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="productsTable"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ORDERS -->
+    <section id="orders" class="page">
+      <div class="glass table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Order</th>
+              <th>Date</th>
+              <th>Status</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody id="ordersList"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <div class="footer glass">← Back to Store</div>
+  </main>
 </div>
 
-<!-- TOPBAR MOBILE -->
-<div class="topbar">
-  <div>LuminaStore Admin</div>
-  <div class="hamburger" id="hamburger">≡</div>
+<!-- MODAL -->
+<div class="modal" id="modal">
+  <div class="modal-content glass">
+    <h3 id="modalTitle">Add Product</h3>
+    <input type="text" id="productName" placeholder="Product Name">
+    <input type="number" id="productPrice" placeholder="Price">
+    <input type="number" id="productQuantity" placeholder="Quantity">
+    <select id="productCategory">
+      <option>Gown</option>
+      <option>Short</option>
+      <option>Top</option>
+    </select>
+    <textarea id="productDescription" placeholder="Description"></textarea>
+    <label>
+      <input type="checkbox" id="productFeatured"> Featured Product
+    </label>
+    <input type="number" id="imageCount" placeholder="Number of images (min 1)" min="1" max="5">
+    <div id="imageInputs"></div>
+    <div id="imagePreview" class="preview-grid"></div>
+    <button class="btn" id="modalBtn">Create Product</button>
+    <button class="btn" style="background:#ccc;color:#333;" onclick="closeModal()">Cancel</button>
+  </div>
 </div>
 
-<!-- MAIN CONTENT -->
-<div class="main" id="mainContent">
-  <div id="dashboardPage" class="page">
-    <h1 style="font-family:'Playfair Display', serif; color:#004D40; text-shadow:0 1px 2px rgba(0,0,0,0.2);">Dashboard</h1>
-    <div class="cards-container">
-      <div class="card">
-        <h2>Total Orders</h2>
-        <p>120</p>
-      </div>
-      <div class="card">
-        <h2>Total Products</h2>
-        <p>45</p>
-      </div>
-      <div class="card">
-        <h2>Revenue</h2>
-        <p>$12,450</p>
-      </div>
-    </div>
-  </div>
-
-  <div id="ordersPage" class="page" style="display:none">
-    <h1 style="font-family:'Playfair Display', serif; color:#004D40; text-shadow:0 1px 2px rgba(0,0,0,0.2);">Orders</h1>
-    <div class="cards-container">
-      <div class="card">
-        <h2>Order #001</h2>
-        <p>Items: 3</p>
-        <p>Total: $150</p>
-        <span style="color:#D4AF37;">Pending</span>
-      </div>
-      <div class="card">
-        <h2>Order #002</h2>
-        <p>Items: 1</p>
-        <p>Total: $80</p>
-        <span style="color:#004D40;">Paid</span>
-      </div>
-    </div>
-  </div>
-
-  <div id="productsPage" class="page" style="display:none">
-    <h1 style="font-family:'Playfair Display', serif; color:#004D40; text-shadow:0 1px 2px rgba(0,0,0,0.2);">Products</h1>
-    <button class="btn">+ Add Product</button>
-    <div class="cards-container">
-      <div class="card">
-        <h2>Product 1</h2>
-        <p>Category: Electronics</p>
-        <p>Price: $99.99</p>
-      </div>
-      <div class="card">
-        <h2>Product 2</h2>
-        <p>Category: Clothing</p>
-        <p>Price: $45.00</p>
-      </div>
-    </div>
-  </div>
-
-  <div id="heroPage" class="page" style="display:none">
-    <h1 style="font-family:'Playfair Display', serif; color:#004D40; text-shadow:0 1px 2px rgba(0,0,0,0.2);">Hero Images</h1>
-    <button class="btn">+ Add Hero</button>
-    <div class="cards-container">
-      <div class="card">
-        <img src="https://via.placeholder.com/150" alt="Hero Image" style="width:100%; border-radius:10px; margin-bottom:10px;">
-        <h2>Summer Sale</h2>
-        <p>Status: Active</p>
-      </div>
-      <div class="card">
-        <img src="https://via.placeholder.com/150" alt="Hero Image" style="width:100%; border-radius:10px; margin-bottom:10px;">
-        <h2>New Arrivals</h2>
-        <p>Status: Inactive</p>
-      </div>
-    </div>
-  </div>
+<div id="loadingOverlay" class="loading-overlay">
+  <div class="spinner"></div>
 </div>
 
 <script>
-  // Sidebar toggle for mobile
-  const sidebar = document.getElementById('sidebar');
-  const hamburger = document.getElementById('hamburger');
-  hamburger.addEventListener('click', () => {
-    sidebar.classList.toggle('hide');
+const API_BASE = 'https://maison-90o3.onrender.com';
+
+const sidebar = document.getElementById("sidebar");
+const modal = document.getElementById("modal");
+const modalBtn = document.getElementById("modalBtn");
+const overlay = document.getElementById("overlay");
+const imagePreview = document.getElementById("imagePreview");
+const modalTitle = document.getElementById("modalTitle");
+const loadingOverlay = document.getElementById("loadingOverlay");
+
+let editProductId = null;
+let allProducts = []; // for filtering
+let existingImages = []; // for editing
+
+/* ===================== SIDEBAR ===================== */
+function toggleSidebar(){  
+  sidebar.classList.toggle("show");  
+  overlay.classList.toggle("show");  
+}
+overlay.addEventListener("click", ()=>{  
+  sidebar.classList.remove("show");  
+  overlay.classList.remove("show");  
+});
+function showPage(id, el){  
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));  
+  document.getElementById(id).classList.add("active");  
+  document.querySelectorAll(".sidebar li").forEach(li=>li.classList.remove("active"));  
+  el.classList.add("active");  
+  sidebar.classList.remove("show");  
+  overlay.classList.remove("show");  
+}
+
+/* ===================== MODAL ===================== */
+function openModal(mode = 'add', product = {}) {
+  modal.style.display = "flex";
+  editProductId = null;
+  existingImages = product.images || [];
+
+  document.getElementById("productName").value = product.name || '';
+  document.getElementById("productPrice").value = product.price || '';
+  document.getElementById("productQuantity").value = product.quantity || '';
+  document.getElementById("productCategory").value = product.category || 'Gown';
+  document.getElementById("productDescription").value = product.description || '';
+  document.getElementById("productFeatured").checked = product.featured || false;
+  document.getElementById("imageCount").value = '';
+  document.getElementById("imageInputs").innerHTML = '';
+  imagePreview.innerHTML = '';
+
+  if (existingImages.length) {
+    renderExistingImages();
+  }
+
+  if (mode === 'edit') {
+    editProductId = product._id;
+    modalTitle.innerText = 'Edit Product';
+    modalBtn.innerText = 'Save Changes';
+  } else {
+    modalTitle.innerText = 'Add Product';
+    modalBtn.innerText = 'Create Product';
+  }
+}
+
+function closeModal() {
+  modal.style.display = "none";
+  editProductId = null;
+  existingImages = [];
+}
+
+/* ===================== LOADING ===================== */
+function showLoading() {
+  loadingOverlay.style.display = "flex";
+  modal.querySelectorAll("input, textarea, select, button")
+    .forEach(el => el.disabled = true);
+}
+function hideLoading() {
+  loadingOverlay.style.display = "none";
+  modal.querySelectorAll("input, textarea, select, button")
+    .forEach(el => el.disabled = false);
+}
+
+/* ===================== TOAST ===================== */
+function toast(msg, type='success'){
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(), 3000);
+}
+
+/* ===================== IMAGE INPUTS ===================== */
+document.getElementById("imageCount").addEventListener("input", e => {
+  const count = +e.target.value;
+  const inputs = document.getElementById("imageInputs");
+  inputs.innerHTML = '';
+  for(let i=0;i<count;i++){
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.onchange = previewNewImages;
+    inputs.appendChild(input);
+  }
+});
+
+function renderExistingImages(){
+  imagePreview.innerHTML = '';
+  existingImages.forEach((imgUrl, idx) => {
+    const div = document.createElement("div");
+    div.className = "preview";
+    div.innerHTML = `
+      <img src="${imgUrl}" alt="product-${idx}">
+      <button onclick="removeExistingImage(${idx})">×</button>
+    `;
+    imagePreview.appendChild(div);
+  });
+}
+
+function removeExistingImage(idx){
+  existingImages.splice(idx, 1);
+  renderExistingImages();
+}
+
+function previewNewImages(e){
+  const files = e.target.files;
+  Array.from(files).forEach(file => {
+    const reader = new FileReader();
+    reader.onload = function(evt){
+      const div = document.createElement("div");
+      div.className = "preview";
+      div.innerHTML = `<img src="${evt.target.result}">`;
+      imagePreview.appendChild(div);
+    }
+    reader.readAsDataURL(file);
+  });
+}
+
+/* ===================== PRODUCT FILTER ===================== */
+function applyProductFilter(){
+  const nameFilter = document.getElementById("searchName").value.toLowerCase();
+  const categoryFilter = document.getElementById("searchCategory").value;
+  const featuredFilter = document.getElementById("searchFeatured").value;
+
+  let filtered = allProducts.filter(p=>{
+    return (!nameFilter || p.name.toLowerCase().includes(nameFilter))
+      && (!categoryFilter || p.category === categoryFilter)
+      && (!featuredFilter || String(p.featured) === featuredFilter);
   });
 
-  // Navigation
-  const navLinks = document.querySelectorAll('.sidebar nav a');
-  const pages = document.querySelectorAll('.page');
-  navLinks.forEach(link => {
-    link.addEventListener('click', (e) => {
-      e.preventDefault();
-      const page = link.dataset.page + 'Page';
-      pages.forEach(p => p.style.display = 'none');
-      const activePage = document.getElementById(page);
-      if(activePage) activePage.style.display = 'block';
+  renderProducts(filtered);
+}
 
-      navLinks.forEach(l => l.classList.remove('active'));
-      link.classList.add('active');
-
-      // Hide sidebar on mobile after click
-      if(window.innerWidth <= 768) sidebar.classList.add('hide');
-    });
+/* ===================== RENDER TABLES ===================== */
+function renderProducts(products){
+  const tbody = document.getElementById("productsTable");
+  tbody.innerHTML = '';
+  products.forEach(p=>{
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${p.images.map(img=>`<img src="${img}" width="50" style="border-radius:8px;">`).join(' ')}</td>
+      <td>${p.name}</td>
+      <td>${p.category}</td>
+      <td>₦${p.price}</td>
+      <td>${p.quantity}</td>
+      <td>${p.featured ? 'Yes' : 'No'}</td>
+      <td>
+        <button class="btn" onclick='openModal("edit", ${JSON.stringify(p)})'>Edit</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
   });
+}
+
+function renderOrders(orders){
+  const tbody = document.getElementById("ordersTable");
+  tbody.innerHTML = '';
+  orders.forEach(o=>{
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${o.orderId}</td>
+      <td>${o.customer}</td>
+      <td>${o.status}</td>
+      <td>₦${o.total}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+/* ===================== INIT ===================== */
+async function initDashboard(){
+  showLoading();
+  try{
+    // Fetch products
+    const resP = await fetch(`${API_BASE}/products`);
+    allProducts = await resP.json();
+    renderProducts(allProducts);
+
+    // Fetch orders
+    const resO = await fetch(`${API_BASE}/orders`);
+    const orders = await resO.json();
+    renderOrders(orders);
+
+    // Metrics
+    document.getElementById("totalProducts").innerText = allProducts.length;
+    document.getElementById("totalOrders").innerText = orders.length;
+    const totalRevenue = orders.reduce((a,b)=>a+b.total,0);
+    document.getElementById("totalRevenue").innerText = `₦${totalRevenue}`;
+    document.getElementById("avgOrder").innerText = `₦${orders.length?Math.round(totalRevenue/orders.length):0}`;
+  }catch(err){
+    console.error(err);
+    toast('Failed to load data', 'error');
+  }finally{
+    hideLoading();
+  }
+}
+
+window.addEventListener('DOMContentLoaded', initDashboard);
 </script>
 
 </body>
