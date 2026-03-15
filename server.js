@@ -374,6 +374,17 @@ app.get('/api/paystack/verify/:reference', async (req, res) => {
   }
 });
 
+// GET ORDERS
+// ---- Get All Orders ----
+app.get('/api/orders', async (req,res)=>{
+  try{
+    const orders = await Order.find().sort({ createdAt: -1 });
+    res.json(orders);
+  }catch(err){
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 // =====================
 // Start Server
 // =====================
