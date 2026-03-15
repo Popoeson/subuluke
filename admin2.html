@@ -325,6 +325,46 @@ color:var(--accent);
 cursor:pointer;
 }
 
+/* HEADER LEFT */
+
+.header-left{
+display:flex;
+align-items:center;
+gap:16px;
+}
+
+/* HAMBURGER */
+
+.hamburger{
+font-size:22px;
+cursor:pointer;
+display:none;
+}
+
+/* MOBILE SIDEBAR */
+
+@media (max-width:900px){
+
+.hamburger{
+display:block;
+}
+
+.sidebar{
+transform:translateX(-100%);
+transition:0.3s;
+z-index:1500;
+}
+
+.sidebar.show{
+transform:translateX(0);
+}
+
+.main{
+margin-left:0;
+padding:90px 20px 40px;
+}
+
+}
 </style>
 </head>
 
@@ -335,7 +375,13 @@ cursor:pointer;
 
 <div class="header">
 
+<div class="header-left">
+
+<div class="hamburger" onclick="toggleSidebar()">☰</div>
+
 <div class="logo">Subuluke Admin</div>
+
+</div>
 
 <div class="header-right">
 
@@ -344,7 +390,6 @@ cursor:pointer;
 </div>
 
 </div>
-
 
 <!-- SIDEBAR -->
 
@@ -550,6 +595,31 @@ cursor:pointer;
 
 
 <script>
+
+/* =====================
+SIDEBAR TOGGLE (MOBILE)
+===================== */
+
+function toggleSidebar(){
+document.querySelector(".sidebar").classList.toggle("show");
+}
+
+// CLOSE SIDEBAR 
+navItems.forEach(item=>{
+item.onclick=()=>{
+
+navItems.forEach(i=>i.classList.remove("active"));
+item.classList.add("active");
+
+sections.forEach(s=>s.classList.remove("active"));
+document.getElementById(item.dataset.target).classList.add("active");
+
+/* close sidebar on mobile */
+
+document.querySelector(".sidebar").classList.remove("show");
+
+};
+});
 
 /* =====================
 THEME TOGGLE
