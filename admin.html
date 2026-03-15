@@ -459,222 +459,356 @@ tr:not(:last-child){
 </div>
 
 <script>
-const API_BASE = 'https://subuluke.onrender.com';
+
+const API_BASE = "https://subuluke.onrender.com";
 
 const sidebar = document.getElementById("sidebar");
+const overlay = document.getElementById("overlay");
 const modal = document.getElementById("modal");
 const modalBtn = document.getElementById("modalBtn");
-const overlay = document.getElementById("overlay");
-const imagePreview = document.getElementById("imagePreview");
 const modalTitle = document.getElementById("modalTitle");
+const imagePreview = document.getElementById("imagePreview");
 const loadingOverlay = document.getElementById("loadingOverlay");
 
+let allProducts = [];
 let editProductId = null;
-let allProducts = []; // for filtering
-let existingImages = []; // for editing
 
-/* ===================== SIDEBAR ===================== */
-function toggleSidebar(){  
-  sidebar.classList.toggle("show");  
-  overlay.classList.toggle("show");  
-}
-overlay.addEventListener("click", ()=>{  
-  sidebar.classList.remove("show");  
-  overlay.classList.remove("show");  
-});
-function showPage(id, el){  
-  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));  
-  document.getElementById(id).classList.add("active");  
-  document.querySelectorAll(".sidebar li").forEach(li=>li.classList.remove("active"));  
-  el.classList.add("active");  
-  sidebar.classList.remove("show");  
-  overlay.classList.remove("show");  
+/* ================= SIDEBAR ================= */
+
+function toggleSidebar(){
+  sidebar.classList.toggle("show");
+  overlay.classList.toggle("show");
 }
 
-/* ===================== MODAL ===================== */
-function openModal(mode = 'add', product = {}) {
-  modal.style.display = "flex";
-  editProductId = null;
-  existingImages = product.images || [];
+overlay.onclick = ()=>{
+  sidebar.classList.remove("show");
+  overlay.classList.remove("show");
+};
 
-  document.getElementById("productName").value = product.name || '';
-  document.getElementById("productPrice").value = product.price || '';
-  document.getElementById("productQuantity").value = product.quantity || '';
-  document.getElementById("productCategory").value = product.category || 'Gown';
-  document.getElementById("productDescription").value = product.description || '';
-  document.getElementById("productFeatured").checked = product.featured || false;
-  document.getElementById("imageCount").value = '';
-  document.getElementById("imageInputs").innerHTML = '';
-  imagePreview.innerHTML = '';
+function showPage(id, el){
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
 
-  if (existingImages.length) {
-    renderExistingImages();
-  }
+  document.querySelectorAll(".sidebar li").forEach(li=>li.classList.remove("active"));
+  el.classList.add("active");
 
-  if (mode === 'edit') {
-    editProductId = product._id;
-    modalTitle.innerText = 'Edit Product';
-    modalBtn.innerText = 'Save Changes';
-  } else {
-    modalTitle.innerText = 'Add Product';
-    modalBtn.innerText = 'Create Product';
-  }
+  sidebar.classList.remove("show");
+  overlay.classList.remove("show");
 }
 
-function closeModal() {
-  modal.style.display = "none";
-  editProductId = null;
-  existingImages = [];
+/* ================= LOADING ================= */
+
+function showLoading(){
+  loadingOverlay.style.display="flex";
 }
 
-/* ===================== LOADING ===================== */
-function showLoading() {
-  loadingOverlay.style.display = "flex";
-  modal.querySelectorAll("input, textarea, select, button")
-    .forEach(el => el.disabled = true);
-}
-function hideLoading() {
-  loadingOverlay.style.display = "none";
-  modal.querySelectorAll("input, textarea, select, button")
-    .forEach(el => el.disabled = false);
+function hideLoading(){
+  loadingOverlay.style.display="none";
 }
 
-/* ===================== TOAST ===================== */
-function toast(msg, type='success'){
-  const t = document.createElement('div');
-  t.className = `toast ${type}`;
-  t.textContent = msg;
+/* ================= TOAST ================= */
+
+function toast(msg,type="success"){
+  const t=document.createElement("div");
+  t.className=`toast ${type}`;
+  t.textContent=msg;
   document.body.appendChild(t);
-  setTimeout(()=>t.remove(), 3000);
+  setTimeout(()=>t.remove(),3000);
 }
 
-/* ===================== IMAGE INPUTS ===================== */
-document.getElementById("imageCount").addEventListener("input", e => {
-  const count = +e.target.value;
-  const inputs = document.getElementById("imageInputs");
-  inputs.innerHTML = '';
+/* ================= MODAL ================= */
+
+function openModal(mode="add",product={}){
+
+  modal.style.display="flex";
+
+  document.getElementById("productName").value=product.name||"";
+  document.getElementById("productPrice").value=product.price||"";
+  document.getElementById("productQuantity").value=product.quantity||"";
+  document.getElementById("productCategory").value=product.category||"Gown";
+  document.getElementById("productDescription").value=product.description||"";
+  document.getElementById("productFeatured").checked=product.featured||false;
+
+  document.getElementById("imageInputs").innerHTML="";
+  imagePreview.innerHTML="";
+
+  if(mode==="edit"){
+    modalTitle.innerText="Edit Product";
+    modalBtn.innerText="Save Changes";
+    editProductId=product._id;
+
+    const images=[product.mainImage,...(product.otherImages||[])];
+
+    images.forEach(img=>{
+      const div=document.createElement("div");
+      div.className="preview";
+      div.innerHTML=`<img src="${img}">`;
+      imagePreview.appendChild(div);
+    });
+
+  }else{
+    modalTitle.innerText="Add Product";
+    modalBtn.innerText="Create Product";
+    editProductId=null;
+  }
+
+}
+
+function closeModal(){
+  modal.style.display="none";
+}
+
+/* ================= IMAGE INPUTS ================= */
+
+document.getElementById("imageCount").addEventListener("input",e=>{
+  const count=+e.target.value;
+  const container=document.getElementById("imageInputs");
+
+  container.innerHTML="";
+
   for(let i=0;i<count;i++){
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = "image/*";
-    input.onchange = previewNewImages;
-    inputs.appendChild(input);
+    const input=document.createElement("input");
+    input.type="file";
+    input.accept="image/*";
+
+    input.onchange=(ev)=>{
+
+      const file=ev.target.files[0];
+      const reader=new FileReader();
+
+      reader.onload=function(evt){
+
+        const div=document.createElement("div");
+        div.className="preview";
+        div.innerHTML=`<img src="${evt.target.result}">`;
+
+        imagePreview.appendChild(div);
+
+      };
+
+      reader.readAsDataURL(file);
+
+    };
+
+    container.appendChild(input);
   }
 });
 
-function renderExistingImages(){
-  imagePreview.innerHTML = '';
-  existingImages.forEach((imgUrl, idx) => {
-    const div = document.createElement("div");
-    div.className = "preview";
-    div.innerHTML = `
-      <img src="${imgUrl}" alt="product-${idx}">
-      <button onclick="removeExistingImage(${idx})">×</button>
-    `;
-    imagePreview.appendChild(div);
-  });
-}
+/* ================= CREATE / UPDATE PRODUCT ================= */
 
-function removeExistingImage(idx){
-  existingImages.splice(idx, 1);
-  renderExistingImages();
-}
+modalBtn.addEventListener("click",async()=>{
 
-function previewNewImages(e){
-  const files = e.target.files;
-  Array.from(files).forEach(file => {
-    const reader = new FileReader();
-    reader.onload = function(evt){
-      const div = document.createElement("div");
-      div.className = "preview";
-      div.innerHTML = `<img src="${evt.target.result}">`;
-      imagePreview.appendChild(div);
+  const name=document.getElementById("productName").value;
+  const price=document.getElementById("productPrice").value;
+  const quantity=document.getElementById("productQuantity").value;
+  const category=document.getElementById("productCategory").value;
+  const description=document.getElementById("productDescription").value;
+  const featured=document.getElementById("productFeatured").checked;
+
+  const files=document.querySelectorAll("#imageInputs input");
+
+  const formData=new FormData();
+
+  formData.append("name",name);
+  formData.append("price",price);
+  formData.append("quantity",quantity);
+  formData.append("category",category);
+  formData.append("description",description);
+  formData.append("featured",featured);
+
+  files.forEach(f=>{
+    if(f.files[0]){
+      formData.append("images",f.files[0]);
     }
-    reader.readAsDataURL(file);
   });
+
+  try{
+
+    showLoading();
+
+    let url=`${API_BASE}/api/products`;
+    let method="POST";
+
+    if(editProductId){
+      url=`${API_BASE}/api/products/${editProductId}`;
+      method="PUT";
+    }
+
+    const res=await fetch(url,{
+      method:method,
+      body:formData
+    });
+
+    if(!res.ok) throw new Error();
+
+    toast("Product saved");
+
+    closeModal();
+    initDashboard();
+
+  }catch(err){
+
+    toast("Failed to save product","error");
+
+  }finally{
+
+    hideLoading();
+
+  }
+
+});
+
+/* ================= DELETE PRODUCT ================= */
+
+async function deleteProduct(id){
+
+  if(!confirm("Delete this product?")) return;
+
+  try{
+
+    await fetch(`${API_BASE}/api/products/${id}`,{
+      method:"DELETE"
+    });
+
+    toast("Product deleted");
+
+    initDashboard();
+
+  }catch{
+
+    toast("Delete failed","error");
+
+  }
+
 }
 
-/* ===================== PRODUCT FILTER ===================== */
-function applyProductFilter(){
-  const nameFilter = document.getElementById("searchName").value.toLowerCase();
-  const categoryFilter = document.getElementById("searchCategory").value;
-  const featuredFilter = document.getElementById("searchFeatured").value;
+/* ================= FILTER ================= */
 
-  let filtered = allProducts.filter(p=>{
-    return (!nameFilter || p.name.toLowerCase().includes(nameFilter))
-      && (!categoryFilter || p.category === categoryFilter)
-      && (!featuredFilter || String(p.featured) === featuredFilter);
+function applyProductFilter(){
+
+  const name=document.getElementById("searchName").value.toLowerCase();
+  const category=document.getElementById("searchCategory").value;
+  const featured=document.getElementById("searchFeatured").value;
+
+  const filtered=allProducts.filter(p=>{
+
+    return (!name || p.name.toLowerCase().includes(name))
+    && (!category || p.category===category)
+    && (!featured || String(p.featured)===featured);
+
   });
 
   renderProducts(filtered);
+
 }
 
-/* ===================== RENDER TABLES ===================== */
+/* ================= RENDER PRODUCTS ================= */
+
 function renderProducts(products){
-  const tbody = document.getElementById("productsTable");
-  tbody.innerHTML = '';
+
+  const tbody=document.getElementById("productsTable");
+
+  tbody.innerHTML="";
+
   products.forEach(p=>{
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td>${p.images.map(img=>`<img src="${img}" width="50" style="border-radius:8px;">`).join(' ')}</td>
-      <td>${p.name}</td>
-      <td>${p.category}</td>
-      <td>₦${p.price}</td>
-      <td>${p.quantity}</td>
-      <td>${p.featured ? 'Yes' : 'No'}</td>
-      <td>
-        <button class="btn" onclick='openModal("edit", ${JSON.stringify(p)})'>Edit</button>
-      </td>
+
+    const tr=document.createElement("tr");
+
+    const other=(p.otherImages||[])
+      .map(img=>`<img src="${img}" width="40">`)
+      .join("");
+
+    tr.innerHTML=`
+    <td>
+      <img src="${p.mainImage}" width="40">
+      ${other}
+    </td>
+    <td>${p.name}</td>
+    <td>${p.category}</td>
+    <td>₦${p.price}</td>
+    <td>${p.quantity}</td>
+    <td>${p.featured?"Yes":"No"}</td>
+    <td>
+      <button class="btn" onclick='openModal("edit",${JSON.stringify(p)})'>Edit</button>
+      <button class="btn" style="background:#C0392B" onclick="deleteProduct('${p._id}')">Delete</button>
+    </td>
     `;
+
     tbody.appendChild(tr);
+
   });
+
 }
+
+/* ================= RENDER ORDERS ================= */
 
 function renderOrders(orders){
-  const tbody = document.getElementById("ordersTable");
-  tbody.innerHTML = '';
+
+  const tbody=document.getElementById("ordersTable");
+
+  tbody.innerHTML="";
+
   orders.forEach(o=>{
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
+
+    const tr=document.createElement("tr");
+
+    tr.innerHTML=`
       <td>${o.orderId}</td>
-      <td>${o.customer}</td>
+      <td>${o.customer?.name || ""}</td>
       <td>${o.status}</td>
-      <td>₦${o.total}</td>
+      <td>₦${o.amount}</td>
     `;
+
     tbody.appendChild(tr);
+
   });
+
 }
 
-/* ===================== INIT ===================== */
+/* ================= INIT ================= */
+
 async function initDashboard(){
-  showLoading();
+
   try{
-    // Fetch products
-    const resP = await fetch(`${API_BASE}/products`);
-    allProducts = await resP.json();
+
+    showLoading();
+
+    const resP=await fetch(`${API_BASE}/api/products`);
+    allProducts=await resP.json();
+
     renderProducts(allProducts);
 
-    // Fetch orders
-    const resO = await fetch(`${API_BASE}/orders`);
-    const orders = await resO.json();
+    const resO=await fetch(`${API_BASE}/api/orders`);
+    const orders=await resO.json();
+
     renderOrders(orders);
 
-    // Metrics
-    document.getElementById("totalProducts").innerText = allProducts.length;
-    document.getElementById("totalOrders").innerText = orders.length;
-    const totalRevenue = orders.reduce((a,b)=>a+b.total,0);
-    document.getElementById("totalRevenue").innerText = `₦${totalRevenue}`;
-    document.getElementById("avgOrder").innerText = `₦${orders.length?Math.round(totalRevenue/orders.length):0}`;
+    document.getElementById("totalProducts").innerText=allProducts.length;
+    document.getElementById("totalOrders").innerText=orders.length;
+
+    const revenue=orders.reduce((a,b)=>a+b.amount,0);
+
+    document.getElementById("totalRevenue").innerText=`₦${revenue}`;
+
+    document.getElementById("avgOrder").innerText=
+      `₦${orders.length?Math.round(revenue/orders.length):0}`;
+
   }catch(err){
+
     console.error(err);
-    toast('Failed to load data', 'error');
+
+    toast("Failed to load data","error");
+
   }finally{
+
     hideLoading();
+
   }
+
 }
 
-window.addEventListener('DOMContentLoaded', initDashboard);
-</script>
+window.addEventListener("DOMContentLoaded",initDashboard);
 
+</script>
 </body>
 </html>
