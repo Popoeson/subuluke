@@ -491,46 +491,57 @@ padding:90px 20px 40px;
 </div>
 
 
-
 <!-- PRODUCTS -->
 
 <div id="products" class="section">
 
-<h1 class="page-title">Products</h1>
+  <h1 class="page-title">Products</h1>
 
-<button class="btn" onclick="openModal()">+ Add Product</button>
+  <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:16px;">
+    <button class="btn" onclick="openModal()">+ Add Product</button>
 
-<div class="table-card">
+    <!-- Search -->
+    <input type="text" id="productSearch" placeholder="Search products..." 
+           style="padding:8px; border:1px solid var(--border); border-radius:6px; flex:1; min-width:150px;">
 
-<div class="table-wrapper">
+    <!-- Category Filter -->
+    <select id="categoryFilter" style="padding:8px; border:1px solid var(--border); border-radius:6px;">
+      <option value="all">All Categories</option>
+      <option value="Clothing">Clothing</option>
+      <option value="Shoes">Shoes</option>
+      <option value="Accessories">Accessories</option>
+    </select>
 
-<table id="productTable">
+    <!-- Featured Filter -->
+    <select id="featuredFilter" style="padding:8px; border:1px solid var(--border); border-radius:6px;">
+      <option value="all">All Products</option>
+      <option value="Yes">Featured</option>
+      <option value="No">Not Featured</option>
+    </select>
+  </div>
 
-<thead>
-<tr>
-<th>Image</th>
-<th>Name</th>
-<th>Category</th>
-<th>Price</th>
-<th>Status</th>
-<th>Featured</th>
-<th>Actions</th>
-</tr>
-</thead>
-
-<tbody>
-
-</tbody>
-
-</table>
+  <div class="table-card">
+    <div class="table-wrapper">
+      <table id="productTable">
+        <thead>
+          <tr>
+            <th>Image</th>
+            <th>Name</th>
+            <th>Category</th>
+            <th>Price</th>
+            <th>Status</th>
+            <th>Featured</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Products will be added here dynamically -->
+        </tbody>
+      </table>
+    </div>
+  </div>
 
 </div>
-
-</div>
-
-</div>
-
-
 
 <!-- ORDERS -->
 
@@ -762,6 +773,43 @@ function editProduct(el){
   // Remove the old row on save
   document.getElementById("productModal").dataset.editing = row.rowIndex;
 }
+
+/* =====================
+PRODUCT FILTER & SEARCH
+===================== */
+
+const searchInput = document.getElementById("productSearch");
+const categoryFilter = document.getElementById("categoryFilter");
+const featuredFilter = document.getElementById("featuredFilter");
+
+function filterProducts() {
+  const searchTerm = searchInput.value.toLowerCase();
+  const categoryTerm = categoryFilter.value;
+  const featuredTerm = featuredFilter.value;
+
+  const rows = document.querySelectorAll("#productTable tbody tr");
+
+  rows.forEach(row => {
+    const name = row.children[1].textContent.toLowerCase();
+    const category = row.children[2].textContent;
+    const featured = row.children[5].textContent;
+
+    const matchesSearch = name.includes(searchTerm);
+    const matchesCategory = categoryTerm === "all" || category === categoryTerm;
+    const matchesFeatured = featuredTerm === "all" || featured === featuredTerm;
+
+    if(matchesSearch && matchesCategory && matchesFeatured){
+      row.style.display = "";
+    } else {
+      row.style.display = "none";
+    }
+  });
+}
+
+// Event listeners
+searchInput.addEventListener("input", filterProducts);
+categoryFilter.addEventListener("change", filterProducts);
+featuredFilter.addEventListener("change", filterProducts);
 </script>
 </body>
 </html>
