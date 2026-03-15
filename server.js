@@ -332,7 +332,7 @@ app.get('/api/paystack/verify/:reference', async (req, res) => {
     if (data.status === "success") {
 
       // Generate MAISON Order ID
-      const orderId = `MAISON-${Date.now()}`;
+      const orderId = `ORD-${Date.now()}`;
 
       // Extract metadata sent during initialize
       const metadata = data.metadata || {};
