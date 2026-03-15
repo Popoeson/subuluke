@@ -12,7 +12,7 @@ const axios = require('axios');
 
 const app = express();
 const corsOptions = {
-  origin: "https://maison-puce.vercel.app", // frontend domain
+  origin: "https://subuluke.vercel.app", // frontend domain
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   credentials: true, // if sending cookies/auth headers
 };
