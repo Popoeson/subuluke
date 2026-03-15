@@ -11,15 +11,14 @@
 <style>
 :root{
   /* ===== COLORS ===== */
-  --bg-main: #111111;          /* Deep charcoal background */
-  --bg-card: #1c1c1c;          /* Slightly lighter card background */
+  --bg-main: #111111;
+  --bg-card: #1c1c1c;
   --bg-overlay: rgba(0,0,0,0.55);
-  --text-primary: #e0e0e0;     /* Light gray text */
-  --text-muted: #9ca3af;       /* Dimmed secondary text */
-  --accent-gold: #fbbf24;      /* Warm gold accent */
-  --accent-green: #22c55e;     /* Live status indicator */
+  --text-primary: #e0e0e0;
+  --text-muted: #9ca3af;
+  --accent-gold: #fbbf24;
+  --accent-green: #22c55e;
   --border-dark: #222222;
-  --blur: blur(12px);
   --btn-hover: #f59e0b;
 }
 
@@ -364,7 +363,7 @@ tr:hover{
 
 <!-- MODAL -->
 <div class="modal" id="modal">
-  <div class="modal-content glass">
+  <div class="modal-content glass" id="modalContent">
     <h3 id="modalTitle">Add Product</h3>
     <input type="text" id="productName" placeholder="Product Name">
     <input type="number" id="productPrice" placeholder="Price">
@@ -391,12 +390,12 @@ tr:hover{
 </div>
 
 <script>
-
 const API_BASE = "https://subuluke.onrender.com";
 
 const sidebar = document.getElementById("sidebar");
 const overlay = document.getElementById("overlay");
 const modal = document.getElementById("modal");
+const modalContent = document.getElementById("modalContent");
 const modalBtn = document.getElementById("modalBtn");
 const modalTitle = document.getElementById("modalTitle");
 const imagePreview = document.getElementById("imagePreview");
@@ -406,7 +405,6 @@ let allProducts = [];
 let editProductId = null;
 
 /* ================= SIDEBAR ================= */
-
 function toggleSidebar(){
   sidebar.classList.toggle("show");
   overlay.classList.toggle("show");
@@ -429,17 +427,10 @@ function showPage(id, el){
 }
 
 /* ================= LOADING ================= */
-
-function showLoading(){
-  loadingOverlay.style.display="flex";
-}
-
-function hideLoading(){
-  loadingOverlay.style.display="none";
-}
+function showLoading(){ loadingOverlay.style.display="flex"; }
+function hideLoading(){ loadingOverlay.style.display="none"; }
 
 /* ================= TOAST ================= */
-
 function toast(msg,type="success"){
   const t=document.createElement("div");
   t.className=`toast ${type}`;
@@ -449,98 +440,88 @@ function toast(msg,type="success"){
 }
 
 /* ================= MODAL ================= */
-
-function openModal(mode="add",product={}){
-
+function openModal(mode="add", product={}){
   modal.style.display="flex";
 
-  document.getElementById("productName").value=product.name||"";
-  document.getElementById("productPrice").value=product.price||"";
-  document.getElementById("productQuantity").value=product.quantity||"";
-  document.getElementById("productCategory").value=product.category||"Gown";
-  document.getElementById("productDescription").value=product.description||"";
-  document.getElementById("productFeatured").checked=product.featured||false;
+  document.getElementById("productName").value = product.name || "";
+  document.getElementById("productPrice").value = product.price || "";
+  document.getElementById("productQuantity").value = product.quantity || "";
+  document.getElementById("productCategory").value = product.category || "Gown";
+  document.getElementById("productDescription").value = product.description || "";
+  document.getElementById("productFeatured").checked = product.featured || false;
 
-  document.getElementById("imageInputs").innerHTML="";
-  imagePreview.innerHTML="";
+  document.getElementById("imageInputs").innerHTML = "";
+  imagePreview.innerHTML = "";
 
-  if(mode==="edit"){
-    modalTitle.innerText="Edit Product";
-    modalBtn.innerText="Save Changes";
-    editProductId=product._id;
+  if(mode === "edit"){
+    modalTitle.innerText = "Edit Product";
+    modalBtn.innerText = "Save Changes";
+    editProductId = product._id;
 
-    const images=[product.mainImage,...(product.otherImages||[])];
-
+    const images = [product.mainImage, ...(product.otherImages||[])];
     images.forEach(img=>{
       const div=document.createElement("div");
       div.className="preview";
       div.innerHTML=`<img src="${img}">`;
       imagePreview.appendChild(div);
     });
-
   }else{
-    modalTitle.innerText="Add Product";
-    modalBtn.innerText="Create Product";
-    editProductId=null;
+    modalTitle.innerText = "Add Product";
+    modalBtn.innerText = "Create Product";
+    editProductId = null;
   }
-
 }
 
-function closeModal(){
-  modal.style.display="none";
-}
+function closeModal(){ modal.style.display="none"; }
+
+/* Close modal when clicking outside */
+modal.addEventListener("click", e => {
+  if(!modalContent.contains(e.target)) closeModal();
+});
+
+/* Close modal on Escape */
+document.addEventListener("keydown", e => {
+  if(e.key === "Escape") closeModal();
+});
 
 /* ================= IMAGE INPUTS ================= */
-
-document.getElementById("imageCount").addEventListener("input",e=>{
-  const count=+e.target.value;
-  const container=document.getElementById("imageInputs");
-
-  container.innerHTML="";
+document.getElementById("imageCount").addEventListener("input", e=>{
+  const count = +e.target.value;
+  const container = document.getElementById("imageInputs");
+  container.innerHTML = "";
+  imagePreview.innerHTML = "";
 
   for(let i=0;i<count;i++){
     const input=document.createElement("input");
     input.type="file";
     input.accept="image/*";
 
-    input.onchange=(ev)=>{
-
-      const file=ev.target.files[0];
-      const reader=new FileReader();
-
-      reader.onload=function(evt){
-
+    input.onchange = ev => {
+      const file = ev.target.files[0];
+      const reader = new FileReader();
+      reader.onload = function(evt){
         const div=document.createElement("div");
         div.className="preview";
         div.innerHTML=`<img src="${evt.target.result}">`;
-
         imagePreview.appendChild(div);
-
       };
-
       reader.readAsDataURL(file);
-
     };
-
     container.appendChild(input);
   }
 });
 
 /* ================= CREATE / UPDATE PRODUCT ================= */
+modalBtn.addEventListener("click", async ()=>{
+  const name = document.getElementById("productName").value;
+  const price = document.getElementById("productPrice").value;
+  const quantity = document.getElementById("productQuantity").value;
+  const category = document.getElementById("productCategory").value;
+  const description = document.getElementById("productDescription").value;
+  const featured = document.getElementById("productFeatured").checked;
+  const files = document.querySelectorAll("#imageInputs input");
 
-modalBtn.addEventListener("click",async()=>{
-
-  const name=document.getElementById("productName").value;
-  const price=document.getElementById("productPrice").value;
-  const quantity=document.getElementById("productQuantity").value;
-  const category=document.getElementById("productCategory").value;
-  const description=document.getElementById("productDescription").value;
-  const featured=document.getElementById("productFeatured").checked;
-
-  const files=document.querySelectorAll("#imageInputs input");
-
-  const formData=new FormData();
-
+  const formData = new FormData();
   formData.append("name",name);
   formData.append("price",price);
   formData.append("quantity",quantity);
@@ -549,198 +530,131 @@ modalBtn.addEventListener("click",async()=>{
   formData.append("featured",featured);
 
   files.forEach(f=>{
-    if(f.files[0]){
-      formData.append("images",f.files[0]);
-    }
+    if(f.files[0]) formData.append("images",f.files[0]);
   });
 
   try{
-
     showLoading();
-
-    let url=`${API_BASE}/api/products`;
-    let method="POST";
-
+    let url = `${API_BASE}/api/products`;
+    let method = "POST";
     if(editProductId){
-      url=`${API_BASE}/api/products/${editProductId}`;
-      method="PUT";
+      url = `${API_BASE}/api/products/${editProductId}`;
+      method = "PUT";
     }
-
-    const res=await fetch(url,{
-      method:method,
-      body:formData
-    });
-
+    const res = await fetch(url, { method, body: formData });
     if(!res.ok) throw new Error();
-
     toast("Product saved");
-
     closeModal();
     initDashboard();
-
-  }catch(err){
-
+  } catch(err) {
     toast("Failed to save product","error");
-
-  }finally{
-
+  } finally {
     hideLoading();
-
   }
-
 });
 
 /* ================= DELETE PRODUCT ================= */
-
-async function deleteProduct(id){
-
+async function deleteProduct(id) {
   if(!confirm("Delete this product?")) return;
-
-  try{
-
-    await fetch(`${API_BASE}/api/products/${id}`,{
-      method:"DELETE"
-    });
-
+  try {
+    await fetch(`${API_BASE}/api/products/${id}`, { method:"DELETE" });
     toast("Product deleted");
-
     initDashboard();
-
-  }catch{
-
+  } catch {
     toast("Delete failed","error");
-
   }
-
 }
 
 /* ================= FILTER ================= */
+function applyProductFilter() {
+  const name = document.getElementById("searchName").value.toLowerCase();
+  const category = document.getElementById("searchCategory").value;
+  const featured = document.getElementById("searchFeatured").value;
 
-function applyProductFilter(){
-
-  const name=document.getElementById("searchName").value.toLowerCase();
-  const category=document.getElementById("searchCategory").value;
-  const featured=document.getElementById("searchFeatured").value;
-
-  const filtered=allProducts.filter(p=>{
-
+  const filtered = allProducts.filter(p => {
     return (!name || p.name.toLowerCase().includes(name))
-    && (!category || p.category===category)
-    && (!featured || String(p.featured)===featured);
-
+        && (!category || p.category === category)
+        && (!featured || String(p.featured) === featured);
   });
 
   renderProducts(filtered);
-
 }
 
 /* ================= RENDER PRODUCTS ================= */
+function renderProducts(products) {
+  const tbody = document.getElementById("productsTable");
+  tbody.innerHTML = "";
 
-function renderProducts(products){
-
-  const tbody=document.getElementById("productsTable");
-
-  tbody.innerHTML="";
-
-  products.forEach(p=>{
-
-    const tr=document.createElement("tr");
-
-    const other=(p.otherImages||[])
-      .map(img=>`<img src="${img}" width="40">`)
+  products.forEach(p => {
+    const other = (p.otherImages || [])
+      .map(img => `<img src="${img}" width="40">`)
       .join("");
 
-    tr.innerHTML=`
-    <td>
-      <img src="${p.mainImage}" width="40">
-      ${other}
-    </td>
-    <td>${p.name}</td>
-    <td>${p.category}</td>
-    <td>₦${p.price}</td>
-    <td>${p.quantity}</td>
-    <td>${p.featured?"Yes":"No"}</td>
-    <td>
-      <button class="btn" onclick='openModal("edit",${JSON.stringify(p)})'>Edit</button>
-      <button class="btn" style="background:#C0392B" onclick="deleteProduct('${p._id}')">Delete</button>
-    </td>
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>
+        <img src="${p.mainImage}" width="40">
+        ${other}
+      </td>
+      <td>${p.name}</td>
+      <td>${p.category}</td>
+      <td>₦${p.price}</td>
+      <td>${p.quantity}</td>
+      <td>${p.featured ? "Yes" : "No"}</td>
+      <td>
+        <button class="btn" onclick='openModal("edit",${JSON.stringify(p)})'>Edit</button>
+        <button class="btn" style="background:#C0392B" onclick="deleteProduct('${p._id}')">Delete</button>
+      </td>
     `;
-
     tbody.appendChild(tr);
-
   });
-
 }
 
 /* ================= RENDER ORDERS ================= */
+function renderOrders(orders) {
+  const tbody = document.getElementById("ordersTable");
+  tbody.innerHTML = "";
 
-function renderOrders(orders){
-
-  const tbody=document.getElementById("ordersTable");
-
-  tbody.innerHTML="";
-
-  orders.forEach(o=>{
-
-    const tr=document.createElement("tr");
-
-    tr.innerHTML=`
+  orders.forEach(o => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
       <td>${o.orderId}</td>
       <td>${o.customer?.name || ""}</td>
       <td>${o.status}</td>
       <td>₦${o.amount}</td>
     `;
-
     tbody.appendChild(tr);
-
   });
-
 }
 
 /* ================= INIT ================= */
-
-async function initDashboard(){
-
-  try{
-
+async function initDashboard() {
+  try {
     showLoading();
 
-    const resP=await fetch(`${API_BASE}/api/products`);
-    allProducts=await resP.json();
-
+    const resP = await fetch(`${API_BASE}/api/products`);
+    allProducts = await resP.json();
     renderProducts(allProducts);
 
-    const resO=await fetch(`${API_BASE}/api/orders`);
-    const orders=await resO.json();
-
+    const resO = await fetch(`${API_BASE}/api/orders`);
+    const orders = await resO.json();
     renderOrders(orders);
 
-    document.getElementById("totalProducts").innerText=allProducts.length;
-    document.getElementById("totalOrders").innerText=orders.length;
+    document.getElementById("totalProducts").innerText = allProducts.length;
+    document.getElementById("totalOrders").innerText = orders.length;
 
-    const revenue=orders.reduce((a,b)=>a+b.amount,0);
-
-    document.getElementById("totalRevenue").innerText=`₦${revenue}`;
-
-    document.getElementById("avgOrder").innerText=
-      `₦${orders.length?Math.round(revenue/orders.length):0}`;
-
-  }catch(err){
-
+    const revenue = orders.reduce((a,b) => a + b.amount, 0);
+    document.getElementById("totalRevenue").innerText = `₦${revenue}`;
+    document.getElementById("avgOrder").innerText = `₦${orders.length ? Math.round(revenue / orders.length) : 0}`;
+  } catch(err) {
     console.error(err);
-
     toast("Failed to load data","error");
-
-  }finally{
-
+  } finally {
     hideLoading();
-
   }
-
 }
 
-window.addEventListener("DOMContentLoaded",initDashboard);
-
+window.addEventListener("DOMContentLoaded", initDashboard);
 </script>
 </body>
 </html>
