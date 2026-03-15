@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LuminaStore Admin Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* --- RESET & GLOBAL --- */
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+  body { background-color: #FDF6F0; color: #333333; }
+
+  a { text-decoration: none; color: inherit; }
+
+  /* --- SIDEBAR --- */
+  .sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 240px;
+    height: 100vh;
+    background-color: rgba(0, 77, 64, 0.8); /* Emerald with opacity */
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding-top: 20px;
+    transition: transform 0.3s ease;
+    color: #FDF6F0;
+    font-family: 'Playfair Display', serif;
+    box-shadow: 4px 0 20px rgba(0,0,0,0.2);
+  }
+  .sidebar.hide { transform: translateX(-100%); }
+  .sidebar .logo { text-align: center; font-size: 1.7em; margin-bottom: 40px; color: #D4AF37; text-shadow: 0 1px 3px rgba(0,0,0,0.3); }
+  .sidebar nav a {
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+    margin: 5px 10px;
+    border-radius: 10px;
+    transition: background 0.2s, color 0.2s;
+    backdrop-filter: blur(5px);
+  }
+  .sidebar nav a:hover, .sidebar nav a.active { background: #D4AF37; color: #004D40; font-weight: 500; }
+
+  /* --- TOPBAR --- */
+  .topbar {
+    display: none; /* shown only on mobile */
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background-color: rgba(0, 77, 64, 0.85); /* Emerald glass */
+    display: flex;
+    align-items: center;
+    padding: 0 15px;
+    justify-content: space-between;
+    z-index: 1000;
+    color: #FDF6F0;
+    font-family: 'Playfair Display', serif;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  }
+  .hamburger { font-size: 1.5em; cursor: pointer; color: #D4AF37; }
+
+  /* --- MAIN CONTENT --- */
+  .main {
+    margin-left: 240px;
+    padding: 20px;
+    transition: margin-left 0.3s ease;
+    min-height: 100vh;
+  }
+  .main.full { margin-left: 0; }
+
+  /* --- CARDS / CONTENT --- */
+  .card {
+    background: rgba(255, 255, 255, 0.3); /* translucent ivory */
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    border-left: 5px solid #D4AF37; /* Gold accent */
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .card:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(0,0,0,0.25); }
+  .card h2 { margin-bottom: 10px; color: #004D40; font-family: 'Playfair Display', serif; text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+  .cards-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+
+  /* --- BUTTONS --- */
+  .btn {
+    background: #D4AF37; /* Gold */
+    border: none;
+    padding: 10px 15px;
+    border-radius: 8px;
+    color: #004D40; /* Emerald text */
+    cursor: pointer;
+    font-weight: 500;
+    transition: transform 0.2s, background 0.2s;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+  .btn:hover { background: #FFC107; transform: scale(1.05); }
+
+  /* --- MEDIA QUERIES --- */
+  @media (max-width: 768px) {
+    .sidebar { transform: translateX(-100%); position: fixed; z-index: 999; }
+    .topbar { display: flex; }
+    .main { margin-left: 0; padding-top: 70px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+  <div class="logo">LuminaStore</div>
+  <nav>
+    <a href="#" class="active" data-page="dashboard"><i>🏠</i> Dashboard</a>
+    <a href="#" data-page="orders"><i>📦</i> Orders</a>
+    <a href="#" data-page="products"><i>🛍️</i> Products</a>
+    <a href="#" data-page="hero"><i>🖼️</i> Hero Images</a>
+    <a href="#" data-page="storefront"><i>🔗</i> Back to Store</a>
+  </nav>
+</div>
+
+<!-- TOPBAR MOBILE -->
+<div class="topbar">
+  <div>LuminaStore Admin</div>
+  <div class="hamburger" id="hamburger">≡</div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main" id="mainContent">
+  <div id="dashboardPage" class="page">
+    <h1 style="font-family:'Playfair Display', serif; color:#004D40; text-shadow:0 1px 2px rgba(0,0,0,0.2);">Dashboard</h1>
+    <div class="cards-container">
+      <div class="card">
+        <h2>Total Orders</h2>
+        <p>120</p>
+      </div>
+      <div class="card">
+        <h2>Total Products</h2>
+        <p>45</p>
+      </div>
+      <div class="card">
+        <h2>Revenue</h2>
+        <p>$12,450</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="ordersPage" class="page" style="display:none">
+    <h1 style="font-family:'Playfair Display', serif; color:#004D40; text-shadow:0 1px 2px rgba(0,0,0,0.2);">Orders</h1>
+    <div class="cards-container">
+      <div class="card">
+        <h2>Order #001</h2>
+        <p>Items: 3</p>
+        <p>Total: $150</p>
+        <span style="color:#D4AF37;">Pending</span>
+      </div>
+      <div class="card">
+        <h2>Order #002</h2>
+        <p>Items: 1</p>
+        <p>Total: $80</p>
+        <span style="color:#004D40;">Paid</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="productsPage" class="page" style="display:none">
+    <h1 style="font-family:'Playfair Display', serif; color:#004D40; text-shadow:0 1px 2px rgba(0,0,0,0.2);">Products</h1>
+    <button class="btn">+ Add Product</button>
+    <div class="cards-container">
+      <div class="card">
+        <h2>Product 1</h2>
+        <p>Category: Electronics</p>
+        <p>Price: $99.99</p>
+      </div>
+      <div class="card">
+        <h2>Product 2</h2>
+        <p>Category: Clothing</p>
+        <p>Price: $45.00</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="heroPage" class="page" style="display:none">
+    <h1 style="font-family:'Playfair Display', serif; color:#004D40; text-shadow:0 1px 2px rgba(0,0,0,0.2);">Hero Images</h1>
+    <button class="btn">+ Add Hero</button>
+    <div class="cards-container">
+      <div class="card">
+        <img src="https://via.placeholder.com/150" alt="Hero Image" style="width:100%; border-radius:10px; margin-bottom:10px;">
+        <h2>Summer Sale</h2>
+        <p>Status: Active</p>
+      </div>
+      <div class="card">
+        <img src="https://via.placeholder.com/150" alt="Hero Image" style="width:100%; border-radius:10px; margin-bottom:10px;">
+        <h2>New Arrivals</h2>
+        <p>Status: Inactive</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Sidebar toggle for mobile
+  const sidebar = document.getElementById('sidebar');
+  const hamburger = document.getElementById('hamburger');
+  hamburger.addEventListener('click', () => {
+    sidebar.classList.toggle('hide');
+  });
+
+  // Navigation
+  const navLinks = document.querySelectorAll('.sidebar nav a');
+  const pages = document.querySelectorAll('.page');
+  navLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      const page = link.dataset.page + 'Page';
+      pages.forEach(p => p.style.display = 'none');
+      const activePage = document.getElementById(page);
+      if(activePage) activePage.style.display = 'block';
+
+      navLinks.forEach(l => l.classList.remove('active'));
+      link.classList.add('active');
+
+      // Hide sidebar on mobile after click
+      if(window.innerWidth <= 768) sidebar.classList.add('hide');
+    });
+  });
+</script>
+
+</body>
+</html>
