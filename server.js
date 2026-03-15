@@ -1,353 +1,297 @@
-require("dotenv").config();
-const express = require("express");
-const mongoose = require("mongoose");
-const cors = require("cors");
-const multer = require("multer");
-const axios = require("axios");
-const cloudinary = require("cloudinary").v2;
-const bodyParser = require("body-parser");
-const crypto = require("crypto");
-
+// =====================
+// server.js
+// =====================
+require('dotenv').config();
+const express = require('express');
+const mongoose = require('mongoose');
+const cors = require('cors');
+const multer = require('multer');
+const cloudinary = require('cloudinary').v2;
+const streamifier = require('streamifier');
+const axios = require('axios');
 
 const app = express();
+const corsOptions = {
+  origin: "https://maison-puce.vercel.app", // frontend domain
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  credentials: true, // if sending cookies/auth headers
+};
 
-/* =====================
-   MIDDLEWARE
-===================== */
-app.use(cors());
-app.use((req, res, next) => {
-  if (req.originalUrl === "/api/paystack/webhook") {
-    next(); // skip json parser
-  } else {
-    express.json()(req, res, next);
-  }
-});
-app.use(express.urlencoded({ extended: true }));
+app.use(cors(corsOptions));
+app.use(express.json());
 
-/* =====================
-   DATABASE
-===================== */
-mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => console.log("MongoDB connected"))
-  .catch(err => console.error(err));
+// =====================
+// MongoDB Connection
+// =====================
+mongoose.connect(process.env.MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+.then(()=>console.log('MongoDB connected'))
+.catch(err=>console.error(err));
 
-/* =====================
-   CLOUDINARY CONFIG
-===================== */
+// =====================
+// Cloudinary Config
+// =====================
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-/* =====================
-   MULTER CONFIG
-===================== */
-const storage = multer.memoryStorage();
-const upload = multer({ storage });
+// =====================
+// Product Schema
+// =====================
+const productSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  category: { type: String, required: true },
+  price: { type: Number, required: true },
+  mainImage: { type: String, required: true },   // main image for cards
+  otherImages: { type: [String], default: [] },  // extra images for single product page
+  description: { type: String },
+  quantity: { type: Number, default: 0 },
+  featured: { type: Boolean, default: false },   // new field for featured products
+}, { timestamps: true });
 
-/* =====================
-   SCHEMAS
-===================== */
-// Ticket
-const ticketSchema = new mongoose.Schema(
-  { image: String, name: String, description: String, price: Number },
-  { timestamps: true }
-);
-const Ticket = mongoose.model("Ticket", ticketSchema);
+const Product = mongoose.model('Product', productSchema);
 
-// Artiste
-const artisteSchema = new mongoose.Schema(
-  { image: String, name: String },
-  { timestamps: true }
-);
-const Artiste = mongoose.model("Artiste", artisteSchema);
+module.exports = Product;
 
-// Hero
-const heroSchema = new mongoose.Schema(
-  { image: String, active: { type: Boolean, default: false } },
-  { timestamps: true }
-);
-const Hero = mongoose.model("Hero", heroSchema);
+// =====================
+// Hero Image Schema
+// =====================
+const heroImageSchema = new mongoose.Schema({
+  imageUrl: { type: String, required: true },
+  isActive: { type: Boolean, default: false },
+}, { timestamps: true });
 
-// Order
-// Order
-const orderSchema = new mongoose.Schema(
-  {
-    name: { type: String, required: true },
-    phone: { type: String, required: true },
-    email: { type: String, required: true },
-    items: {
-      type: [
-        {
-          _id: { type: mongoose.Schema.Types.ObjectId, ref: "Ticket", required: true }, // <-- updated
-          name: { type: String, required: true },
-          price: { type: Number, required: true },
-          quantity: { type: Number, required: true }
-        }
-      ],
-      validate: [arr => arr.length > 0, "Order must have at least one item"]
-    },
-    totalAmount: { type: Number, required: true },
-    paymentReference: { type: String, index: true },
-    paymentStatus: { type: String, enum: ["pending","paid","failed"], default: "pending" },
-    orderRef: { type: String, unique: true, required: true },
-    paymentMethod: { type: String, enum: ["paystack","bank"], default: "paystack" },
-    statusHistory: [
-      { status: String, updatedAt: { type: Date, default: Date.now }, note: String }
-    ]
+const HeroImage = mongoose.model('HeroImage', heroImageSchema);
+
+// =====================
+// Order Schema
+// =====================
+const orderSchema = new mongoose.Schema({
+  orderId: { type: String, required: true, unique: true },
+  reference: { type: String, required: true },
+  customer: {
+    name: String,
+    email: String,
+    phone: String,
+    address: String,
+    nearestBustop: String,
+    deliveryMode: String
   },
-  { timestamps: true }
-);
+  items: Array,
+  amount: Number,
+  status: { type: String, default: "paid" }
+}, { timestamps: true });
 
 const Order = mongoose.model("Order", orderSchema);
 
-/* =====================
-   TICKETS ROUTES
-===================== */
-app.post("/api/tickets", upload.single("image"), async (req, res) => {
-  try {
-    const { name, description, price } = req.body;
-    const uploadRes = await cloudinary.uploader.upload(
-      `data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`,
-      { folder: "concert_tickets" }
+// =====================
+// Multer Config
+// =====================
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
+
+// =====================
+// Helper: Upload to Cloudinary
+// =====================
+const uploadToCloudinary = (buffer) => {
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      { folder: 'maison_products' },
+      (error, result) => {
+        if (result) resolve(result);
+        else reject(error);
+      }
     );
-    const ticket = await Ticket.create({ image: uploadRes.secure_url, name, description, price });
-    res.status(201).json(ticket);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Failed to create ticket" });
-  }
-});
+    streamifier.createReadStream(buffer).pipe(stream);
+  });
+};
 
-app.get("/api/tickets", async (req, res) => {
-  res.json(await Ticket.find().sort({ createdAt: -1 }));
-});
-
-// NEW: GET single ticket by ID
-app.get("/api/tickets/:id", async (req, res) => {
-  try {
-    const ticket = await Ticket.findById(req.params.id);
-    if (!ticket) return res.status(404).json({ error: "Ticket not found" });
-    res.json(ticket);
-  } catch (err) {
-    res.status(500).json({ error: "Failed to fetch ticket" });
-  }
-});
-
-app.put("/api/tickets/:id", upload.single("image"), async (req, res) => {
-  try {
-    let update = req.body;
-    if (req.file) {
-      const uploadRes = await cloudinary.uploader.upload(
-        `data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`,
-        { folder: "concert_tickets" }
-      );
-      update.image = uploadRes.secure_url;
-    }
-    const updated = await Ticket.findByIdAndUpdate(req.params.id, update, { new: true });
-    res.json(updated);
-  } catch (err) {
-    res.status(500).json({ error: "Failed to update ticket" });
-  }
-});
-
-app.delete("/api/tickets/:id", async (req, res) => {
-  try {
-    await Ticket.findByIdAndDelete(req.params.id);
-    res.json({ success: true });
-  } catch {
-    res.status(500).json({ error: "Failed to delete ticket" });
-  }
-});
-
-/* =====================
-   ARTISTES ROUTES
-===================== */
-app.post("/api/artistes", upload.single("image"), async (req, res) => {
-  try {
-    const uploadRes = await cloudinary.uploader.upload(
-      `data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`,
-      { folder: "concert_artistes" }
+const uploadHeroToCloudinary = (buffer) => {
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      { folder: 'maison_hero' },
+      (error, result) => {
+        if (result) resolve(result);
+        else reject(error);
+      }
     );
-    const artiste = await Artiste.create({ image: uploadRes.secure_url, name: req.body.name });
-    res.status(201).json(artiste);
-  } catch (err) {
-    res.status(500).json({ error: "Failed to create artiste" });
-  }
-});
+    streamifier.createReadStream(buffer).pipe(stream);
+  });
+};
 
-app.get("/api/artistes", async (req, res) => {
-  res.json(await Artiste.find().sort({ createdAt: -1 }));
-});
+// =====================
+// Routes
+// =====================
 
-// NEW: GET single artiste by ID
-app.get("/api/artistes/:id", async (req, res) => {
+// ---- Create Product ----
+app.post('/api/products', upload.array('images', 5), async (req, res) => {
   try {
-    const artiste = await Artiste.findById(req.params.id);
-    if (!artiste) return res.status(404).json({ error: "Artiste not found" });
-    res.json(artiste);
-  } catch (err) {
-    res.status(500).json({ error: "Failed to fetch artiste" });
-  }
-});
+    const { name, category, price, description, quantity, featured } = req.body; // <-- include featured
 
-// NEW: PUT artiste
-app.put("/api/artistes/:id", upload.single("image"), async (req, res) => {
-  try {
-    let update = { name: req.body.name };
-    if (req.file) {
-      const uploadRes = await cloudinary.uploader.upload(
-        `data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`,
-        { folder: "concert_artistes" }
-      );
-      update.image = uploadRes.secure_url;
-    }
-    const updated = await Artiste.findByIdAndUpdate(req.params.id, update, { new: true });
-    res.json(updated);
-  } catch (err) {
-    res.status(500).json({ error: "Failed to update artiste" });
-  }
-});
-
-app.delete("/api/artistes/:id", async (req, res) => {
-  try {
-    await Artiste.findByIdAndDelete(req.params.id);
-    res.json({ success: true });
-  } catch {
-    res.status(500).json({ error: "Failed to delete artiste" });
-  }
-});
-
-/* =====================
-   HERO ROUTES
-===================== */
-const heroRouter = express.Router();
-
-heroRouter.get("/", async (_, res) => res.json(await Hero.find().sort({ createdAt: -1 })));
-heroRouter.get("/:id", async (req, res) => {
-  try {
-    const hero = await Hero.findById(req.params.id);
-    if (!hero) return res.status(404).json({ error: "Hero not found" });
-    res.json(hero);
-  } catch {
-    res.status(500).json({ error: "Failed to fetch hero" });
-  }
-});
-heroRouter.post("/", upload.single("image"), async (req, res) => {
-  const uploadRes = await cloudinary.uploader.upload(
-    `data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`,
-    { folder: "concert_hero" }
-  );
-  res.status(201).json(await Hero.create({ image: uploadRes.secure_url }));
-});
-heroRouter.put("/:id", upload.single("image"), async (req, res) => {
-  try {
-    let update = {};
-    if (req.file) {
-      const uploadRes = await cloudinary.uploader.upload(
-        `data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`,
-        { folder: "concert_hero" }
-      );
-      update.image = uploadRes.secure_url;
-    }
-    const updated = await Hero.findByIdAndUpdate(req.params.id, update, { new: true });
-    res.json(updated);
-  } catch {
-    res.status(500).json({ error: "Failed to update hero" });
-  }
-});
-heroRouter.patch("/:id/toggle", async (req, res) => {
-  try {
-    const hero = await Hero.findById(req.params.id);
-    await Hero.updateMany({}, { active: false });
-    hero.active = !hero.active;
-    await hero.save();
-    res.json(hero);
-  } catch {
-    res.status(500).json({ error: "Failed to toggle hero" });
-  }
-});
-heroRouter.delete("/:id", async (req, res) => {
-  try {
-    await Hero.findByIdAndDelete(req.params.id);
-    res.json({ success: true });
-  } catch {
-    res.status(500).json({ error: "Failed to delete hero" });
-  }
-});
-
-app.use("/api/hero", heroRouter);
-
-/* =====================
-   CHECKOUT & PAYSTACK (Optimized)
-===================== */
-
-/* -------- CREATE ORDER -------- */
-app.post("/api/orders", async (req, res) => {
-  try {
-    const { name, phone, email, items } = req.body;
-    if (!name || !phone || !email || !items || items.length === 0) {
-      return res.status(400).json({ error: "Invalid order data" });
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({ error: 'No images uploaded' });
     }
 
-    // Map items to ensure only the required fields are stored
-    const orderItems = items.map(i => ({
-      _id: i._id,
-      name: i.name,
-      price: i.price,
-      quantity: i.quantity
-    }));
+    // Upload all images to Cloudinary
+    const uploadResults = await Promise.all(req.files.map(file => uploadToCloudinary(file.buffer)));
 
-    const totalAmount = orderItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
-    const orderRef = `OKIZZ-${Date.now()}`;
+    const mainImage = uploadResults[0].secure_url;
+    const otherImages = uploadResults.slice(1).map(r => r.secure_url);
 
-    const order = await Order.create({
+    const newProduct = new Product({
       name,
-      phone,
-      email,
-      items: orderItems,
-      totalAmount,
-      orderRef,
-      paymentStatus: "pending",
+      category,
+      price: Number(price),
+      quantity: quantity ? Number(quantity) : 0,
+      description,
+      featured: featured === 'true', // <-- convert to boolean
+      mainImage,
+      otherImages
     });
 
-    res.json({ success: true, order });
-  } catch (err) {
-    console.error("Create order error:", err.message);
-    res.status(500).json({ error: "Failed to create order" });
+    await newProduct.save();
+    res.status(201).json(newProduct);
+
+  } catch(err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
   }
 });
 
-/* -------- INITIALIZE PAYSTACK (WITH SPLIT GROUP & REDIRECT) -------- */
-app.post("/api/paystack/init", async (req, res) => {
+// ---- Update Product ----
+app.put('/api/products/:id', upload.array('images', 5), async (req,res)=>{
   try {
-    const { email, amount, orderRef } = req.body;
+    const { name, category, price, description, quantity, featured } = req.body;
 
-    if (!email || !amount || !orderRef) {
-      return res.status(400).json({ error: "Invalid payment data" });
+    const updateData = {
+      name,
+      category,
+      price: Number(price),
+      description,
+      quantity: Number(quantity),
+      featured: featured === 'true' // <-- convert to boolean
+    };
+
+    if (req.files && req.files.length > 0) {
+      // Upload all new images
+      const uploadResults = await Promise.all(req.files.map(file => uploadToCloudinary(file.buffer)));
+      updateData.mainImage = uploadResults[0].secure_url;
+      updateData.otherImages = uploadResults.slice(1).map(r => r.secure_url);
     }
 
-    // 1️⃣ Confirm order exists
-    const order = await Order.findOne({ orderRef });
-    if (!order) {
-      return res.status(404).json({ error: "Order not found" });
+    const updatedProduct = await Product.findByIdAndUpdate(req.params.id, updateData, { new: true });
+    res.json(updatedProduct);
+
+  } catch(err){
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+// ---- Get All Products ----
+app.get('/api/products', async (req, res)=>{
+  try {
+    const products = await Product.find().sort({ createdAt: -1 });
+    res.json(products);
+  } catch(err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// ---- Delete Product ----
+app.delete('/api/products/:id', async (req,res)=>{
+  try {
+    await Product.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Product deleted' });
+  } catch(err){
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+//=====================
+// HERO SECTION 
+//=====================
+
+//--- CREATE HERO -----
+app.post('/api/hero-images', upload.single('image'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No image uploaded' });
     }
 
-    // 2️⃣ Initialize Paystack with SPLIT CODE + CALLBACK URL
+    const result = await uploadHeroToCloudinary(req.file.buffer);
+
+    const hero = new HeroImage({
+      imageUrl: result.secure_url,
+      isActive: req.body.isActive === 'true' || req.body.isActive === true
+    });
+
+    await hero.save();
+    res.status(201).json(hero);
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+//----- FETCH HERO -----
+app.get('/api/hero-images', async (req, res) => {
+  try {
+    const heroes = await HeroImage.find().sort({ createdAt: -1 });
+    res.json(heroes);
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+//---- ACTIVATE/DEACTIVATE HERO
+app.patch('/api/hero-images/:id/toggle', async (req, res) => {
+  try {
+    const hero = await HeroImage.findById(req.params.id);
+    if (!hero) return res.status(404).json({ error: 'Hero image not found' });
+
+    hero.isActive = !hero.isActive;
+    await hero.save();
+
+    res.json(hero);
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+//---- DELETE HERO----
+app.delete('/api/hero-images/:id', async (req, res) => {
+  try {
+    await HeroImage.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Hero image deleted' });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// =====================
+// PAYSTACK INTEGRATION
+// =====================
+
+// ---- Initialize Payment ----
+app.post('/api/paystack/initialize', async (req, res) => {
+  try {
+    const { email, amount, metadata } = req.body;
+
+    if (!email || !amount) {
+      return res.status(400).json({ error: "Email and amount are required" });
+    }
+
     const response = await axios.post(
       "https://api.paystack.co/transaction/initialize",
       {
         email,
-        amount: amount * 100, // amount in kobo
-        split_code: process.env.PAYSTACK_SPLIT_CODE,
-        callback_url: "https://okizz.vercel.app/checkout.html", // <-- redirect back here
-        metadata: {
-          orderRef,
-          customer_name: order.name,
-          customer_phone: order.phone
-        }
+        amount,
+        metadata
       },
       {
         headers: {
@@ -357,179 +301,81 @@ app.post("/api/paystack/init", async (req, res) => {
       }
     );
 
-    const paystackRef = response.data.data.reference;
-
-    // 3️⃣ Save Paystack reference on order
-    order.paymentReference = paystackRef;
-    await order.save();
-
-    // 4️⃣ Send Paystack authorization URL to frontend
     res.json({
-      status: true,
-      message: "Payment initialized",
-      data: {
-        authorization_url: response.data.data.authorization_url,
-        reference: paystackRef
-      }
+      authorization_url: response.data.data.authorization_url,
+      reference: response.data.data.reference,
+      publicKey: process.env.PAYSTACK_PUBLIC_KEY
     });
 
-  } catch (err) {
-    console.error("Paystack init error:", err.response?.data || err.message);
+  } catch (error) {
+    console.error("Paystack Initialize Error:", error.response?.data || error.message);
     res.status(500).json({ error: "Payment initialization failed" });
   }
 });
 
-/* -------- VERIFY PAYMENT -------- */
-app.get("/api/paystack/verify/:reference", async (req, res) => {
+// ---- Verify Payment ----
+app.get('/api/paystack/verify/:reference', async (req, res) => {
   try {
-    const reference = req.params.reference;
+    const { reference } = req.params;
 
     const response = await axios.get(
       `https://api.paystack.co/transaction/verify/${reference}`,
-      { headers: { Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}` } }
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`
+        }
+      }
     );
 
     const data = response.data.data;
 
-    const order = await Order.findOne({
-      $or: [{ paymentReference: reference }, { orderRef: data.metadata?.orderRef }],
-    });
+    if (data.status === "success") {
 
-    if (!order) return res.status(404).json({ success: false, message: "Order not found", order: null });
+      // Generate MAISON Order ID
+      const orderId = `MAISON-${Date.now()}`;
 
-    if (data.status === "success" && order.paymentStatus !== "paid") {
-      // Update order
-      order.paymentStatus = "paid";
-      order.paymentReference = reference;
-      await order.save();
+      // Extract metadata sent during initialize
+      const metadata = data.metadata || {};
+
+      const newOrder = new Order({
+        orderId,
+        reference,
+        customer: {
+          name: metadata.name,
+          email: metadata.email,
+          phone: metadata.phone,
+          address: metadata.address,
+          nearestBustop: metadata.nearestBustop,
+          deliveryMode: metadata.deliveryMode
+        },
+        items: metadata.items || [],
+        amount: data.amount / 100,
+        status: "paid"
+      });
+
+      await newOrder.save();
+
+      return res.json({
+        status: "success",
+        orderId,
+        message: "Payment verified and order created"
+      });
+
+    } else {
+      return res.status(400).json({
+        status: "failed",
+        message: "Payment not successful"
+      });
     }
 
-    res.json({ success: data.status === "success", order });
-  } catch (err) {
-    console.error("Paystack verify error:", err.message);
-    res.status(500).json({ success: false, message: "Verification failed", order: null });
-  }
-});
-
-/* -------- PAYSTACK WEBHOOK -------- */
- app.post(
-  "/api/paystack/webhook",
-  bodyParser.raw({ type: "application/json" }),
-  async (req, res) => {
-    try {
-      const secret = process.env.PAYSTACK_SECRET_KEY;
-
-      const signature = req.headers["x-paystack-signature"];
-
-      const hash = crypto
-        .createHmac("sha512", secret)
-        .update(req.body)
-        .digest("hex");
-
-      if (hash !== signature) {
-        console.log("Invalid webhook signature");
-        return res.sendStatus(401);
-      }
-
-      const event = JSON.parse(req.body.toString());
-
-      if (event.event === "charge.success") {
-        const data = event.data;
-        const orderRef = data.metadata?.orderRef;
-
-        if (!orderRef) {
-          console.log("Webhook missing orderRef");
-          return res.sendStatus(400);
-        }
-
-        const order = await Order.findOne({ orderRef });
-
-        if (!order) {
-          console.log("Order not found for webhook:", orderRef);
-          return res.sendStatus(404);
-        }
-
-        if (order.paymentStatus !== "paid") {
-          order.paymentStatus = "paid";
-          order.paymentReference = data.reference;
-          order.statusHistory.push({
-            status: "paid",
-            note: "Confirmed via Paystack webhook"
-          });
-          await order.save();
-
-          console.log("✅ Order marked PAID:", orderRef);
-        }
-      }
-
-      res.sendStatus(200);
-    } catch (err) {
-      console.error("Webhook error:", err);
-      res.sendStatus(500);
-    }
-  }
-);
-
-/* -------- GET SINGLE ORDER BY REF -------- */
-app.get("/api/orders/ref/:orderRef", async (req, res) => {
-  try {
-    const order = await Order.findOne({ orderRef: req.params.orderRef });
-    if (!order) {
-      return res.status(404).json({ error: "Order not found" });
-    }
-
-    res.json(order); // ✅ return FULL document
-  } catch (err) {
-    console.error("Fetch order error:", err.message);
-    res.status(500).json({ error: "Failed to fetch order" });
-  }
-});
-
-// GET /api/orders/pending/:email
-app.get("/api/orders/pending/:email", async (req, res) => {
-  try {
-    const { email } = req.params;
-    const order = await Order.findOne({ email, paymentStatus: "pending" }).sort({ createdAt: -1 });
-    if (!order) return res.status(404).json(null);
-    res.json(order);
-  } catch(err) {
-    console.error("Fetch pending order error:", err);
-    res.status(500).json({ error: "Failed to fetch pending order" });
-  }
-});
-
-// GET ALL ORDERS (ADMIN)
-app.get("/api/orders", async (req, res) => {
-  try {
-    const orders = await Order.find()
-      .sort({ createdAt: -1 }); // latest first
-
-    res.json(orders);
   } catch (error) {
-    console.error("Fetch orders error:", error.message);
-    res.status(500).json({ error: "Failed to fetch orders" });
+    console.error("Paystack Verify Error:", error.response?.data || error.message);
+    res.status(500).json({ error: "Payment verification failed" });
   }
 });
 
-/* GET SINGLE ORDER
-app.get("/api/orders/:id", async (req, res) => {
-  try {
-    const order = await Order.findById(req.params.id);
-    if (!order) return res.status(404).json({ error: "Order not found" });
-    res.json(order);
-  } catch {
-    res.status(500).json({ error: "Failed to fetch order" });
-  }
-});*/
-
-// HEALTH CHECK
-
-app.get("/api/health", (req, res) => {
-  res.json({ status: "ok" });
-});
-
-/* =====================
-   SERVER
-===================== */
+// =====================
+// Start Server
+// =====================
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, ()=>console.log(`Server running on port ${PORT}`));
