@@ -54,6 +54,10 @@ body {
 HEADER
 ========================= */
 .header {
+  position: sticky;   /* Make it truly sticky */
+  top: 0;
+  z-index: 1000;      /* higher to stay on top of content */
+
   height: 72px;
   display: flex;
   align-items: center;
@@ -63,48 +67,53 @@ HEADER
   background: var(--header-gradient);
   color: var(--text);
 
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  position: relative;
-
   border-bottom: 1px solid rgba(255,255,255,0.18);
+  border-radius: 0 0 14px 14px;
 
   box-shadow:
     0 6px 18px rgba(0,0,0,0.18),
     inset 0 1px 0 rgba(255,255,255,0.25);
 
-  border-radius: 0 0 14px 14px;
-
   transition: background 0.4s, color 0.4s;
+
+  /* stacking context for pseudo-elements */
+  position: sticky;
 }
 
 /* Glass layer */
-.header::before{
+.header::before {
   content:"";
-  position:absolute;
-  inset:0;
+  position: absolute;
+  inset: 0;
 
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
 
   background: rgba(255,255,255,0.08);
 
-  pointer-events:none;
+  z-index: 0;             /* push behind header content */
+  pointer-events: none;
 }
 
 /* Reflection layer */
-.header::after{
+.header::after {
   content:"";
-  position:absolute;
-  inset:0;
-  background:linear-gradient(
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
     120deg,
     rgba(255,255,255,0.08),
     rgba(255,255,255,0.03),
     transparent
   );
-  pointer-events:none;
+  z-index: 0;             /* push behind header content */
+  pointer-events: none;
+}
+
+/* Ensure header content is above pseudo-elements */
+.header > * {
+  position: relative;
+  z-index: 1;
 }
 
 .logo {
