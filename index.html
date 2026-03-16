@@ -456,143 +456,261 @@ FOOTER
 </footer>
 
 <script>
+
 const API="https://subuluke.onrender.com"
 
-/* THEME TOGGLE */
+let allProducts=[]
+
+/* =========================
+THEME TOGGLE
+========================= */
+
 function toggleTheme(){
   document.body.classList.toggle("dark")
-  localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark":"light")
+  localStorage.setItem(
+    "theme",
+    document.body.classList.contains("dark") ? "dark" : "light"
+  )
 }
 
-if(localStorage.getItem("theme")==="dark") document.body.classList.add("dark")
+if(localStorage.getItem("theme")==="dark"){
+  document.body.classList.add("dark")
+}
 
 /* =========================
 SIDEBAR
 ========================= */
 
 function toggleSidebar(){
-
-document.querySelector(".mobile-sidebar").classList.add("active")
-document.querySelector(".sidebar-overlay").classList.add("active")
-
+  document.querySelector(".mobile-sidebar").classList.add("active")
+  document.querySelector(".sidebar-overlay").classList.add("active")
 }
 
 function closeSidebar(){
-
-document.querySelector(".mobile-sidebar").classList.remove("active")
-document.querySelector(".sidebar-overlay").classList.remove("active")
-
+  document.querySelector(".mobile-sidebar").classList.remove("active")
+  document.querySelector(".sidebar-overlay").classList.remove("active")
 }
 
-/* LOAD HERO */
+/* =========================
+LOAD HERO
+========================= */
+
 async function loadHero(){
   try{
-    const res=await fetch(API+"/api/hero-images")
-    const heroes=await res.json()
+
+    const res = await fetch(API+"/api/hero-images")
+    const heroes = await res.json()
+
     if(!heroes.length) return
-    const activeHero=heroes.find(h=>h.isActive) || heroes[0]
-    document.getElementById("heroSection").innerHTML=`
+
+    const activeHero = heroes.find(h=>h.isActive) || heroes[0]
+
+    document.getElementById("heroSection").innerHTML = `
       <img src="${activeHero.imageUrl}">
       <div class="hero-overlay">
         <h1>Welcome to Subuluke</h1>
         <p>Explore our premium collection</p>
       </div>
     `
+
   }catch(err){
     console.log("Hero load error:",err)
   }
 }
 
-/* LOAD PRODUCTS */
+/* =========================
+LOAD PRODUCTS
+========================= */
+
 async function loadProducts(){
+
   try{
-    const res=await fetch(API+"/api/products")
-    const products=await res.json()
+
+    const res = await fetch(API+"/api/products")
+    const products = await res.json()
+
+    allProducts = products
+
     renderProducts(products)
     renderCategories(products)
+
   }catch(err){
+
     console.log("Product load error:",err)
+
   }
+
 }
 
-/* RENDER PRODUCTS */
+/* =========================
+RENDER PRODUCTS
+========================= */
+
 function renderProducts(products){
+
   const container=document.getElementById("products")
+
   container.innerHTML=""
+
   products.forEach(p=>{
-    const out=p.status==="out_of_stall"
+
+    const out = p.status==="out_of_stall"
+
     const card=document.createElement("div")
+
     card.className="product-card"
+
     card.innerHTML=`
+
       <div class="product-image">
+
         <img src="${p.mainImage}">
-        ${p.featured?'<div class="badge">FEATURED</div>':""}
-        ${p.slashPrice>0?'<div class="badge sale">SALE</div>':""}
-        ${out?'<div class="badge out">OUT OF STALL</div>':""}
+
+        ${p.featured ? '<div class="badge">FEATURED</div>' : ""}
+
+        ${p.slashPrice>0 ? '<div class="badge sale">SALE</div>' : ""}
+
+        ${out ? '<div class="badge out">OUT OF STALL</div>' : ""}
+
       </div>
+
       <div class="product-body">
+
         <div class="product-category">${p.category}</div>
+
         <div class="product-name">${p.name}</div>
+
         <div class="price">
-          ${p.slashPrice>0?`<span class="old-price">₦${p.slashPrice}</span>`:""}
+
+          ${p.slashPrice>0 ? `<span class="old-price">₦${p.slashPrice}</span>` : ""}
+
           <span class="new-price">₦${p.price}</span>
+
         </div>
+
         <button class="add-cart ${out?'disabled':''}" ${out?'disabled':''}>
-          ${out?"Out of Stall":"Add to Cart"}
+
+          ${out ? "Out of Stall" : "Add to Cart"}
+
         </button>
+
       </div>
+
     `
+
     container.appendChild(card)
+
   })
+
 }
 
-/* CATEGORIES */
+/* =========================
+FILTER PRODUCTS
+========================= */
+
+function filterProducts(category){
+
+  if(category==="All"){
+
+    renderProducts(allProducts)
+
+    return
+
+  }
+
+  const filtered = allProducts.filter(p=>p.category===category)
+
+  renderProducts(filtered)
+
+}
+
+/* =========================
+RENDER CATEGORIES
+========================= */
+
 function renderCategories(products){
 
-const cats=[...new Set(products.map(p=>p.category))]
+  const cats = [...new Set(products.map(p=>p.category))]
 
-const container=document.getElementById("categories")
-const mobileContainer=document.getElementById("mobileCategories")
+  const container = document.getElementById("categories")
+  const mobileContainer = document.getElementById("mobileCategories")
 
-container.innerHTML=`<div class="category-pill active" onclick="filterProducts('All')">All</div>`
-mobileContainer.innerHTML=`<div class="mobile-category" onclick="filterProducts('All');closeSidebar()">All</div>`
+  container.innerHTML=""
+  mobileContainer.innerHTML=""
 
-cats.forEach(c=>{
+  /* ALL CATEGORY */
 
-// Desktop pill
-const pill=document.createElement("div")
-pill.className="category-pill"
-pill.innerText=c
+  const allPill=document.createElement("div")
+  allPill.className="category-pill active"
+  allPill.innerText="All"
 
-pill.onclick=()=>{
+  allPill.onclick=()=>{
 
-document.querySelectorAll(".category-pill").forEach(p=>p.classList.remove("active"))
+    document.querySelectorAll(".category-pill")
+    .forEach(p=>p.classList.remove("active"))
 
-pill.classList.add("active")
+    allPill.classList.add("active")
 
-filterProducts(c)
+    filterProducts("All")
+
+  }
+
+  container.appendChild(allPill)
+
+  const mobileAll=document.createElement("div")
+  mobileAll.className="mobile-category"
+  mobileAll.innerText="All"
+
+  mobileAll.onclick=()=>{
+    filterProducts("All")
+    closeSidebar()
+  }
+
+  mobileContainer.appendChild(mobileAll)
+
+  /* OTHER CATEGORIES */
+
+  cats.forEach(c=>{
+
+    const pill=document.createElement("div")
+    pill.className="category-pill"
+    pill.innerText=c
+
+    pill.onclick=()=>{
+
+      document.querySelectorAll(".category-pill")
+      .forEach(p=>p.classList.remove("active"))
+
+      pill.classList.add("active")
+
+      filterProducts(c)
+
+    }
+
+    container.appendChild(pill)
+
+    const mobileItem=document.createElement("div")
+    mobileItem.className="mobile-category"
+    mobileItem.innerText=c
+
+    mobileItem.onclick=()=>{
+      filterProducts(c)
+      closeSidebar()
+    }
+
+    mobileContainer.appendChild(mobileItem)
+
+  })
 
 }
 
-// Mobile category
-const mobileItem=document.createElement("div")
-mobileItem.className="mobile-category"
-mobileItem.innerText=c
+/* =========================
+INIT
+========================= */
 
-mobileItem.onclick=()=>{
-filterProducts(c)
-closeSidebar()
-}
-
-container.appendChild(pill)
-mobileContainer.appendChild(mobileItem)
-
-})
-
-}
-/* INIT */
 loadHero()
 loadProducts()
+
 </script>
 
 </body>
