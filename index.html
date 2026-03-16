@@ -53,10 +53,14 @@ body {
 /* =========================
 HEADER
 ========================= */
+
+/* -------------------------
+Header Theme & Glass
+------------------------- */
 .header {
-  position: sticky;   /* Make it truly sticky */
+  position: sticky;      /* sticky to top */
   top: 0;
-  z-index: 1000;      /* higher to stay on top of content */
+  z-index: 1000;         /* above everything */
 
   height: 72px;
   display: flex;
@@ -75,29 +79,23 @@ HEADER
     inset 0 1px 0 rgba(255,255,255,0.25);
 
   transition: background 0.4s, color 0.4s;
-
-  /* stacking context for pseudo-elements */
-  position: sticky;
 }
 
 /* Glass layer */
 .header::before {
-  content:"";
+  content: "";
   position: absolute;
   inset: 0;
-
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-
-  background: rgba(255,255,255,0.08);
-
-  z-index: 0;             /* push behind header content */
+  background: rgba(255,255,255,0.05);  /* light transparency */
+  z-index: 0;
   pointer-events: none;
 }
 
-/* Reflection layer */
+/* Reflection / shine layer */
 .header::after {
-  content:"";
+  content: "";
   position: absolute;
   inset: 0;
   background: linear-gradient(
@@ -106,149 +104,146 @@ HEADER
     rgba(255,255,255,0.03),
     transparent
   );
-  z-index: 0;             /* push behind header content */
+  z-index: 0;
   pointer-events: none;
 }
 
-/* Ensure header content is above pseudo-elements */
+/* Ensure content is above pseudo-elements */
 .header > * {
   position: relative;
   z-index: 1;
 }
 
+/* Logo */
 .logo {
   font-size: 22px;
   font-weight: 700;
 }
 
+/* Header right group */
 .header-right {
   display: flex;
   gap: 20px;
   align-items: center;
 }
 
+/* Theme toggle container */
 .theme-toggle {
   cursor: pointer;
-  display:flex;
-  align-items:center;
+  display: flex;
+  align-items: center;
 }
 
-/* =========================
-HEADER ICONS
-========================= */
-
-.cart-icon{
-cursor:pointer;
-display:flex;
-align-items:center;
-}
+/* -------------------------
+Header Icons
+------------------------- */
+:root { --icon-color: #3a2a00; }      /* light mode */
+body.dark { --icon-color: var(--softGold); } /* dark mode */
 
 .cart-icon svg,
-.theme-toggle svg{
-stroke:var(--softGold);
-color:var(--softGold);
+.theme-toggle svg,
+.hamburger {
+  stroke: var(--icon-color);
+  color: var(--icon-color);
+  transition: all 0.3s;
 }
 
 .cart-icon:hover svg,
-.theme-toggle:hover svg{
-filter: drop-shadow(0 0 6px var(--softGold));
+.theme-toggle:hover svg,
+.hamburger:hover {
+  filter: drop-shadow(0 0 6px var(--softGold));
 }
 
-/* =========================
-HAMBURGER
-========================= */
-
-.hamburger{
-display:none;
-font-size:22px;
-cursor:pointer;
-color:var(--softGold);
+/* -------------------------
+Hamburger (mobile)
+------------------------- */
+.hamburger {
+  display: none;
+  font-size: 22px;
+  cursor: pointer;
 }
 
-/* =========================
-MOBILE SIDEBAR
-========================= */
-
-.sidebar-overlay{
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-background:rgba(0,0,0,0.45);
-display:none;
-z-index:200;
+/* -------------------------
+Mobile Sidebar
+------------------------- */
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.45);
+  display: none;
+  z-index: 900;
 }
 
-.mobile-sidebar{
-position:fixed;
-top:0;
-left:-280px;
-width:260px;
-height:100%;
-
-background:var(--card);
-
-backdrop-filter:blur(16px);
--webkit-backdrop-filter:blur(16px);
-
-border-right:1px solid var(--border);
-
-padding:20px;
-transition:left .3s ease;
-z-index:300;
-
-box-shadow:4px 0 20px rgba(0,0,0,0.25);
+.mobile-sidebar {
+  position: fixed;
+  top: 72px;                   /* below header */
+  left: -280px;
+  width: 260px;
+  height: calc(100% - 72px);   /* full height minus header */
+  background: var(--card);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-right: 1px solid var(--border);
+  padding: 20px;
+  transition: left 0.3s ease;
+  z-index: 950;
+  box-shadow: 4px 0 20px rgba(0,0,0,0.25);
+  border-radius: 0 0 14px 0;
 }
 
-.mobile-sidebar.active{
-left:0;
+/* Sidebar active */
+.mobile-sidebar.active {
+  left: 0;
 }
 
-.sidebar-overlay.active{
-display:block;
+/* Overlay active */
+.sidebar-overlay.active {
+  display: block;
 }
 
-.sidebar-header{
-margin-bottom:20px;
+/* Sidebar header */
+.sidebar-header {
+  margin-bottom: 20px;
+  font-weight: 600;
+  color: var(--text);
 }
 
-/* =========================
-MOBILE CATEGORY ITEMS
-========================= */
-
-.mobile-category{
-padding:12px 14px;
-border-left:4px solid transparent;
-cursor:pointer;
-color:var(--text);
-transition:all .25s ease;
-border-radius:6px;
+/* Mobile category items */
+.mobile-category {
+  padding: 12px 14px;
+  border-left: 4px solid transparent;
+  cursor: pointer;
+  color: var(--text);
+  transition: all 0.25s ease;
+  border-radius: 6px;
+  backdrop-filter: blur(8px);
 }
 
-.mobile-category:hover{
-background:rgba(255,255,255,0.08);
+.mobile-category:hover {
+  background: rgba(255,255,255,0.08);
 }
 
 /* Active sidebar item */
-
-.mobile-category.active{
-color:var(--softGold);
-border-left:4px solid var(--accent);
-background:rgba(255,215,122,0.08);
-font-weight:500;
+.mobile-category.active {
+  color: var(--softGold);
+  border-left: 4px solid var(--accent);
+  background: rgba(255,215,122,0.12);
+  font-weight: 500;
+  backdrop-filter: blur(12px);
 }
 
-/* =========================
-CATEGORY TABS
-========================= */
-
+/* -------------------------
+Category Tabs (desktop)
+------------------------- */
 .categories {
   display: flex;
   gap: 12px;
   padding: 18px 24px;
   overflow: auto;
-  scroll-behavior:smooth;
+  scroll-behavior: smooth;
 }
 
 .category-pill {
@@ -262,9 +257,9 @@ CATEGORY TABS
   transition: all 0.3s;
 }
 
-.category-pill:hover{
-transform:translateY(-2px);
-box-shadow:0 4px 10px rgba(0,0,0,0.2);
+.category-pill:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 }
 
 .category-pill.active {
@@ -273,20 +268,16 @@ box-shadow:0 4px 10px rgba(0,0,0,0.2);
   border: none;
 }
 
-/* =========================
-RESPONSIVE
-========================= */
-
-@media(max-width:768px){
-
-.categories{
-display:none;
-}
-
-.hamburger{
-display:block;
-}
-
+/* -------------------------
+Responsive
+------------------------- */
+@media (max-width: 768px) {
+  .categories {
+    display: none;
+  }
+  .hamburger {
+    display: block;
+  }
 }
 
 /* =========================
