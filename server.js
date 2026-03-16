@@ -40,17 +40,16 @@ cloudinary.config({
 });
 
 // =====================
-// Product Schema
+// Product Schema (Simplified for Admin Form)
 // =====================
 const productSchema = new mongoose.Schema({
   name: { type: String, required: true },
   category: { type: String, required: true },
   price: { type: Number, required: true },
-  mainImage: { type: String, required: true },   // main image for cards
-  otherImages: { type: [String], default: [] },  // extra images for single product page
-  description: { type: String },
-  quantity: { type: Number, default: 0 },
-  featured: { type: Boolean, default: false },   // new field for featured products
+  slashPrice: { type: Number, default: 0 },        // optional slashed price
+  mainImage: { type: String, required: true },     // single uploaded image
+  status: { type: String, enum: ["in_stall", "out_of_stall"], default: "in_stall" }, // stock status
+  featured: { type: Boolean, default: false },     // featured product toggle
 }, { timestamps: true });
 
 const Product = mongoose.model('Product', productSchema);
