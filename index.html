@@ -283,33 +283,157 @@ Responsive
 /* =========================
 HERO
 ========================= */
-.hero {
-  height: 500px;
-  position: relative;
-  overflow: hidden;
-  border-radius: 16px;
-  margin: 20px 24px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+
+.hero{
+  height:500px;
+  position:relative;
+  overflow:hidden;
+  border-radius:16px;
+  margin:20px 24px;
+  box-shadow:0 10px 28px rgba(0,0,0,0.2);
 }
 
-.hero img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
+/* TRACK */
+
+.hero-track{
+  position:relative;
+  width:100%;
+  height:100%;
 }
 
-.hero-overlay {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%,-50%);
-  text-align: center;
-  color: white;
-  background: rgba(0,0,0,0.25);
-  padding: 16px 32px;
-  border-radius: 12px;
-  backdrop-filter: blur(6px);
+/* SLIDE */
+
+.hero-slide{
+  position:absolute;
+  inset:0;
+  opacity:0;
+  transition:opacity 0.8s ease;
+}
+
+.hero-slide.active{
+  opacity:1;
+  z-index:2;
+}
+
+.hero-slide img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+/* OVERLAY */
+
+.hero-overlay{
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  text-align:center;
+  color:#fff;
+
+  padding:22px 36px;
+  border-radius:14px;
+
+  background:rgba(0,0,0,0.35);
+
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+
+  box-shadow:0 10px 24px rgba(0,0,0,0.25);
+}
+
+.hero-overlay h1{
+  font-size:48px;
+  margin-bottom:12px;
+  font-weight:700;
+}
+
+.hero-overlay p{
+  font-size:20px;
+  opacity:0.9;
+}
+
+/* ARROWS */
+
+.hero-arrow{
+  position:absolute;
+  top:50%;
+  transform:translateY(-50%);
+  width:48px;
+  height:48px;
+
+  border:none;
+  border-radius:50%;
+
+  background:rgba(0,0,0,0.4);
+  color:#fff;
+  font-size:24px;
+
+  cursor:pointer;
+  z-index:5;
+
+  backdrop-filter:blur(6px);
+}
+
+.hero-prev{
+  left:24px;
+}
+
+.hero-next{
+  right:24px;
+}
+
+.hero-arrow:hover{
+  background:rgba(0,0,0,0.65);
+}
+
+/* DOTS */
+
+.hero-dots{
+  position:absolute;
+  bottom:24px;
+  left:50%;
+  transform:translateX(-50%);
+  display:flex;
+  gap:10px;
+  z-index:5;
+}
+
+.hero-dot{
+  width:12px;
+  height:12px;
+  border-radius:50%;
+  background:rgba(255,255,255,0.5);
+  cursor:pointer;
+  transition:all 0.3s;
+}
+
+.hero-dot.active{
+  background:#E6A520;
+  transform:scale(1.2);
+}
+
+/* RESPONSIVE */
+
+@media(max-width:768px){
+
+.hero{
+  height:360px;
+}
+
+.hero-overlay h1{
+  font-size:32px;
+}
+
+.hero-overlay p{
+  font-size:16px;
+}
+
+.hero-arrow{
+  width:38px;
+  height:38px;
+}
+
 }
 
 /* =========================
@@ -538,7 +662,24 @@ FOOTER
 </div>
 
 
-<section class="hero" id="heroSection"></section>
+<!-- HERO -->
+<section class="hero" id="heroSection">
+
+  <div class="hero-track" id="heroTrack"></div>
+
+  <!-- ARROWS -->
+  <button class="hero-arrow hero-prev" id="heroPrev">
+    &#10094;
+  </button>
+
+  <button class="hero-arrow hero-next" id="heroNext">
+    &#10095;
+  </button>
+
+  <!-- DOTS -->
+  <div class="hero-dots" id="heroDots"></div>
+
+</section>
 
 <div class="section-title">
   <h2>Our Collection</h2>
@@ -613,29 +754,170 @@ function closeSidebar(){
 LOAD HERO
 ========================= */
 
+let heroIndex = 0
+let heroTimer
+
 async function loadHero(){
+
   try{
 
-    const res = await fetch(API+"/api/hero-images")
+    const res = await fetch(API + "/api/hero-images")
     const heroes = await res.json()
 
-    if(!heroes.length) return
+    const activeHeroes = heroes.filter(h => h.isActive)
 
-    const activeHero = heroes.find(h=>h.isActive) || heroes[0]
+    if(!activeHeroes.length) return
 
-    document.getElementById("heroSection").innerHTML = `
-      <img src="${activeHero.imageUrl}">
-      <div class="hero-overlay">
-        <h1>Welcome to Subuluke</h1>
-        <p>Explore our premium collection</p>
-      </div>
-    `
+    const track = document.getElementById("heroTrack")
+    const dotsContainer = document.getElementById("heroDots")
+
+    track.innerHTML = ""
+    dotsContainer.innerHTML = ""
+
+    activeHeroes.forEach((hero,i)=>{
+
+      /* SLIDE */
+
+      const slide = document.createElement("div")
+      slide.className = "hero-slide"
+      if(i===0) slide.classList.add("active")
+
+      slide.innerHTML = `
+        <img src="${hero.imageUrl}" loading="${i===0 ? "eager":"lazy"}">
+        <div class="hero-overlay">
+          <h1>Welcome to Subuluke</h1>
+          <p>Explore our premium collection</p>
+        </div>
+      `
+
+      track.appendChild(slide)
+
+      /* DOT */
+
+      const dot = document.createElement("div")
+      dot.className = "hero-dot"
+      if(i===0) dot.classList.add("active")
+
+      dot.onclick = ()=>goToHero(i)
+
+      dotsContainer.appendChild(dot)
+
+    })
+
+    startHeroSlider()
 
   }catch(err){
     console.log("Hero load error:",err)
   }
+
 }
 
+/* =========================
+SLIDER LOGIC
+========================= */
+
+function showHero(index){
+
+  const slides = document.querySelectorAll(".hero-slide")
+  const dots = document.querySelectorAll(".hero-dot")
+
+  slides.forEach(s=>s.classList.remove("active"))
+  dots.forEach(d=>d.classList.remove("active"))
+
+  slides[index].classList.add("active")
+  dots[index].classList.add("active")
+
+}
+
+/* NEXT */
+
+function nextHero(){
+
+  const slides = document.querySelectorAll(".hero-slide")
+
+  heroIndex++
+
+  if(heroIndex >= slides.length){
+    heroIndex = 0
+  }
+
+  showHero(heroIndex)
+
+}
+
+/* PREV */
+
+function prevHero(){
+
+  const slides = document.querySelectorAll(".hero-slide")
+
+  heroIndex--
+
+  if(heroIndex < 0){
+    heroIndex = slides.length - 1
+  }
+
+  showHero(heroIndex)
+
+}
+
+/* DOT CLICK */
+
+function goToHero(index){
+
+  heroIndex = index
+  showHero(heroIndex)
+
+}
+
+/* AUTO SLIDE */
+
+function startHeroSlider(){
+
+  heroTimer = setInterval(()=>{
+    nextHero()
+  },6000)
+
+}
+
+/* =========================
+ARROW EVENTS
+========================= */
+
+document.getElementById("heroNext").onclick = ()=>{
+  nextHero()
+}
+
+document.getElementById("heroPrev").onclick = ()=>{
+  prevHero()
+}
+
+/* =========================
+MOBILE SWIPE
+========================= */
+
+let touchStartX = 0
+let touchEndX = 0
+
+const hero = document.getElementById("heroSection")
+
+hero.addEventListener("touchstart",e=>{
+  touchStartX = e.changedTouches[0].screenX
+})
+
+hero.addEventListener("touchend",e=>{
+
+  touchEndX = e.changedTouches[0].screenX
+
+  if(touchEndX < touchStartX - 50){
+    nextHero()
+  }
+
+  if(touchEndX > touchStartX + 50){
+    prevHero()
+  }
+
+})
 /* =========================
 LOAD PRODUCTS
 ========================= */
