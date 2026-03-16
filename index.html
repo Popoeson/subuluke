@@ -3,283 +3,304 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Subuluke Store</title>
 
 <style>
-
 /* =========================
 THEME VARIABLES
 ========================= */
-
 :root{
---bg:#FFF8E7;
---header:#ffffff;
---sidebar:#ffffff;
---card:#ffffff;
---text:#333;
---muted:#777;
---border:#eee;
---accent:#E6A520;
---softGold:#FFD77A;
+  --bg:#FFF8E7;
+  --header:#E6A520; /* gradient override will be applied */
+  --card:rgba(255,248,231,0.65);
+  --text:#3a2a00;
+  --muted:#777;
+  --border:rgba(255,255,255,0.25);
+  --accent:#E6A520;
+  --softGold:#FFD77A;
 }
 
 body.dark{
---bg:#0F0F0F;
---header:#121212;
---sidebar:#111;
---card:#1A1A1A;
---text:#F5F5F5;
---muted:#BBBBBB;
---border:#2A2A2A;
+  --bg:#0F0F0F;
+  --header:#121212;
+  --card:rgba(26,26,26,0.65);
+  --text:#F5F5F5;
+  --muted:#BBBBBB;
+  --border:rgba(255,255,255,0.15);
 }
 
+/* =========================
+BASE
+========================= */
+*{margin:0; padding:0; box-sizing:border-box;}
 body{
-margin:0;
-font-family:system-ui;
-background:var(--bg);
-color:var(--text);
+  font-family: system-ui, -apple-system, sans-serif;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  background: linear-gradient(to bottom, #FFF8E7 0%, #FFD77A 100%);
+  color: var(--text);
 }
 
 /* =========================
 HEADER
 ========================= */
-
 .header{
-height:72px;
-display:flex;
-align-items:center;
-justify-content:space-between;
-padding:0 28px;
-border-bottom:1px solid var(--border);
-background:var(--header);
-position:sticky;
-top:0;
-z-index:100;
+  height:72px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 28px;
+  background: linear-gradient(135deg, #E6A520 0%, #FFD77A 100%);
+  color:#3a2a00;
+  position:sticky;
+  top:0;
+  z-index:100;
+  box-shadow:0 4px 12px rgba(122,74,0,0.25);
+  border-radius:0 0 12px 12px;
 }
 
 .logo{
-font-size:22px;
-font-weight:700;
+  font-size:22px;
+  font-weight:700;
 }
 
 .header-right{
-display:flex;
-gap:20px;
-align-items:center;
+  display:flex;
+  gap:20px;
+  align-items:center;
 }
 
 .theme-toggle{
-cursor:pointer;
-font-size:18px;
+  cursor:pointer;
+  font-size:18px;
 }
 
 /* =========================
 CATEGORY TABS
 ========================= */
-
 .categories{
-display:flex;
-gap:12px;
-padding:18px 24px;
-overflow:auto;
+  display:flex;
+  gap:12px;
+  padding:18px 24px;
+  overflow:auto;
 }
 
 .category-pill{
-padding:8px 18px;
-border:1px solid var(--border);
-border-radius:999px;
-cursor:pointer;
+  padding:8px 18px;
+  border-radius:999px;
+  cursor:pointer;
+  background: rgba(255,255,255,0.35);
+  backdrop-filter: blur(8px);
+  border:1px solid var(--border);
+  color: var(--text);
+  transition: all 0.3s;
 }
 
 .category-pill.active{
-background:var(--accent);
-color:white;
-border:none;
+  background: var(--accent);
+  color:white;
+  border:none;
 }
 
 /* =========================
 HERO
 ========================= */
-
 .hero{
-height:500px;
-position:relative;
-overflow:hidden;
+  height:500px;
+  position:relative;
+  overflow:hidden;
+  border-radius:16px;
+  margin:20px 24px;
+  box-shadow:0 8px 24px rgba(0,0,0,0.15);
 }
 
 .hero img{
-width:100%;
-height:100%;
-object-fit:cover;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
 }
 
 .hero-overlay{
-position:absolute;
-top:50%;
-left:50%;
-transform:translate(-50%,-50%);
-text-align:center;
-color:white;
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  text-align:center;
+  color:white;
+  background: rgba(0,0,0,0.25);
+  padding:16px 32px;
+  border-radius:12px;
+  backdrop-filter:blur(6px);
 }
 
 .hero-overlay h1{
-font-size:52px;
-margin-bottom:16px;
+  font-size:52px;
+  margin-bottom:16px;
 }
 
 .hero-overlay p{
-font-size:20px;
+  font-size:20px;
 }
 
 /* =========================
 SECTION TITLE
 ========================= */
-
 .section-title{
-text-align:center;
-padding:60px 20px;
+  text-align:center;
+  padding:60px 20px;
 }
 
 .section-title h2{
-font-size:36px;
-margin-bottom:12px;
+  font-size:36px;
+  margin-bottom:12px;
 }
 
 .section-title p{
-color:var(--muted);
+  color:var(--muted);
 }
 
 /* =========================
 PRODUCT GRID
 ========================= */
-
 .products{
-max-width:1280px;
-margin:auto;
-display:grid;
-grid-template-columns:repeat(4,1fr);
-gap:28px;
-padding:20px;
+  max-width:1280px;
+  margin:auto;
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:28px;
+  padding:20px;
 }
 
 @media(max-width:1100px){
-.products{
-grid-template-columns:repeat(3,1fr);
+  .products{grid-template-columns:repeat(3,1fr);}
 }
-}
-
 @media(max-width:768px){
-.products{
-grid-template-columns:repeat(2,1fr);
+  .products{grid-template-columns:repeat(2,1fr);}
 }
+@media(max-width:480px){
+  .products{grid-template-columns:1fr;}
 }
 
 /* =========================
-PRODUCT CARD
+PRODUCT CARD (GLASS)
 ========================= */
-
 .product-card{
-background:var(--card);
-border:1px solid var(--border);
-border-radius:12px;
-overflow:hidden;
+  background: var(--card);
+  backdrop-filter: blur(12px);
+  border-radius:16px;
+  border:1px solid var(--border);
+  overflow:hidden;
+  box-shadow:0 8px 24px rgba(0,0,0,0.15);
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
 }
 
 .product-image{
-position:relative;
+  position:relative;
 }
 
 .product-image img{
-width:100%;
-aspect-ratio:4/5;
-object-fit:cover;
+  width:100%;
+  aspect-ratio:4/5;
+  object-fit:cover;
 }
 
 /* BADGES */
-
 .badge{
-position:absolute;
-top:10px;
-left:10px;
-background:var(--accent);
-color:white;
-font-size:12px;
-padding:4px 10px;
-border-radius:20px;
+  position:absolute;
+  top:10px;
+  left:10px;
+  background: rgba(230,165,32,0.85);
+  color:white;
+  font-size:12px;
+  padding:4px 10px;
+  border-radius:20px;
+  box-shadow:0 2px 12px rgba(230,165,32,0.5);
 }
 
 .badge.sale{
-right:10px;
-left:auto;
-background:#d62828;
+  right:10px;
+  left:auto;
+  background:rgba(214,40,40,0.85);
+  box-shadow:0 2px 12px rgba(214,40,40,0.5);
 }
 
 .badge.out{
-background:#777;
+  background: rgba(119,119,119,0.85);
+  box-shadow:0 2px 12px rgba(119,119,119,0.5);
 }
 
 /* PRODUCT BODY */
-
 .product-body{
-padding:18px;
+  padding:18px;
 }
 
 .product-category{
-font-size:12px;
-color:var(--muted);
-margin-bottom:6px;
+  font-size:12px;
+  color:var(--muted);
+  margin-bottom:6px;
 }
 
 .product-name{
-font-weight:600;
-margin-bottom:8px;
+  font-weight:600;
+  margin-bottom:8px;
 }
 
 .price{
-display:flex;
-gap:10px;
-align-items:center;
-margin-top:4px;
+  display:flex;
+  gap:10px;
+  align-items:center;
+  margin-top:4px;
 }
 
 .old-price{
-text-decoration:line-through;
-color:var(--muted);
-font-size:14px;
+  text-decoration:line-through;
+  color:var(--muted);
+  font-size:14px;
 }
 
 .new-price{
-font-weight:700;
-font-size:18px;
-color:var(--accent);
+  font-weight:700;
+  font-size:18px;
+  color:var(--accent);
 }
 
 .add-cart{
-margin-top:14px;
-width:100%;
-padding:10px;
-border:none;
-background:black;
-color:white;
-border-radius:6px;
-cursor:pointer;
+  margin-top:14px;
+  width:100%;
+  padding:10px;
+  border:none;
+  background: rgba(0,0,0,0.6);
+  color:white;
+  border-radius:8px;
+  cursor:pointer;
+  transition: all 0.3s;
+}
+
+.add-cart:hover:not(.disabled){
+  background: rgba(0,0,0,0.8);
+  box-shadow:0 0 12px var(--softGold);
 }
 
 .add-cart.disabled{
-background:#999;
-cursor:not-allowed;
+  background:#999;
+  cursor:not-allowed;
 }
 
 /* =========================
 FOOTER
 ========================= */
-
 .footer{
-margin-top:80px;
-padding:60px 20px;
-border-top:1px solid var(--border);
-text-align:center;
+  margin-top:80px;
+  padding:60px 20px;
+  background: linear-gradient(135deg, #E6A520 0%, #FFD77A 100%);
+  color:#3a2a00;
+  text-align:center;
+  border-radius:12px 12px 0 0;
+  box-shadow:0 -4px 12px rgba(122,74,0,0.25);
 }
 
 </style>
@@ -288,225 +309,128 @@ text-align:center;
 <body>
 
 <header class="header">
-
-<div class="logo">Subuluke</div>
-
-<div class="header-right">
-<div class="theme-toggle" onclick="toggleTheme()">🌙</div>
-</div>
-
+  <div class="logo">Subuluke</div>
+  <div class="header-right">
+    <div class="theme-toggle" onclick="toggleTheme()">🌙</div>
+  </div>
 </header>
-
 
 <div class="categories" id="categories"></div>
 
-
 <section class="hero" id="heroSection"></section>
 
-
 <div class="section-title">
-<h2>Our Collection</h2>
-<p>Discover our latest pieces curated for you</p>
+  <h2>Our Collection</h2>
+  <p>Discover our latest pieces curated for you</p>
 </div>
-
 
 <section class="products" id="products"></section>
 
-
 <footer class="footer">
-<p>© 2026 Subuluke Store</p>
+  <p>© 2026 Subuluke Store</p>
 </footer>
 
-
 <script>
-
 const API="https://subuluke.onrender.com"
 
-/* =========================
-THEME TOGGLE
-========================= */
-
+/* THEME TOGGLE */
 function toggleTheme(){
-
-document.body.classList.toggle("dark")
-
-if(document.body.classList.contains("dark")){
-localStorage.setItem("theme","dark")
-}else{
-localStorage.setItem("theme","light")
+  document.body.classList.toggle("dark")
+  localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark":"light")
 }
 
-}
+if(localStorage.getItem("theme")==="dark") document.body.classList.add("dark")
 
-const savedTheme=localStorage.getItem("theme")
-
-if(savedTheme==="dark"){
-document.body.classList.add("dark")
-}
-
-/* =========================
-LOAD HERO
-========================= */
-
+/* LOAD HERO */
 async function loadHero(){
-
-try{
-
-const res=await fetch(API+"/api/hero-images")
-const heroes=await res.json()
-
-if(!heroes.length) return
-
-const activeHero=heroes.find(h=>h.isActive) || heroes[0]
-
-document.getElementById("heroSection").innerHTML=`
-
-<img src="${activeHero.imageUrl}">
-
-`
-
-}catch(err){
-console.log("Hero load error:",err)
+  try{
+    const res=await fetch(API+"/api/hero-images")
+    const heroes=await res.json()
+    if(!heroes.length) return
+    const activeHero=heroes.find(h=>h.isActive) || heroes[0]
+    document.getElementById("heroSection").innerHTML=`
+      <img src="${activeHero.imageUrl}">
+      <div class="hero-overlay">
+        <h1>Welcome to Subuluke</h1>
+        <p>Explore our premium collection</p>
+      </div>
+    `
+  }catch(err){
+    console.log("Hero load error:",err)
+  }
 }
 
-}
-
-/* =========================
-LOAD PRODUCTS
-========================= */
-
+/* LOAD PRODUCTS */
 async function loadProducts(){
-
-try{
-
-const res=await fetch(API+"/api/products")
-const products=await res.json()
-
-renderProducts(products)
-renderCategories(products)
-
-}catch(err){
-
-console.log("Product load error:",err)
-
+  try{
+    const res=await fetch(API+"/api/products")
+    const products=await res.json()
+    renderProducts(products)
+    renderCategories(products)
+  }catch(err){
+    console.log("Product load error:",err)
+  }
 }
 
-}
-
-/* =========================
-RENDER PRODUCTS
-========================= */
-
+/* RENDER PRODUCTS */
 function renderProducts(products){
-
-const container=document.getElementById("products")
-container.innerHTML=""
-
-products.forEach(p=>{
-
-const out=p.status==="out_of_stall"
-
-const card=document.createElement("div")
-card.className="product-card"
-
-card.innerHTML=`
-
-<div class="product-image">
-
-<img src="${p.mainImage}">
-
-${p.featured?'<div class="badge">FEATURED</div>':""}
-
-${p.slashPrice>0?'<div class="badge sale">SALE</div>':""}
-
-${out?'<div class="badge out">OUT OF STALL</div>':""}
-
-</div>
-
-<div class="product-body">
-
-<div class="product-category">${p.category}</div>
-
-<div class="product-name">${p.name}</div>
-
-<div class="price">
-
-${p.slashPrice>0?`<span class="old-price">₦${p.slashPrice}</span>`:""}
-
-<span class="new-price">₦${p.price}</span>
-
-</div>
-
-<button class="add-cart ${out?'disabled':''}" ${out?'disabled':''}>
-
-${out?"Out of Stall":"Add to Cart"}
-
-</button>
-
-</div>
-`
-
-container.appendChild(card)
-
-})
-
+  const container=document.getElementById("products")
+  container.innerHTML=""
+  products.forEach(p=>{
+    const out=p.status==="out_of_stall"
+    const card=document.createElement("div")
+    card.className="product-card"
+    card.innerHTML=`
+      <div class="product-image">
+        <img src="${p.mainImage}">
+        ${p.featured?'<div class="badge">FEATURED</div>':""}
+        ${p.slashPrice>0?'<div class="badge sale">SALE</div>':""}
+        ${out?'<div class="badge out">OUT OF STALL</div>':""}
+      </div>
+      <div class="product-body">
+        <div class="product-category">${p.category}</div>
+        <div class="product-name">${p.name}</div>
+        <div class="price">
+          ${p.slashPrice>0?`<span class="old-price">₦${p.slashPrice}</span>`:""}
+          <span class="new-price">₦${p.price}</span>
+        </div>
+        <button class="add-cart ${out?'disabled':''}" ${out?'disabled':''}>
+          ${out?"Out of Stall":"Add to Cart"}
+        </button>
+      </div>
+    `
+    container.appendChild(card)
+  })
 }
 
-/* =========================
-CATEGORIES
-========================= */
-
+/* CATEGORIES */
 function renderCategories(products){
-
-const cats=[...new Set(products.map(p=>p.category))]
-
-const container=document.getElementById("categories")
-
-container.innerHTML=`<div class="category-pill active" onclick="filterProducts('All')">All</div>`
-
-cats.forEach(c=>{
-
-const pill=document.createElement("div")
-pill.className="category-pill"
-pill.innerText=c
-
-pill.onclick=()=>{
-
-document.querySelectorAll(".category-pill").forEach(p=>p.classList.remove("active"))
-
-pill.classList.add("active")
-
-filterProducts(c)
-
-}
-
-container.appendChild(pill)
-
-})
-
+  const cats=[...new Set(products.map(p=>p.category))]
+  const container=document.getElementById("categories")
+  container.innerHTML=`<div class="category-pill active" onclick="filterProducts('All')">All</div>`
+  cats.forEach(c=>{
+    const pill=document.createElement("div")
+    pill.className="category-pill"
+    pill.innerText=c
+    pill.onclick=()=>{
+      document.querySelectorAll(".category-pill").forEach(p=>p.classList.remove("active"))
+      pill.classList.add("active")
+      filterProducts(c)
+    }
+    container.appendChild(pill)
+  })
 }
 
 async function filterProducts(category){
-
-const res=await fetch(API+"/api/products")
-const products=await res.json()
-
-if(category==="All"){
-renderProducts(products)
-return
+  const res=await fetch(API+"/api/products")
+  const products=await res.json()
+  if(category==="All"){ renderProducts(products); return }
+  renderProducts(products.filter(p=>p.category===category))
 }
 
-renderProducts(products.filter(p=>p.category===category))
-
-}
-
-/* =========================
-INIT
-========================= */
-
+/* INIT */
 loadHero()
 loadProducts()
-
 </script>
 
 </body>
