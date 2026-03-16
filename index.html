@@ -6,30 +6,45 @@
 <title>Subuluke Store</title>
 
 <style>
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  background: var(--bg-gradient);
+  color: var(--text);
+}
+
+.header {
+  
+}
+
+.footer {
+  
 /* =========================
 THEME VARIABLES
 ========================= */
-:root{
-  --bg:#FFF8E7;
-  --header:#E6A520; /* gradient override will be applied */
-  --card:rgba(255,248,231,0.65);
-  --text:#3a2a00;
-  --muted:#777;
-  --border:rgba(255,255,255,0.25);
-  --accent:#E6A520;
-  --softGold:#FFD77A;
+:root {
+  --bg-gradient: linear-gradient(to bottom, #FFF8E7 0%, #FFD77A 100%);
+  --bg: #FFF8E7;
+  --header-gradient: linear-gradient(135deg, #E6A520 0%, #FFD77A 100%);
+  --card: rgba(255,248,231,0.65);
+  --text: #3a2a00;
+  --muted: #777;
+  --border: rgba(255,255,255,0.25);
+  --accent: #E6A520;
+  --softGold: #FFD77A;
 }
 
-body.dark{
---bg:#0F0F0F;
---header:#121212;
---sidebar:#111;
---card:#1A1A1A;
---text:#F5F5F5;
---muted:#BBBBBB;
---border:#2A2A2A;
+body.dark {
+  --bg-gradient: linear-gradient(to bottom, #121212 0%, #1A1A1A 100%);
+  --bg: #0F0F0F;
+  --header-gradient: linear-gradient(135deg, #121212 0%, #1A1A1A 100%);
+  --card: rgba(26,26,26,0.65);
+  --text: #F5F5F5;
+  --muted: #BBBBBB;
+  --border: rgba(255,255,255,0.15);
 }
-
 /* =========================
 BASE
 ========================= */
@@ -52,8 +67,8 @@ HEADER
   align-items:center;
   justify-content:space-between;
   padding:0 28px;
-  background: linear-gradient(135deg, #E6A520 0%, #FFD77A 100%);
-  color:#3a2a00;
+  background: var(--header-gradient);
+  color: var(--text);
   position:sticky;
   top:0;
   z-index:100;
@@ -297,8 +312,8 @@ FOOTER
 .footer{
   margin-top:80px;
   padding:60px 20px;
-  background: linear-gradient(135deg, #E6A520 0%, #FFD77A 100%);
-  color:#3a2a00;
+background: var(--header-gradient);
+  color: var(--text);
   text-align:center;
   border-radius:12px 12px 0 0;
   box-shadow:0 -4px 12px rgba(122,74,0,0.25);
