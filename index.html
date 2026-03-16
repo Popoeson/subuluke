@@ -488,18 +488,40 @@ let allProducts=[]
 /* =========================
 THEME TOGGLE
 ========================= */
-
 function toggleTheme(){
+
   document.body.classList.toggle("dark")
-  localStorage.setItem(
-    "theme",
-    document.body.classList.contains("dark") ? "dark" : "light"
-  )
+
+  const isDark = document.body.classList.contains("dark")
+
+  localStorage.setItem("theme", isDark ? "dark" : "light")
+
+  updateThemeIcon()
+
 }
 
+// ICON SWITCH
+function updateThemeIcon(){
+
+  const moon = document.getElementById("moonIcon")
+  const sun = document.getElementById("sunIcon")
+
+  if(document.body.classList.contains("dark")){
+    moon.style.display="none"
+    sun.style.display="block"
+  }else{
+    moon.style.display="block"
+    sun.style.display="none"
+  }
+
+}
+
+// LOAD THEME
 if(localStorage.getItem("theme")==="dark"){
   document.body.classList.add("dark")
 }
+
+updateThemeIcon()
 
 /* =========================
 SIDEBAR
