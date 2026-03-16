@@ -265,21 +265,27 @@ display:none;
 align-items:center;
 justify-content:center;
 z-index:2000;
+padding:16px; /* prevents edge touching on mobile */
 }
 
+/* modal container */
 .modal-content{
 background:var(--card);
 padding:24px;
 border-radius:12px;
 width:500px;
-max-width:90%;
+max-width:100%;
+max-height:90vh;        /* prevents overflow */
+overflow-y:auto;        /* enables scroll if content too tall */
 border:1px solid var(--border);
 }
 
+/* modal title */
 .modal h2{
 margin-bottom:20px;
 }
 
+/* form inputs */
 .modal input,
 .modal select{
 width:100%;
@@ -291,12 +297,24 @@ background:transparent;
 color:var(--text);
 }
 
+/* preview image */
+#preview{
+width:100%;
+max-height:220px;   /* prevents huge images */
+object-fit:cover;
+border-radius:8px;
+margin-bottom:10px;
+display:none;
+}
+
+/* toggle group */
 .toggle-group{
 display:flex;
 gap:10px;
 margin-bottom:12px;
 }
 
+/* toggle buttons */
 .toggle{
 flex:1;
 padding:8px;
@@ -309,6 +327,23 @@ border-radius:6px;
 .toggle.active{
 background:var(--accent);
 color:white;
+}
+
+/* =========================
+MOBILE OPTIMIZATION
+========================= */
+
+@media (max-width:600px){
+
+.modal-content{
+padding:18px;
+border-radius:10px;
+}
+
+.modal h2{
+font-size:18px;
+}
+
 }
 
 /* =========================
