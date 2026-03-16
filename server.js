@@ -125,85 +125,85 @@ const uploadHeroToCloudinary = (buffer) => {
 // =====================
 
 // ---- Create Product ----
-app.post('/api/products', upload.array('images', 5), async (req, res) => {
+app.post('/api/products', upload.single('images'), async (req, res) => {
   try {
-    const { name, category, price, description, quantity, featured } = req.body; // <-- include featured
+    const { name, category, price, slashPrice, description, status, featured } = req.body;
 
-    if (!req.files || req.files.length === 0) {
-      return res.status(400).json({ error: 'No images uploaded' });
+    if (!req.file) {
+      return res.status(400).json({ error: 'No image uploaded' });
     }
 
-    // Upload all images to Cloudinary
-    const uploadResults = await Promise.all(req.files.map(file => uploadToCloudinary(file.buffer)));
-
-    const mainImage = uploadResults[0].secure_url;
-    const otherImages = uploadResults.slice(1).map(r => r.secure_url);
+    // Upload main image to Cloudinary
+    const uploadResult = await uploadToCloudinary(req.file.buffer);
+    const mainImage = uploadResult.secure_url;
 
     const newProduct = new Product({
       name,
       category,
       price: Number(price),
-      quantity: quantity ? Number(quantity) : 0,
-      description,
-      featured: featured === 'true', // <-- convert to boolean
-      mainImage,
-      otherImages
+      slashPrice: Number(slashPrice || 0),
+      description: description || "",
+      quantity: status === "in_stall" ? 10 : 0, // simple logic
+      featured: featured === 'true',
+      mainImage
     });
 
     await newProduct.save();
     res.status(201).json(newProduct);
 
-  } catch(err) {
+  } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Server error' });
   }
 });
 
 // ---- Update Product ----
-app.put('/api/products/:id', upload.array('images', 5), async (req,res)=>{
+app.put('/api/products/:id', upload.single('images'), async (req, res) => {
   try {
-    const { name, category, price, description, quantity, featured } = req.body;
+    const { name, category, price, slashPrice, description, status, featured } = req.body;
 
     const updateData = {
       name,
       category,
       price: Number(price),
-      description,
-      quantity: Number(quantity),
-      featured: featured === 'true' // <-- convert to boolean
+      slashPrice: Number(slashPrice || 0),
+      description: description || "",
+      quantity: status === "in_stall" ? 10 : 0,
+      featured: featured === 'true'
     };
 
-    if (req.files && req.files.length > 0) {
-      // Upload all new images
-      const uploadResults = await Promise.all(req.files.map(file => uploadToCloudinary(file.buffer)));
-      updateData.mainImage = uploadResults[0].secure_url;
-      updateData.otherImages = uploadResults.slice(1).map(r => r.secure_url);
+    if (req.file) {
+      const uploadResult = await uploadToCloudinary(req.file.buffer);
+      updateData.mainImage = uploadResult.secure_url;
     }
 
     const updatedProduct = await Product.findByIdAndUpdate(req.params.id, updateData, { new: true });
     res.json(updatedProduct);
 
-  } catch(err){
+  } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Server error' });
   }
 });
+
 // ---- Get All Products ----
-app.get('/api/products', async (req, res)=>{
+app.get('/api/products', async (req, res) => {
   try {
     const products = await Product.find().sort({ createdAt: -1 });
     res.json(products);
-  } catch(err) {
+  } catch (err) {
+    console.error(err);
     res.status(500).json({ error: 'Server error' });
   }
 });
 
 // ---- Delete Product ----
-app.delete('/api/products/:id', async (req,res)=>{
+app.delete('/api/products/:id', async (req, res) => {
   try {
     await Product.findByIdAndDelete(req.params.id);
     res.json({ message: 'Product deleted' });
-  } catch(err){
+  } catch (err) {
+    console.error(err);
     res.status(500).json({ error: 'Server error' });
   }
 });
