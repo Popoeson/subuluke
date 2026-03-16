@@ -745,86 +745,79 @@ function filterProducts(category){
 /* =========================
 RENDER CATEGORIES
 ========================= */
+function renderCategories(products) {
+  const cats = [...new Set(products.map(p => p.category))];
 
-function renderCategories(products){
+  const container = document.getElementById("categories");
+  const mobileContainer = document.getElementById("mobileCategories");
 
-  const cats = [...new Set(products.map(p=>p.category))]
+  // Clear previous categories
+  container.innerHTML = "";
+  mobileContainer.innerHTML = "";
 
-  const container = document.getElementById("categories")
-  const mobileContainer = document.getElementById("mobileCategories")
+  // --- ALL CATEGORY ---
+  const allPill = document.createElement("div");
+  allPill.className = "category-pill active";
+  allPill.innerText = "All";
+  allPill.onclick = () => {
+    document.querySelectorAll(".category-pill").forEach(p => p.classList.remove("active"));
+    document.querySelectorAll(".mobile-category").forEach(p => p.classList.remove("active"));
 
-document.querySelectorAll(".mobile-category")
-.forEach(c=>c.classList.remove("active"))
+    allPill.classList.add("active");
+    mobileAll.classList.add("active");
 
-mobileItem.classList.add("active")
+    filterProducts("All");
+  };
+  container.appendChild(allPill);
 
-  container.innerHTML=""
-  mobileContainer.innerHTML=""
+  const mobileAll = document.createElement("div");
+  mobileAll.className = "mobile-category active";
+  mobileAll.innerText = "All";
+  mobileAll.onclick = () => {
+    document.querySelectorAll(".category-pill").forEach(p => p.classList.remove("active"));
+    document.querySelectorAll(".mobile-category").forEach(p => p.classList.remove("active"));
 
-  /* ALL CATEGORY */
+    allPill.classList.add("active");
+    mobileAll.classList.add("active");
 
-  const allPill=document.createElement("div")
-  allPill.className="category-pill active"
-  allPill.innerText="All"
+    filterProducts("All");
+    closeSidebar();
+  };
+  mobileContainer.appendChild(mobileAll);
 
-  allPill.onclick=()=>{
+  // --- OTHER CATEGORIES ---
+  cats.forEach(c => {
+    // Desktop pill
+    const pill = document.createElement("div");
+    pill.className = "category-pill";
+    pill.innerText = c;
+    pill.onclick = () => {
+      document.querySelectorAll(".category-pill").forEach(p => p.classList.remove("active"));
+      document.querySelectorAll(".mobile-category").forEach(p => p.classList.remove("active"));
 
-    document.querySelectorAll(".category-pill")
-    .forEach(p=>p.classList.remove("active"))
+      pill.classList.add("active");
+      mobileItem.classList.add("active");
 
-    allPill.classList.add("active")
+      filterProducts(c);
+    };
+    container.appendChild(pill);
 
-    filterProducts("All")
+    // Mobile item
+    const mobileItem = document.createElement("div");
+    mobileItem.className = "mobile-category";
+    mobileItem.innerText = c;
+    mobileItem.onclick = () => {
+      document.querySelectorAll(".category-pill").forEach(p => p.classList.remove("active"));
+      document.querySelectorAll(".mobile-category").forEach(p => p.classList.remove("active"));
 
-  }
+      pill.classList.add("active");
+      mobileItem.classList.add("active");
 
-  container.appendChild(allPill)
-
-  const mobileAll=document.createElement("div")
-  mobileAll.className="mobile-category"
-  mobileAll.innerText="All"
-
-  mobileAll.onclick=()=>{
-    filterProducts("All")
-    closeSidebar()
-  }
-
-  mobileContainer.appendChild(mobileAll)
-
-  /* OTHER CATEGORIES */
-
-  cats.forEach(c=>{
-
-    const pill=document.createElement("div")
-    pill.className="category-pill"
-    pill.innerText=c
-
-    pill.onclick=()=>{
-
-      document.querySelectorAll(".category-pill")
-      .forEach(p=>p.classList.remove("active"))
-
-      pill.classList.add("active")
-
-      filterProducts(c)
-
-    }
-
-    container.appendChild(pill)
-
-    const mobileItem=document.createElement("div")
-    mobileItem.className="mobile-category"
-    mobileItem.innerText=c
-
-    mobileItem.onclick=()=>{
-      filterProducts(c)
-      closeSidebar()
-    }
-
-    mobileContainer.appendChild(mobileItem)
-
-  })
-
+      filterProducts(c);
+      closeSidebar();
+    };
+    mobileContainer.appendChild(mobileItem);
+  });
 }
 
 /* =========================
