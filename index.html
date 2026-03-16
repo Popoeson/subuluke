@@ -9,29 +9,29 @@
 <style>
 
 /* =========================
-COLOR SYSTEM
+THEME VARIABLES
 ========================= */
 
 :root{
-
---bg:#f8fafc;
+--bg:#FFF8E7;
+--header:#ffffff;
+--sidebar:#ffffff;
 --card:#ffffff;
---text:#0f172a;
---muted:#64748b;
---border:#e2e8f0;
---accent:#f97316;
-
+--text:#333;
+--muted:#777;
+--border:#eee;
+--accent:#E6A520;
+--softGold:#FFD77A;
 }
 
 body.dark{
-
---bg:#020617;
---card:#0f172a;
---text:#f8fafc;
---muted:#94a3b8;
---border:#334155;
---accent:#fb923c;
-
+--bg:#0F0F0F;
+--header:#121212;
+--sidebar:#111;
+--card:#1A1A1A;
+--text:#F5F5F5;
+--muted:#BBBBBB;
+--border:#2A2A2A;
 }
 
 body{
@@ -46,43 +46,32 @@ HEADER
 ========================= */
 
 .header{
-
 height:72px;
 display:flex;
 align-items:center;
 justify-content:space-between;
-
 padding:0 28px;
-
 border-bottom:1px solid var(--border);
-background:var(--card);
-
+background:var(--header);
 position:sticky;
 top:0;
 z-index:100;
-
 }
 
 .logo{
-
 font-size:22px;
 font-weight:700;
-
 }
 
 .header-right{
-
 display:flex;
 gap:20px;
 align-items:center;
-
 }
 
 .theme-toggle{
-
 cursor:pointer;
 font-size:18px;
-
 }
 
 /* =========================
@@ -90,29 +79,23 @@ CATEGORY TABS
 ========================= */
 
 .categories{
-
 display:flex;
 gap:12px;
 padding:18px 24px;
 overflow:auto;
-
 }
 
 .category-pill{
-
 padding:8px 18px;
 border:1px solid var(--border);
 border-radius:999px;
 cursor:pointer;
-
 }
 
 .category-pill.active{
-
 background:var(--accent);
 color:white;
 border:none;
-
 }
 
 /* =========================
@@ -120,44 +103,33 @@ HERO
 ========================= */
 
 .hero{
-
-height:480px;
+height:500px;
 position:relative;
 overflow:hidden;
-
 }
 
 .hero img{
-
 width:100%;
 height:100%;
 object-fit:cover;
-
 }
 
 .hero-overlay{
-
 position:absolute;
 top:50%;
 left:50%;
 transform:translate(-50%,-50%);
-
 text-align:center;
 color:white;
-
 }
 
 .hero-overlay h1{
-
 font-size:52px;
 margin-bottom:16px;
-
 }
 
 .hero-overlay p{
-
 font-size:20px;
-
 }
 
 /* =========================
@@ -165,23 +137,17 @@ SECTION TITLE
 ========================= */
 
 .section-title{
-
 text-align:center;
 padding:60px 20px;
-
 }
 
 .section-title h2{
-
 font-size:36px;
 margin-bottom:12px;
-
 }
 
 .section-title p{
-
 color:var(--muted);
-
 }
 
 /* =========================
@@ -189,32 +155,24 @@ PRODUCT GRID
 ========================= */
 
 .products{
-
 max-width:1280px;
 margin:auto;
-
 display:grid;
 grid-template-columns:repeat(4,1fr);
 gap:28px;
-
 padding:20px;
-
 }
 
 @media(max-width:1100px){
-
 .products{
 grid-template-columns:repeat(3,1fr);
 }
-
 }
 
 @media(max-width:768px){
-
 .products{
 grid-template-columns:repeat(2,1fr);
 }
-
 }
 
 /* =========================
@@ -222,122 +180,95 @@ PRODUCT CARD
 ========================= */
 
 .product-card{
-
 background:var(--card);
 border:1px solid var(--border);
 border-radius:12px;
 overflow:hidden;
-
 }
 
 .product-image{
-
 position:relative;
-
 }
 
 .product-image img{
-
 width:100%;
 aspect-ratio:4/5;
 object-fit:cover;
-
 }
 
 /* BADGES */
 
 .badge{
-
 position:absolute;
 top:10px;
 left:10px;
-
 background:var(--accent);
 color:white;
-
 font-size:12px;
 padding:4px 10px;
 border-radius:20px;
-
 }
 
 .badge.sale{
-
-left:auto;
 right:10px;
-background:#ef4444;
-
+left:auto;
+background:#d62828;
 }
 
 .badge.out{
-
-background:#64748b;
-
+background:#777;
 }
 
+/* PRODUCT BODY */
+
 .product-body{
-
 padding:18px;
-
 }
 
 .product-category{
-
 font-size:12px;
 color:var(--muted);
 margin-bottom:6px;
-
 }
 
 .product-name{
-
 font-weight:600;
 margin-bottom:8px;
-
 }
 
 .price{
-
 display:flex;
 gap:10px;
 align-items:center;
-
+margin-top:4px;
 }
 
 .old-price{
-
 text-decoration:line-through;
 color:var(--muted);
-
+font-size:14px;
 }
 
 .new-price{
-
 font-weight:700;
-
+font-size:18px;
+color:var(--accent);
 }
 
 .add-cart{
-
 margin-top:14px;
-
 width:100%;
 padding:10px;
-
 border:none;
 background:black;
 color:white;
 border-radius:6px;
-
 cursor:pointer;
-
 }
 
 .add-cart.disabled{
-
 background:#999;
 cursor:not-allowed;
-
 }
 
 /* =========================
@@ -345,13 +276,10 @@ FOOTER
 ========================= */
 
 .footer{
-
 margin-top:80px;
 padding:60px 20px;
 border-top:1px solid var(--border);
-
 text-align:center;
-
 }
 
 </style>
@@ -364,9 +292,7 @@ text-align:center;
 <div class="logo">Subuluke</div>
 
 <div class="header-right">
-
 <div class="theme-toggle" onclick="toggleTheme()">🌙</div>
-
 </div>
 
 </header>
@@ -379,10 +305,8 @@ text-align:center;
 
 
 <div class="section-title">
-
 <h2>Our Collection</h2>
 <p>Discover our latest pieces curated for you</p>
-
 </div>
 
 
@@ -390,9 +314,7 @@ text-align:center;
 
 
 <footer class="footer">
-
 <p>© 2026 Subuluke Store</p>
-
 </footer>
 
 
@@ -401,7 +323,7 @@ text-align:center;
 const API="https://subuluke.onrender.com"
 
 /* =========================
-THEME
+THEME TOGGLE
 ========================= */
 
 function toggleTheme(){
@@ -430,30 +352,21 @@ async function loadHero(){
 
 try{
 
-const res=await fetch(API+"/api/heroes")
+const res=await fetch(API+"/api/hero-images")
 const heroes=await res.json()
 
 if(!heroes.length) return
 
-const hero=heroes[0]
+const activeHero=heroes.find(h=>h.isActive) || heroes[0]
 
 document.getElementById("heroSection").innerHTML=`
 
-<img src="${hero.image}">
-
-<div class="hero-overlay">
-
-<h1>${hero.title||""}</h1>
-<p>${hero.subtitle||""}</p>
-
-</div>
+<img src="${activeHero.imageUrl}">
 
 `
 
 }catch(err){
-
-console.log(err)
-
+console.log("Hero load error:",err)
 }
 
 }
@@ -474,21 +387,24 @@ renderCategories(products)
 
 }catch(err){
 
-console.log(err)
+console.log("Product load error:",err)
 
 }
 
 }
+
+/* =========================
+RENDER PRODUCTS
+========================= */
 
 function renderProducts(products){
 
 const container=document.getElementById("products")
-
 container.innerHTML=""
 
 products.forEach(p=>{
 
-const out=!p.inStock
+const out=p.status==="out_of_stall"
 
 const card=document.createElement("div")
 card.className="product-card"
@@ -497,11 +413,11 @@ card.innerHTML=`
 
 <div class="product-image">
 
-<img src="${p.image}">
+<img src="${p.mainImage}">
 
 ${p.featured?'<div class="badge">FEATURED</div>':""}
 
-${p.slashedPrice?'<div class="badge sale">SALE</div>':""}
+${p.slashPrice>0?'<div class="badge sale">SALE</div>':""}
 
 ${out?'<div class="badge out">OUT OF STALL</div>':""}
 
@@ -515,20 +431,19 @@ ${out?'<div class="badge out">OUT OF STALL</div>':""}
 
 <div class="price">
 
-${p.slashedPrice?`<span class="old-price">$${p.slashedPrice}</span>`:""}
+${p.slashPrice>0?`<span class="old-price">₦${p.slashPrice}</span>`:""}
 
-<span class="new-price">$${p.price}</span>
+<span class="new-price">₦${p.price}</span>
 
 </div>
 
 <button class="add-cart ${out?'disabled':''}" ${out?'disabled':''}>
 
-${out?"Out of Stock":"Add to Cart"}
+${out?"Out of Stall":"Add to Cart"}
 
 </button>
 
 </div>
-
 `
 
 container.appendChild(card)
@@ -538,7 +453,7 @@ container.appendChild(card)
 }
 
 /* =========================
-CATEGORY FILTER
+CATEGORIES
 ========================= */
 
 function renderCategories(products){
@@ -547,7 +462,7 @@ const cats=[...new Set(products.map(p=>p.category))]
 
 const container=document.getElementById("categories")
 
-container.innerHTML=`<div class="category-pill active">All</div>`
+container.innerHTML=`<div class="category-pill active" onclick="filterProducts('All')">All</div>`
 
 cats.forEach(c=>{
 
