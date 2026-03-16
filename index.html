@@ -53,7 +53,6 @@ body {
 /* =========================
 HEADER
 ========================= */
-
 /* -------------------------
 Header Theme & Glass
 ------------------------- */
@@ -163,31 +162,9 @@ Hamburger (mobile)
   cursor: pointer;
 }
 
-/* =========================
-SIDEBAR (ADMIN-LIKE STYLE)
-========================= */
-
-/* Sidebar container */
-.mobile-sidebar {
-  position: fixed;
-  top: 72px;                       /* below sticky header */
-  left: -280px;                     /* hidden by default */
-  width: 260px;
-  height: calc(100% - 72px);        /* full height minus header */
-  background: var(--card);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-right: 1px solid var(--border);
-  padding: 24px 16px;               /* admin-like padding */
-  transition: left 0.3s ease, background 0.4s;
-  z-index: 950;
-  box-shadow: 4px 0 20px rgba(0,0,0,0.25);
-  border-radius: 0 0 14px 0;
-  display: flex;
-  flex-direction: column;
-}
-
-/* Overlay for sidebar */
+/* -------------------------
+Mobile Sidebar
+------------------------- */
 .sidebar-overlay {
   position: fixed;
   top: 0;
@@ -199,6 +176,28 @@ SIDEBAR (ADMIN-LIKE STYLE)
   z-index: 900;
 }
 
+.mobile-sidebar {
+  position: fixed;
+  top: 72px;                   /* below header */
+  left: -280px;
+  width: 260px;
+  height: calc(100% - 72px);   /* full height minus header */
+  background: var(--card);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-right: 1px solid var(--border);
+  padding: 20px;
+  transition: left 0.3s ease;
+  z-index: 950;
+  box-shadow: 4px 0 20px rgba(0,0,0,0.25);
+  border-radius: 0 0 14px 0;
+}
+
+/* Sidebar active */
+.mobile-sidebar.active {
+  left: 0;
+}
+
 /* Overlay active */
 .sidebar-overlay.active {
   display: block;
@@ -206,35 +205,24 @@ SIDEBAR (ADMIN-LIKE STYLE)
 
 /* Sidebar header */
 .sidebar-header {
-  font-size: 18px;
+  margin-bottom: 20px;
   font-weight: 600;
-  margin-bottom: 24px;              /* more spacing like admin */
   color: var(--text);
 }
 
-/* Category / nav items container */
-#mobileCategories {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;                          /* spacing between items */
-}
-
-/* Sidebar item styling */
+/* Mobile category items */
 .mobile-category {
   padding: 12px 14px;
   border-left: 4px solid transparent;
   cursor: pointer;
   color: var(--text);
-  font-weight: 500;
-  border-radius: 8px;                 /* rounded edges like admin */
   transition: all 0.25s ease;
+  border-radius: 6px;
   backdrop-filter: blur(8px);
 }
 
-/* Hover effect */
 .mobile-category:hover {
-  background: rgba(255,255,255,0.08); /* subtle glass highlight */
-  color: var(--softGold);
+  background: rgba(255,255,255,0.08);
 }
 
 /* Active sidebar item */
@@ -242,18 +230,52 @@ SIDEBAR (ADMIN-LIKE STYLE)
   color: var(--softGold);
   border-left: 4px solid var(--accent);
   background: rgba(255,215,122,0.12);
-  font-weight: 600;
+  font-weight: 500;
   backdrop-filter: blur(12px);
 }
 
-/* Responsive adjustments */
+/* -------------------------
+Category Tabs (desktop)
+------------------------- */
+.categories {
+  display: flex;
+  gap: 12px;
+  padding: 18px 24px;
+  overflow: auto;
+  scroll-behavior: smooth;
+}
+
+.category-pill {
+  padding: 8px 18px;
+  border-radius: 999px;
+  cursor: pointer;
+  background: var(--card);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--border);
+  color: var(--text);
+  transition: all 0.3s;
+}
+
+.category-pill:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.category-pill.active {
+  background: var(--accent);
+  color: white;
+  border: none;
+}
+
+/* -------------------------
+Responsive
+------------------------- */
 @media (max-width: 768px) {
   .categories {
     display: none;
   }
   .hamburger {
     display: block;
-    color: var(--softGold);
   }
 }
 
