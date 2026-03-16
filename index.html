@@ -60,27 +60,16 @@ HEADER
   justify-content: space-between;
   padding: 0 28px;
 
-  /* Respect theme gradient */
   background: var(--header-gradient);
-
   color: var(--text);
 
   position: sticky;
   top: 0;
   z-index: 100;
-/*  position: relative;*/
+  position: relative;
 
-  /* Glass effect */
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(255,255,255,0.18);
 
-  /* subtle transparency overlay */
-  background-blend-mode: overlay;
-
-  /* glass border */
-  border-bottom: 1px solid rgba(255,255,255,0.2);
-
-  /* premium shadow */
   box-shadow:
     0 6px 18px rgba(0,0,0,0.18),
     inset 0 1px 0 rgba(255,255,255,0.25);
@@ -90,14 +79,29 @@ HEADER
   transition: background 0.4s, color 0.4s;
 }
 
+/* Glass layer */
+.header::before{
+  content:"";
+  position:absolute;
+  inset:0;
+
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+
+  background: rgba(255,255,255,0.08);
+
+  pointer-events:none;
+}
+
+/* Reflection layer */
 .header::after{
   content:"";
   position:absolute;
   inset:0;
   background:linear-gradient(
     120deg,
-    rgba(255,255,255,0.15),
-    rgba(255,255,255,0.05),
+    rgba(255,255,255,0.08),
+    rgba(255,255,255,0.03),
     transparent
   );
   pointer-events:none;
@@ -116,7 +120,8 @@ HEADER
 
 .theme-toggle {
   cursor: pointer;
-  font-size: 18px;
+  display:flex;
+  align-items:center;
 }
 
 /* =========================
@@ -129,8 +134,15 @@ display:flex;
 align-items:center;
 }
 
-.cart-icon svg{
-stroke:var(--text);
+.cart-icon svg,
+.theme-toggle svg{
+stroke:var(--softGold);
+color:var(--softGold);
+}
+
+.cart-icon:hover svg,
+.theme-toggle:hover svg{
+filter: drop-shadow(0 0 6px var(--softGold));
 }
 
 /* =========================
@@ -141,6 +153,7 @@ HAMBURGER
 display:none;
 font-size:22px;
 cursor:pointer;
+color:var(--softGold);
 }
 
 /* =========================
@@ -164,12 +177,19 @@ top:0;
 left:-280px;
 width:260px;
 height:100%;
+
 background:var(--card);
-backdrop-filter:blur(14px);
+
+backdrop-filter:blur(16px);
+-webkit-backdrop-filter:blur(16px);
+
 border-right:1px solid var(--border);
+
 padding:20px;
 transition:left .3s ease;
 z-index:300;
+
+box-shadow:4px 0 20px rgba(0,0,0,0.25);
 }
 
 .mobile-sidebar.active{
@@ -189,23 +209,37 @@ MOBILE CATEGORY ITEMS
 ========================= */
 
 .mobile-category{
-padding:12px;
-border-bottom:1px solid var(--border);
+padding:12px 14px;
+border-left:4px solid transparent;
 cursor:pointer;
+color:var(--text);
+transition:all .25s ease;
+border-radius:6px;
 }
 
 .mobile-category:hover{
-background:rgba(255,255,255,0.1);
+background:rgba(255,255,255,0.08);
+}
+
+/* Active sidebar item */
+
+.mobile-category.active{
+color:var(--softGold);
+border-left:4px solid var(--accent);
+background:rgba(255,215,122,0.08);
+font-weight:500;
 }
 
 /* =========================
 CATEGORY TABS
 ========================= */
+
 .categories {
   display: flex;
   gap: 12px;
   padding: 18px 24px;
   overflow: auto;
+  scroll-behavior:smooth;
 }
 
 .category-pill {
@@ -213,11 +247,15 @@ CATEGORY TABS
   border-radius: 999px;
   cursor: pointer;
   background: var(--card);
- /* background: rgba(255,255,255,0.35);*/
   backdrop-filter: blur(8px);
   border: 1px solid var(--border);
   color: var(--text);
   transition: all 0.3s;
+}
+
+.category-pill:hover{
+transform:translateY(-2px);
+box-shadow:0 4px 10px rgba(0,0,0,0.2);
 }
 
 .category-pill.active {
@@ -225,7 +263,6 @@ CATEGORY TABS
   color: white;
   border: none;
 }
-
 
 /* =========================
 RESPONSIVE
@@ -715,6 +752,11 @@ function renderCategories(products){
 
   const container = document.getElementById("categories")
   const mobileContainer = document.getElementById("mobileCategories")
+
+document.querySelectorAll(".mobile-category")
+.forEach(c=>c.classList.remove("active"))
+
+mobileItem.classList.add("active")
 
   container.innerHTML=""
   mobileContainer.innerHTML=""
