@@ -895,50 +895,48 @@ FOOTER
 
 <script>
 
-const API="https://subuluke.onrender.com"
+const API = "https://subuluke.onrender.com"
 
-let allProducts=[]
+/* =========================
+GLOBAL STATE
+========================= */
+let allProducts = []
+let currentProducts = []
+let currentPage = 1
+const productsPerPage = 4
 
 /* =========================
 THEME TOGGLE
 ========================= */
-let currentPage = 1
-const productsPerPage = 4
-let allProducts = []
 
 function toggleTheme(){
-
   document.body.classList.toggle("dark")
 
   const isDark = document.body.classList.contains("dark")
-
   localStorage.setItem("theme", isDark ? "dark" : "light")
 
   updateThemeIcon()
-
 }
 
-// ICON SWITCH
 function updateThemeIcon(){
-
   const moon = document.getElementById("moonIcon")
   const sun = document.getElementById("sunIcon")
 
-  if(document.body.classList.contains("dark")){
-    moon.style.display="none"
-    sun.style.display="block"
-  }else{
-    moon.style.display="block"
-    sun.style.display="none"
-  }
+  if(!moon || !sun) return
 
+  if(document.body.classList.contains("dark")){
+    moon.style.display = "none"
+    sun.style.display = "block"
+  }else{
+    moon.style.display = "block"
+    sun.style.display = "none"
+  }
 }
 
-// LOAD THEME
-if(localStorage.getItem("theme")==="dark"){
+/* LOAD THEME */
+if(localStorage.getItem("theme") === "dark"){
   document.body.classList.add("dark")
 }
-
 updateThemeIcon()
 
 /* =========================
@@ -946,42 +944,39 @@ SIDEBAR
 ========================= */
 
 function toggleSidebar(){
-  document.querySelector(".mobile-sidebar").classList.add("active")
-  document.querySelector(".sidebar-overlay").classList.add("active")
+  document.querySelector(".mobile-sidebar")?.classList.add("active")
+  document.querySelector(".sidebar-overlay")?.classList.add("active")
 }
 
 function closeSidebar(){
-  document.querySelector(".mobile-sidebar").classList.remove("active")
-  document.querySelector(".sidebar-overlay").classList.remove("active")
+  document.querySelector(".mobile-sidebar")?.classList.remove("active")
+  document.querySelector(".sidebar-overlay")?.classList.remove("active")
 }
 
 /* =========================
-LOAD HERO
+HERO
 ========================= */
 
 let heroIndex = 0
 let heroTimer
 
 async function loadHero(){
-
   try{
-
     const res = await fetch(API + "/api/hero-images")
     const heroes = await res.json()
 
     const activeHeroes = heroes.filter(h => h.isActive)
-
     if(!activeHeroes.length) return
 
     const track = document.getElementById("heroTrack")
     const dotsContainer = document.getElementById("heroDots")
 
+    if(!track || !dotsContainer) return
+
     track.innerHTML = ""
     dotsContainer.innerHTML = ""
 
     activeHeroes.forEach((hero,i)=>{
-
-      /* SLIDE */
 
       const slide = document.createElement("div")
       slide.className = "hero-slide"
@@ -997,16 +992,12 @@ async function loadHero(){
 
       track.appendChild(slide)
 
-      /* DOT */
-
       const dot = document.createElement("div")
       dot.className = "hero-dot"
       if(i===0) dot.classList.add("active")
 
       dot.onclick = ()=>goToHero(i)
-
       dotsContainer.appendChild(dot)
-
     })
 
     startHeroSlider()
@@ -1014,126 +1005,77 @@ async function loadHero(){
   }catch(err){
     console.log("Hero load error:",err)
   }
-
 }
 
-/* =========================
-SLIDER LOGIC
-========================= */
-
 function showHero(index){
-
   const slides = document.querySelectorAll(".hero-slide")
   const dots = document.querySelectorAll(".hero-dot")
 
   slides.forEach(s=>s.classList.remove("active"))
   dots.forEach(d=>d.classList.remove("active"))
 
-  slides[index].classList.add("active")
-  dots[index].classList.add("active")
-
+  slides[index]?.classList.add("active")
+  dots[index]?.classList.add("active")
 }
-
-/* NEXT */
 
 function nextHero(){
-
   const slides = document.querySelectorAll(".hero-slide")
-
-  heroIndex++
-
-  if(heroIndex >= slides.length){
-    heroIndex = 0
-  }
-
+  heroIndex = (heroIndex + 1) % slides.length
   showHero(heroIndex)
-
 }
-
-/* PREV */
 
 function prevHero(){
-
   const slides = document.querySelectorAll(".hero-slide")
-
-  heroIndex--
-
-  if(heroIndex < 0){
-    heroIndex = slides.length - 1
-  }
-
+  heroIndex = (heroIndex - 1 + slides.length) % slides.length
   showHero(heroIndex)
-
 }
-
-/* DOT CLICK */
 
 function goToHero(index){
-
   heroIndex = index
   showHero(heroIndex)
-
 }
-
-/* AUTO SLIDE */
 
 function startHeroSlider(){
-
-  heroTimer = setInterval(()=>{
-    nextHero()
-  },6000)
-
+  clearInterval(heroTimer)
+  heroTimer = setInterval(nextHero, 6000)
 }
 
-/* =========================
-ARROW EVENTS
-========================= */
+/* HERO BUTTONS SAFE */
+const nextBtn = document.getElementById("heroNext")
+const prevBtn = document.getElementById("heroPrev")
 
-document.getElementById("heroNext").onclick = ()=>{
-  nextHero()
-}
+if(nextBtn) nextBtn.onclick = nextHero
+if(prevBtn) prevBtn.onclick = prevHero
 
-document.getElementById("heroPrev").onclick = ()=>{
-  prevHero()
-}
-
-/* =========================
-MOBILE SWIPE
-========================= */
-
-let touchStartX = 0
-let touchEndX = 0
-
+/* TOUCH SWIPE */
 const hero = document.getElementById("heroSection")
 
-hero.addEventListener("touchstart",e=>{
-  touchStartX = e.changedTouches[0].screenX
-})
+if(hero){
+  let touchStartX = 0
 
-hero.addEventListener("touchend",e=>{
+  hero.addEventListener("touchstart",e=>{
+    touchStartX = e.changedTouches[0].screenX
+  })
 
-  touchEndX = e.changedTouches[0].screenX
+  hero.addEventListener("touchend",e=>{
+    const touchEndX = e.changedTouches[0].screenX
 
-  if(touchEndX < touchStartX - 50){
-    nextHero()
-  }
+    if(touchEndX < touchStartX - 50) nextHero()
+    if(touchEndX > touchStartX + 50) prevHero()
+  })
+}
 
-  if(touchEndX > touchStartX + 50){
-    prevHero()
-  }
-
-})
 /* =========================
 LOAD PRODUCTS
 ========================= */
+
 async function loadProducts(){
-
   try{
-
-    const res = await fetch(API+"/api/products")
+    const res = await fetch(API + "/api/products")
     const products = await res.json()
 
     allProducts = products
+    currentProducts = products
     currentPage = 1
 
     renderProducts(products)
@@ -1142,50 +1084,34 @@ async function loadProducts(){
   }catch(err){
     console.log("Product load error:",err)
   }
-
 }
 
 /* =========================
 RENDER PRODUCTS
 ========================= */
+
 function renderProducts(products){
 
   const container = document.getElementById("products")
-  const pagination = document.getElementById("pagination")
+  if(!container) return
 
   container.innerHTML = ""
-
-  /* =========================
-  SORT PRODUCTS
-  ========================= */
 
   const sortedProducts = [...products].sort((a,b)=>{
     return (b.featured === true) - (a.featured === true)
   })
 
-  /* =========================
-  PAGINATION LOGIC
-  ========================= */
-
   const start = (currentPage - 1) * productsPerPage
-  const end = start + productsPerPage
-
-  const paginatedProducts = sortedProducts.slice(start, end)
-
-  /* =========================
-  RENDER PRODUCTS
-  ========================= */
+  const paginatedProducts = sortedProducts.slice(start, start + productsPerPage)
 
   paginatedProducts.forEach(p=>{
 
     const out = p.status === "out_of_stall"
 
     const card = document.createElement("div")
-
     card.className = "product-card"
 
     card.innerHTML = `
-
       <div class="product-image">
         <img src="${p.mainImage}">
         ${p.featured ? '<div class="badge">FEATURED</div>' : ""}
@@ -1194,7 +1120,6 @@ function renderProducts(products){
       </div>
 
       <div class="product-body">
-
         <div class="product-category">${p.category}</div>
         <div class="product-name">${p.name}</div>
 
@@ -1214,17 +1139,13 @@ function renderProducts(products){
             <path d="M1 1h4l2.6 13.4a2 2 0 0 0 2 1.6h9.8a2 2 0 0 0 2-1.6L23 6H6"></path>
           </svg>
         </button>
-
       </div>
-
     `
 
     container.appendChild(card)
-
   })
 
   renderPagination(sortedProducts.length)
-
 }
 
 /* =========================
@@ -1233,100 +1154,72 @@ FILTER PRODUCTS
 
 function filterProducts(category){
 
-  if(category==="All"){
+  currentPage = 1
 
-    renderProducts(allProducts)
-
-    return
-
+  if(category === "All"){
+    currentProducts = allProducts
+  }else{
+    currentProducts = allProducts.filter(p => p.category === category)
   }
 
-  const filtered = allProducts.filter(p=>p.category===category)
-
-  renderProducts(filtered)
-
+  renderProducts(currentProducts)
 }
 
 /* =========================
-RENDER CATEGORIES
+CATEGORIES
 ========================= */
-function renderCategories(products) {
-  const cats = [...new Set(products.map(p => p.category))];
 
-  const container = document.getElementById("categories");
-  const mobileContainer = document.getElementById("mobileCategories");
+function renderCategories(products){
 
-  // Clear previous categories
-  container.innerHTML = "";
-  mobileContainer.innerHTML = "";
+  const cats = [...new Set(products.map(p => p.category))]
 
-  // --- ALL CATEGORY ---
-  const allPill = document.createElement("div");
-  allPill.className = "category-pill active";
-  allPill.innerText = "All";
-  allPill.onclick = () => {
-    document.querySelectorAll(".category-pill").forEach(p => p.classList.remove("active"));
-    document.querySelectorAll(".mobile-category").forEach(p => p.classList.remove("active"));
+  const container = document.getElementById("categories")
+  const mobileContainer = document.getElementById("mobileCategories")
 
-    allPill.classList.add("active");
-    mobileAll.classList.add("active");
+  if(!container || !mobileContainer) return
 
-    filterProducts("All");
-  };
-  container.appendChild(allPill);
+  container.innerHTML = ""
+  mobileContainer.innerHTML = ""
 
-  const mobileAll = document.createElement("div");
-  mobileAll.className = "mobile-category active";
-  mobileAll.innerText = "All";
-  mobileAll.onclick = () => {
-    document.querySelectorAll(".category-pill").forEach(p => p.classList.remove("active"));
-    document.querySelectorAll(".mobile-category").forEach(p => p.classList.remove("active"));
+  function setActive(){
+    document.querySelectorAll(".category-pill").forEach(p=>p.classList.remove("active"))
+    document.querySelectorAll(".mobile-category").forEach(p=>p.classList.remove("active"))
+  }
 
-    allPill.classList.add("active");
-    mobileAll.classList.add("active");
+  function createCategory(name){
 
-    filterProducts("All");
-    closeSidebar();
-  };
-  mobileContainer.appendChild(mobileAll);
+    const pill = document.createElement("div")
+    pill.className = "category-pill"
+    pill.innerText = name
 
-  // --- OTHER CATEGORIES ---
-  cats.forEach(c => {
-    // Desktop pill
-    const pill = document.createElement("div");
-    pill.className = "category-pill";
-    pill.innerText = c;
-    pill.onclick = () => {
-      document.querySelectorAll(".category-pill").forEach(p => p.classList.remove("active"));
-      document.querySelectorAll(".mobile-category").forEach(p => p.classList.remove("active"));
+    const mobileItem = document.createElement("div")
+    mobileItem.className = "mobile-category"
+    mobileItem.innerText = name
 
-      pill.classList.add("active");
-      mobileItem.classList.add("active");
+    const clickHandler = ()=>{
+      setActive()
+      pill.classList.add("active")
+      mobileItem.classList.add("active")
+      filterProducts(name)
+      closeSidebar()
+    }
 
-      filterProducts(c);
-    };
-    container.appendChild(pill);
+    pill.onclick = clickHandler
+    mobileItem.onclick = clickHandler
 
-    // Mobile item
-    const mobileItem = document.createElement("div");
-    mobileItem.className = "mobile-category";
-    mobileItem.innerText = c;
-    mobileItem.onclick = () => {
-      document.querySelectorAll(".category-pill").forEach(p => p.classList.remove("active"));
-      document.querySelectorAll(".mobile-category").forEach(p => p.classList.remove("active"));
+    container.appendChild(pill)
+    mobileContainer.appendChild(mobileItem)
+  }
 
-      pill.classList.add("active");
-      mobileItem.classList.add("active");
+  createCategory("All")
+  container.firstChild.classList.add("active")
+  mobileContainer.firstChild.classList.add("active")
 
-      filterProducts(c);
-      closeSidebar();
-    };
-    mobileContainer.appendChild(mobileItem);
-  });
+  cats.forEach(createCategory)
 }
 
 /* =========================
-CART SYSTEM
+CART
 ========================= */
 
 let cart = JSON.parse(localStorage.getItem("cart")) || []
@@ -1335,8 +1228,6 @@ function saveCart(){
   localStorage.setItem("cart", JSON.stringify(cart))
   updateCartCount()
 }
-
-/* ADD TO CART */
 
 function addToCart(id){
 
@@ -1358,14 +1249,12 @@ function addToCart(id){
   }
 
   saveCart()
-
 }
 
-/* CART COUNT (BADGE) */
+/* CART COUNT */
 function updateCartCount(){
 
   const count = cart.reduce((sum,item)=>sum+item.qty,0)
-
   const badge = document.getElementById("cartCount")
 
   if(!badge) return
@@ -1376,42 +1265,34 @@ function updateCartCount(){
     badge.style.display = "flex"
     badge.innerText = count
 
-    /* small pop animation */
     badge.style.transform = "scale(1.2)"
-    setTimeout(()=>{
-      badge.style.transform = "scale(1)"
-    },150)
+    setTimeout(()=>badge.style.transform = "scale(1)",150)
   }
-
 }
 
-
 /* =========================
-PAGINATION 
+PAGINATION
 ========================= */
+
 function renderPagination(totalProducts){
 
   const pagination = document.getElementById("pagination")
+  if(!pagination) return
 
   pagination.innerHTML = ""
 
   const totalPages = Math.ceil(totalProducts / productsPerPage)
 
-  /* PREV BUTTON */
   const prev = document.createElement("button")
   prev.innerText = "Prev"
   prev.disabled = currentPage === 1
-
   prev.onclick = ()=>{
     currentPage--
-    renderProducts(allProducts)
+    renderProducts(currentProducts)
   }
-
   pagination.appendChild(prev)
 
-  /* PAGE NUMBERS */
   for(let i=1;i<=totalPages;i++){
-
     const btn = document.createElement("button")
     btn.innerText = i
 
@@ -1421,25 +1302,21 @@ function renderPagination(totalProducts){
 
     btn.onclick = ()=>{
       currentPage = i
-      renderProducts(allProducts)
+      renderProducts(currentProducts)
     }
 
     pagination.appendChild(btn)
-
   }
 
-  /* NEXT BUTTON */
   const next = document.createElement("button")
   next.innerText = "Next"
   next.disabled = currentPage === totalPages
-
   next.onclick = ()=>{
     currentPage++
-    renderProducts(allProducts)
+    renderProducts(currentProducts)
   }
 
   pagination.appendChild(next)
-
 }
 
 /* =========================
@@ -1449,6 +1326,7 @@ INIT
 loadHero()
 loadProducts()
 updateCartCount()
+
 </script>
 
 </body>
