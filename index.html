@@ -862,6 +862,10 @@ let allProducts=[]
 /* =========================
 THEME TOGGLE
 ========================= */
+let currentPage = 1
+const productsPerPage = 4
+let allProducts = []
+
 function toggleTheme(){
 
   document.body.classList.toggle("dark")
@@ -1082,7 +1086,6 @@ hero.addEventListener("touchend",e=>{
 /* =========================
 LOAD PRODUCTS
 ========================= */
-
 async function loadProducts(){
 
   try{
@@ -1091,14 +1094,13 @@ async function loadProducts(){
     const products = await res.json()
 
     allProducts = products
+    currentPage = 1
 
     renderProducts(products)
     renderCategories(products)
 
   }catch(err){
-
     console.log("Product load error:",err)
-
   }
 
 }
@@ -1109,6 +1111,7 @@ RENDER PRODUCTS
 function renderProducts(products){
 
   const container = document.getElementById("products")
+  const pagination = document.getElementById("pagination")
 
   container.innerHTML = ""
 
@@ -1121,10 +1124,19 @@ function renderProducts(products){
   })
 
   /* =========================
-  RENDER
+  PAGINATION LOGIC
   ========================= */
 
-  sortedProducts.forEach(p=>{
+  const start = (currentPage - 1) * productsPerPage
+  const end = start + productsPerPage
+
+  const paginatedProducts = sortedProducts.slice(start, end)
+
+  /* =========================
+  RENDER PRODUCTS
+  ========================= */
+
+  paginatedProducts.forEach(p=>{
 
     const out = p.status === "out_of_stall"
 
@@ -1135,29 +1147,20 @@ function renderProducts(products){
     card.innerHTML = `
 
       <div class="product-image">
-
         <img src="${p.mainImage}">
-
         ${p.featured ? '<div class="badge">FEATURED</div>' : ""}
-
         ${p.slashPrice>0 ? '<div class="badge sale">SALE</div>' : ""}
-
         ${out ? '<div class="badge out">OUT OF STALL</div>' : ""}
-
       </div>
 
       <div class="product-body">
 
         <div class="product-category">${p.category}</div>
-
         <div class="product-name">${p.name}</div>
 
         <div class="price">
-
           ${p.slashPrice>0 ? `<span class="old-price">₦${p.slashPrice}</span>` : ""}
-
           <span class="new-price">₦${p.price}</span>
-
         </div>
 
         <button 
@@ -1179,6 +1182,8 @@ function renderProducts(products){
     container.appendChild(card)
 
   })
+
+  renderPagination(sortedProducts.length)
 
 }
 
