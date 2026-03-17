@@ -865,7 +865,7 @@ FOOTER
   .footer-container {
     flex-direction: column;
     text-align: center;
-    gap: 20px;
+    gap: 12px; /* reduced from 20px to tighten spacing */
   }
 
   .footer-about, .footer-contact {
@@ -874,6 +874,11 @@ FOOTER
 
   .footer-contact li {
     justify-content: center;
+  }
+
+  /* Reduce space between contact and copyright */
+  .footer-copy {
+    margin-top: 20px; /* reduced from 40px */
   }
 }
 </style>
