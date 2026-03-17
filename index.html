@@ -458,127 +458,163 @@ SECTION TITLE
 }
 
 /* =========================
-PRODUCT GRID
+PRODUCT CARD (PREMIUM)
 ========================= */
-.products {
-  max-width: 1280px;
-  margin: auto;
-  display: grid;
-  grid-template-columns: repeat(4,1fr);
-  gap: 28px;
-  padding: 20px;
-}
 
-@media(max-width:1100px){ .products{ grid-template-columns: repeat(3,1fr); } }
-@media(max-width:768px){ .products{ grid-template-columns: repeat(2,1fr); } }
-@media(max-width:480px){ .products{ grid-template-columns: 1fr; } }
-
-/* =========================
-PRODUCT CARD (GLASS)
-========================= */
 .product-card {
   background: var(--card);
-  backdrop-filter: blur(12px);
   border-radius: 16px;
   border: 1px solid var(--border);
   overflow: hidden;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  transition: background 0.4s, border 0.4s;
-}
 
-.product-image {
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
   position: relative;
 }
 
-.product-image img {
+/* HOVER EFFECT */
+.product-card:hover{
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.25);
+}
+
+/* IMAGE */
+
+.product-image{
+  position: relative;
+  overflow: hidden;
+}
+
+.product-image img{
   width: 100%;
   aspect-ratio: 4/5;
   object-fit: cover;
+
+  transition: transform 0.6s ease;
+}
+
+.product-card:hover .product-image img{
+  transform: scale(1.08);
 }
 
 /* BADGES */
-.badge {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  background: rgba(230,165,32,0.85);
-  color: white;
-  font-size: 12px;
-  padding: 4px 10px;
-  border-radius: 20px;
-  box-shadow: 0 2px 12px rgba(230,165,32,0.5);
+
+.badge{
+  position:absolute;
+  top:12px;
+  left:12px;
+
+  font-size:11px;
+  padding:5px 12px;
+  border-radius:20px;
+
+  background: rgba(230,165,32,0.9);
+  color:#fff;
+
+  backdrop-filter: blur(6px);
 }
 
-.badge.sale {
-  right: 10px;
-  left: auto;
-  background: rgba(214,40,40,0.85);
-  box-shadow: 0 2px 12px rgba(214,40,40,0.5);
+.badge.sale{
+  left:auto;
+  right:12px;
+  background: rgba(214,40,40,0.9);
 }
 
-.badge.out {
-  background: rgba(119,119,119,0.85);
-  box-shadow: 0 2px 12px rgba(119,119,119,0.5);
+.badge.out{
+  background: rgba(120,120,120,0.9);
 }
 
-/* PRODUCT BODY */
-.product-body {
-  padding: 18px;
+/* BODY */
+
+.product-body{
+  padding:18px;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
 }
 
-.product-category {
-  font-size: 12px;
+/* CATEGORY */
+
+.product-category{
+  font-size:11px;
+  text-transform: uppercase;
+  letter-spacing:0.5px;
   color: var(--muted);
-  margin-bottom: 6px;
 }
 
-.product-name {
-  font-weight: 600;
-  margin-bottom: 8px;
+/* NAME */
+
+.product-name{
+  font-weight:600;
+  font-size:16px;
+  line-height:1.4;
 }
 
-.price {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  margin-top: 4px;
+/* PRICE */
+
+.price{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-top:6px;
 }
 
-.old-price {
+.old-price{
   text-decoration: line-through;
   color: var(--muted);
-  font-size: 14px;
+  font-size:13px;
 }
 
-.new-price {
-  font-weight: 700;
-  font-size: 18px;
+.new-price{
+  font-weight:700;
+  font-size:20px;
   color: var(--accent);
 }
 
-.add-cart {
-  margin-top: 14px;
-  width: 100%;
-  padding: 10px;
-  border: none;
-  background: rgba(0,0,0,0.6);
-  color: white;
-  border-radius: 8px;
-  cursor: pointer;
+/* FLOATING ADD TO CART */
+
+.add-cart{
+  position:absolute;
+  bottom:16px;
+  right:16px;
+
+  width:44px;
+  height:44px;
+
+  border:none;
+  border-radius:50%;
+
+  background: rgba(0,0,0,0.7);
+  color:#fff;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  cursor:pointer;
   transition: all 0.3s;
 }
 
-.add-cart:hover:not(.disabled) {
-  background: rgba(0,0,0,0.8);
-  box-shadow: 0 0 12px var(--softGold);
+/* ICON INSIDE BUTTON */
+.add-cart svg{
+  width:20px;
+  height:20px;
 }
 
-.add-cart.disabled {
-  background: #999;
-  cursor: not-allowed;
+/* HOVER */
+.product-card:hover .add-cart{
+  background: var(--accent);
+  color:#000;
+  transform: scale(1.1);
+}
+
+/* DISABLED */
+.add-cart.disabled{
+  background:#777;
+  cursor:not-allowed;
+  transform:none;
 }
 
 /* =========================
@@ -992,11 +1028,17 @@ function renderProducts(products){
 
         </div>
 
-        <button class="add-cart ${out?'disabled':''}" ${out?'disabled':''}>
-
-          ${out ? "Out of Stall" : "Add to Cart"}
-
-        </button>
+        <button 
+  class="add-cart ${out?'disabled':''}" 
+  ${out?'disabled':''}
+  onclick="addToCart('${p._id}')"
+>
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <circle cx="9" cy="21" r="1"></circle>
+    <circle cx="20" cy="21" r="1"></circle>
+    <path d="M1 1h4l2.6 13.4a2 2 0 0 0 2 1.6h9.8a2 2 0 0 0 2-1.6L23 6H6"></path>
+  </svg>
+</button>
 
       </div>
 
@@ -1104,6 +1146,55 @@ function renderCategories(products) {
     };
     mobileContainer.appendChild(mobileItem);
   });
+}
+
+/* =========================
+CART SYSTEM
+========================= */
+
+let cart = JSON.parse(localStorage.getItem("cart")) || []
+
+function saveCart(){
+  localStorage.setItem("cart", JSON.stringify(cart))
+  updateCartCount()
+}
+
+/* ADD TO CART */
+
+function addToCart(id){
+
+  const product = allProducts.find(p => p._id === id)
+  if(!product) return
+
+  const existing = cart.find(item => item._id === id)
+
+  if(existing){
+    existing.qty += 1
+  }else{
+    cart.push({
+      _id: product._id,
+      name: product.name,
+      price: product.price,
+      image: product.mainImage,
+      qty: 1
+    })
+  }
+
+  saveCart()
+
+}
+
+/* CART COUNT (BADGE) */
+
+function updateCartCount(){
+
+  const count = cart.reduce((sum,item)=>sum+item.qty,0)
+
+  const badge = document.getElementById("cartCount")
+  if(badge){
+    badge.innerText = count
+  }
+
 }
 
 /* =========================
