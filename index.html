@@ -153,6 +153,49 @@ body.dark { --icon-color: var(--softGold); } /* dark mode */
   filter: drop-shadow(0 0 6px var(--softGold));
 }
 
+/* =========================
+CART BADGE
+========================= */
+
+.cart-icon{
+  position: relative;
+  cursor: pointer;
+}
+
+/* BADGE */
+
+.cart-badge{
+  position: absolute;
+  top: -6px;
+  right: -8px;
+
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+
+  border-radius: 20px;
+
+  background: var(--accent);
+  color: #000;
+
+  font-size: 11px;
+  font-weight: 600;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  box-shadow: 0 0 8px var(--softGold);
+
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+/* HIDE WHEN EMPTY */
+
+.cart-badge:empty{
+  display:none;
+}
+
 /* -------------------------
 Hamburger (mobile)
 ------------------------- */
@@ -642,13 +685,17 @@ FOOTER
   <div class="header-right">
 
     <!-- Cart Icon -->
-    <div class="cart-icon">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <circle cx="9" cy="21" r="1"></circle>
-        <circle cx="20" cy="21" r="1"></circle>
-        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h7.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-      </svg>
-    </div>
+    <a href="cart.html" class="cart-icon">
+
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <circle cx="9" cy="21" r="1"></circle>
+    <circle cx="20" cy="21" r="1"></circle>
+    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h7.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+  </svg>
+
+  <span id="cartCount" class="cart-badge">0</span>
+
+</a>
 
     <!-- Theme Toggle -->
     <div class="theme-toggle" onclick="toggleTheme()">
@@ -1185,18 +1232,28 @@ function addToCart(id){
 }
 
 /* CART COUNT (BADGE) */
-
 function updateCartCount(){
 
   const count = cart.reduce((sum,item)=>sum+item.qty,0)
 
   const badge = document.getElementById("cartCount")
-  if(badge){
+
+  if(!badge) return
+
+  if(count === 0){
+    badge.style.display = "none"
+  }else{
+    badge.style.display = "flex"
     badge.innerText = count
+
+    /* small pop animation */
+    badge.style.transform = "scale(1.2)"
+    setTimeout(()=>{
+      badge.style.transform = "scale(1)"
+    },150)
   }
 
 }
-
 /* =========================
 INIT
 ========================= */
