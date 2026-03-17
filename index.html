@@ -501,29 +501,66 @@ SECTION TITLE
 }
 
 /* =========================
-PRODUCT CARD (PREMIUM)
+PRODUCT GRID (REFINED)
+========================= */
+
+.products {
+  max-width: 1200px;
+  margin: auto;
+
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+
+  gap: 32px;
+  padding: 20px 16px;
+}
+
+/* TABLET */
+@media(max-width:1024px){
+  .products{
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+  }
+}
+
+/* MOBILE */
+@media(max-width:600px){
+  .products{
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}
+
+
+/* =========================
+PRODUCT CARD (REFINED)
 ========================= */
 
 .product-card {
   background: var(--card);
-  border-radius: 16px;
-  border: 1px solid var(--border);
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.08);
   overflow: hidden;
 
   display: flex;
   flex-direction: column;
 
-  transition: transform 0.35s ease, box-shadow 0.35s ease;
   position: relative;
+
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  backdrop-filter: blur(6px);
 }
 
 /* HOVER EFFECT */
 .product-card:hover{
-  transform: translateY(-6px) scale(1.02);
-  box-shadow: 0 16px 40px rgba(0,0,0,0.25);
+  transform: translateY(-5px) scale(1.015);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.22);
 }
 
-/* IMAGE */
+
+/* =========================
+IMAGE
+========================= */
 
 .product-image{
   position: relative;
@@ -535,14 +572,17 @@ PRODUCT CARD (PREMIUM)
   aspect-ratio: 4/5;
   object-fit: cover;
 
-  transition: transform 0.6s ease;
+  transition: transform 0.5s ease;
 }
 
 .product-card:hover .product-image img{
-  transform: scale(1.08);
+  transform: scale(1.07);
 }
 
-/* BADGES */
+
+/* =========================
+BADGES
+========================= */
 
 .badge{
   position:absolute;
@@ -569,33 +609,35 @@ PRODUCT CARD (PREMIUM)
   background: rgba(120,120,120,0.9);
 }
 
-/* BODY */
+
+/* =========================
+PRODUCT BODY
+========================= */
 
 .product-body{
-  padding:18px;
+  padding:14px;
   display:flex;
   flex-direction:column;
-  gap:6px;
+  gap:5px;
 }
 
-/* CATEGORY */
-
 .product-category{
-  font-size:11px;
+  font-size:10px;
   text-transform: uppercase;
   letter-spacing:0.5px;
   color: var(--muted);
 }
 
-/* NAME */
-
 .product-name{
   font-weight:600;
-  font-size:16px;
+  font-size:15px;
   line-height:1.4;
 }
 
-/* PRICE */
+
+/* =========================
+PRICE
+========================= */
 
 .price{
   display:flex;
@@ -612,19 +654,22 @@ PRODUCT CARD (PREMIUM)
 
 .new-price{
   font-weight:700;
-  font-size:20px;
+  font-size:18px;
   color: var(--accent);
 }
 
-/* FLOATING ADD TO CART */
+
+/* =========================
+ADD TO CART BUTTON
+========================= */
 
 .add-cart{
   position:absolute;
-  bottom:16px;
-  right:16px;
+  bottom:14px;
+  right:14px;
 
-  width:44px;
-  height:44px;
+  width:40px;
+  height:40px;
 
   border:none;
   border-radius:50%;
@@ -637,13 +682,14 @@ PRODUCT CARD (PREMIUM)
   justify-content:center;
 
   cursor:pointer;
+
   transition: all 0.3s;
 }
 
-/* ICON INSIDE BUTTON */
+/* ICON */
 .add-cart svg{
-  width:20px;
-  height:20px;
+  width:18px;
+  height:18px;
 }
 
 /* HOVER */
@@ -651,6 +697,7 @@ PRODUCT CARD (PREMIUM)
   background: var(--accent);
   color:#000;
   transform: scale(1.1);
+  box-shadow: 0 0 10px var(--softGold);
 }
 
 /* DISABLED */
@@ -658,6 +705,33 @@ PRODUCT CARD (PREMIUM)
   background:#777;
   cursor:not-allowed;
   transform:none;
+  box-shadow:none;
+}
+
+
+/* =========================
+MOBILE REFINEMENT
+========================= */
+
+@media(max-width:600px){
+
+  .product-body{
+    padding:16px;
+  }
+
+  .product-name{
+    font-size:17px;
+  }
+
+  .new-price{
+    font-size:20px;
+  }
+
+  .add-cart{
+    width:44px;
+    height:44px;
+  }
+
 }
 
 /* =========================
