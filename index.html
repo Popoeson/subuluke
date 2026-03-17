@@ -1106,22 +1106,33 @@ async function loadProducts(){
 /* =========================
 RENDER PRODUCTS
 ========================= */
-
 function renderProducts(products){
 
-  const container=document.getElementById("products")
+  const container = document.getElementById("products")
 
-  container.innerHTML=""
+  container.innerHTML = ""
 
-  products.forEach(p=>{
+  /* =========================
+  SORT PRODUCTS
+  ========================= */
 
-    const out = p.status==="out_of_stall"
+  const sortedProducts = [...products].sort((a,b)=>{
+    return (b.featured === true) - (a.featured === true)
+  })
 
-    const card=document.createElement("div")
+  /* =========================
+  RENDER
+  ========================= */
 
-    card.className="product-card"
+  sortedProducts.forEach(p=>{
 
-    card.innerHTML=`
+    const out = p.status === "out_of_stall"
+
+    const card = document.createElement("div")
+
+    card.className = "product-card"
+
+    card.innerHTML = `
 
       <div class="product-image">
 
@@ -1150,16 +1161,16 @@ function renderProducts(products){
         </div>
 
         <button 
-  class="add-cart ${out?'disabled':''}" 
-  ${out?'disabled':''}
-  onclick="addToCart('${p._id}')"
->
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-    <circle cx="9" cy="21" r="1"></circle>
-    <circle cx="20" cy="21" r="1"></circle>
-    <path d="M1 1h4l2.6 13.4a2 2 0 0 0 2 1.6h9.8a2 2 0 0 0 2-1.6L23 6H6"></path>
-  </svg>
-</button>
+          class="add-cart ${out?'disabled':''}" 
+          ${out?'disabled':''}
+          onclick="addToCart('${p._id}')"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="9" cy="21" r="1"></circle>
+            <circle cx="20" cy="21" r="1"></circle>
+            <path d="M1 1h4l2.6 13.4a2 2 0 0 0 2 1.6h9.8a2 2 0 0 0 2-1.6L23 6H6"></path>
+          </svg>
+        </button>
 
       </div>
 
