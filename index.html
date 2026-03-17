@@ -735,6 +735,45 @@ MOBILE REFINEMENT
 }
 
 /* =========================
+PAGINATION
+========================= */
+
+.pagination{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:10px;
+  margin:30px 0;
+  flex-wrap:wrap;
+}
+
+.pagination button{
+  padding:8px 14px;
+  border:none;
+  border-radius:8px;
+  background:var(--card);
+  color:var(--text);
+  cursor:pointer;
+  border:1px solid var(--border);
+}
+
+.pagination button:hover{
+  background:var(--accent);
+  color:#000;
+}
+
+.pagination button.active{
+  background:var(--accent);
+  color:#000;
+  font-weight:600;
+}
+
+.pagination button:disabled{
+  opacity:0.4;
+  cursor:not-allowed;
+}
+
+/* =========================
 FOOTER
 ========================= */
 .footer {
@@ -848,6 +887,7 @@ FOOTER
 </div>
 
 <section class="products" id="products"></section>
+<div id="pagination" class="pagination"></div>
 
 <footer class="footer">
   <p>© 2026 Subuluke Store</p>
@@ -1344,6 +1384,64 @@ function updateCartCount(){
   }
 
 }
+
+
+/* =========================
+PAGINATION 
+========================= */
+function renderPagination(totalProducts){
+
+  const pagination = document.getElementById("pagination")
+
+  pagination.innerHTML = ""
+
+  const totalPages = Math.ceil(totalProducts / productsPerPage)
+
+  /* PREV BUTTON */
+  const prev = document.createElement("button")
+  prev.innerText = "Prev"
+  prev.disabled = currentPage === 1
+
+  prev.onclick = ()=>{
+    currentPage--
+    renderProducts(allProducts)
+  }
+
+  pagination.appendChild(prev)
+
+  /* PAGE NUMBERS */
+  for(let i=1;i<=totalPages;i++){
+
+    const btn = document.createElement("button")
+    btn.innerText = i
+
+    if(i === currentPage){
+      btn.classList.add("active")
+    }
+
+    btn.onclick = ()=>{
+      currentPage = i
+      renderProducts(allProducts)
+    }
+
+    pagination.appendChild(btn)
+
+  }
+
+  /* NEXT BUTTON */
+  const next = document.createElement("button")
+  next.innerText = "Next"
+  next.disabled = currentPage === totalPages
+
+  next.onclick = ()=>{
+    currentPage++
+    renderProducts(allProducts)
+  }
+
+  pagination.appendChild(next)
+
+}
+
 /* =========================
 INIT
 ========================= */
