@@ -38,34 +38,58 @@ body{
   color:var(--text);  
 }  
   
-/* ========================= HEADER ========================= */  
-.header{  
-  height:70px;  
-  display:flex;  
-  justify-content:space-between;  
-  align-items:center;  
-  padding:0 20px;  
-  background:var(--header-gradient);  
-}  
-  
-.header-left{  
-  display:flex;  
-  align-items:center;  
-  gap:10px;  
-}  
-  
-.back-btn{  
-  width:36px;height:36px;  
-  border:1px solid var(--border);  
-  background:transparent;  
-  border-radius:8px;  
-  cursor:pointer;  
-}  
-  
-.logo{font-weight:700;}  
-  
-.theme-toggle{cursor:pointer;}  
-  
+/* =========================
+HEADER
+========================= */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+
+  background: var(--header-gradient);
+  border-bottom: 1px solid rgba(255,255,255,0.18);
+  border-radius: 0 0 14px 14px;
+
+  box-shadow: 0 6px 18px rgba(0,0,0,0.18);
+}
+
+.header-left{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.logo {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.header-right{
+  display:flex;
+  align-items:center;
+}
+
+.back-btn{
+  background: transparent;
+  border:1px solid var(--border);
+  width:36px;
+  height:36px;
+  border-radius:8px;
+  cursor:pointer;
+  color:var(--text);
+}
+
+.back-btn:hover{
+  background: var(--accent);
+  color:#000;
+}
+
 /* ========================= PAGE ========================= */  
 .checkout{  
   max-width:700px;  
@@ -131,23 +155,46 @@ body{
   display:none;  
 }  
   
-</style>  </head>  <body>  <!-- HEADER -->  <header class="header">  
+</style>
+
+  </head> 
+ <body> 
+
+ <!-- HEADER --> 
+
+ <header class="header">  
   <div class="header-left">  
     <button onclick="goBack()" class="back-btn">←</button>  
     <div class="logo">Subuluke</div>  
-  </div>    <div class="theme-toggle" onclick="toggleTheme()">  
+
+  </div>  
+
+  <div class="theme-toggle" onclick="toggleTheme()">  
     <span id="themeIcon">🌙</span>  
   </div>  
-</header>  <!-- PAGE -->  <div class="checkout">    <!-- FORM -->    <div class="form">  
+
+
+</header> 
+
+ <!-- PAGE -->  <div class="checkout">    <!-- FORM -->   
+
+ <div class="form">  
     <input id="name" placeholder="Full Name">  
     <input id="email" placeholder="Email">  
     <input id="phone" placeholder="Phone Number">  
     <input id="address" placeholder="Delivery Address">  
-  </div>    <!-- SUMMARY -->    <div class="summary">  
+
+  </div>   
+
+ <!-- SUMMARY -->  
+
+  <div class="summary">  
     <div class="row">  
       <span>Subtotal</span>  
       <span>₦<span id="subtotal">0</span></span>  
-    </div>  <div class="row">  
+    </div> 
+
+ <div class="row">  
   <span>Delivery</span>  
   <span>₦1500</span>  
 </div>  
@@ -165,14 +212,33 @@ body{
 
 <script>
 
-/* ========================= THEME ========================= */
+/* =========================
+THEME
+========================= */
 function toggleTheme(){
   document.body.classList.toggle("dark")
-  localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark":"light")
+  const isDark = document.body.classList.contains("dark")
+  localStorage.setItem("theme", isDark ? "dark" : "light")
+  updateThemeIcon()
 }
-if(localStorage.getItem("theme")==="dark"){
+
+function updateThemeIcon(){
+  const moon = document.getElementById("moonIcon")
+  const sun = document.getElementById("sunIcon")
+
+  if(document.body.classList.contains("dark")){
+    moon.style.display = "none"
+    sun.style.display = "block"
+  }else{
+    moon.style.display = "block"
+    sun.style.display = "none"
+  }
+}
+
+if(localStorage.getItem("theme") === "dark"){
   document.body.classList.add("dark")
 }
+updateThemeIcon()
 
 /* ========================= CART ========================= */
 let cart = JSON.parse(localStorage.getItem("cart")) || []
