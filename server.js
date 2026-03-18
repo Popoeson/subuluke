@@ -80,7 +80,11 @@ const orderSchema = new mongoose.Schema({
   },
   items: Array,
   amount: Number,
-  status: { type: String, default: "paid" }
+  status: { 
+  type: String, 
+  enum: ["pending", "success", "failed"], 
+  default: "pending" 
+}
 }, { timestamps: true });
 
 const Order = mongoose.model("Order", orderSchema);
@@ -303,9 +307,30 @@ app.post('/api/paystack/initialize', async (req, res) => {
       }
     );
 
+    const reference = response.data.data.reference;
+
+    // 🔥 CREATE PENDING ORDER
+    const newOrder = new Order({
+      orderId: `ORD-${Date.now()}`,
+      reference,
+      customer: {
+        name: metadata.name,
+        email: metadata.email,
+        phone: metadata.phone,
+        address: metadata.address,
+        nearestBustop: metadata.nearestBustop,
+        deliveryMode: metadata.deliveryMode
+      },
+      items: metadata.items || [],
+      amount: amount / 100,
+      status: "pending"
+    });
+
+    await newOrder.save();
+
     res.json({
       authorization_url: response.data.data.authorization_url,
-      reference: response.data.data.reference,
+      reference,
       publicKey: process.env.PAYSTACK_PUBLIC_KEY
     });
 
@@ -320,6 +345,25 @@ app.get('/api/paystack/verify/:reference', async (req, res) => {
   try {
     const { reference } = req.params;
 
+    // 🔍 FIND EXISTING ORDER
+    let order = await Order.findOne({ reference });
+
+    if (!order) {
+      return res.status(404).json({
+        status: "error",
+        message: "Order not found"
+      });
+    }
+
+    // ✅ PREVENT DUPLICATE PROCESSING
+    if (order.status === "success") {
+      return res.json({
+        status: "success",
+        message: "Order already verified",
+        orderId: order.orderId
+      });
+    }
+
     const response = await axios.get(
       `https://api.paystack.co/transaction/verify/${reference}`,
       {
@@ -333,37 +377,24 @@ app.get('/api/paystack/verify/:reference', async (req, res) => {
 
     if (data.status === "success") {
 
-      // Generate MAISON Order ID
-      const orderId = `ORD-${Date.now()}`;
+      // ✅ UPDATE ORDER
+      order.status = "success";
+      order.amount = data.amount / 100;
 
-      // Extract metadata sent during initialize
-      const metadata = data.metadata || {};
-
-      const newOrder = new Order({
-        orderId,
-        reference,
-        customer: {
-          name: metadata.name,
-          email: metadata.email,
-          phone: metadata.phone,
-          address: metadata.address,
-          nearestBustop: metadata.nearestBustop,
-          deliveryMode: metadata.deliveryMode
-        },
-        items: metadata.items || [],
-        amount: data.amount / 100,
-        status: "paid"
-      });
-
-      await newOrder.save();
+      await order.save();
 
       return res.json({
         status: "success",
-        orderId,
-        message: "Payment verified and order created"
+        orderId: order.orderId,
+        message: "Payment verified successfully"
       });
 
     } else {
+
+      // ❌ FAILED PAYMENT
+      order.status = "failed";
+      await order.save();
+
       return res.status(400).json({
         status: "failed",
         message: "Payment not successful"
@@ -372,7 +403,12 @@ app.get('/api/paystack/verify/:reference', async (req, res) => {
 
   } catch (error) {
     console.error("Paystack Verify Error:", error.response?.data || error.message);
-    res.status(500).json({ error: "Payment verification failed" });
+
+    // ⚠️ KEEP ORDER AS PENDING IF ERROR
+    return res.status(500).json({
+      status: "pending",
+      message: "Verification error, try again"
+    });
   }
 });
 
