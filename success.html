@@ -165,39 +165,77 @@ if(localStorage.getItem("theme")==="dark"){
   document.body.classList.add("dark")
 }
 
-/* ================= LOAD ORDER ================= */
-let order = JSON.parse(localStorage.getItem("last_order"))
+/* ================= GLOBAL ORDER ================= */
+let order = null
 
-if(!order){
-  alert("No order found")
-  window.location.href = "index.html"
+/* ================= GET ORDER ID FROM URL ================= */
+function getOrderId(){
+  const params = new URLSearchParams(window.location.search)
+  return params.get("orderId")
 }
 
-/* ================= DISPLAY ================= */
-document.getElementById("orderId").innerText = "Order ID: " + order.orderId
+/* ================= FETCH ORDER ================= */
+async function fetchOrder(){
 
-let itemsHTML = ""
-order.items.forEach(item=>{
-  itemsHTML += `
-    <div class="item">
-      <strong>${item.name}</strong><br>
-      Qty: ${item.qty}<br>
-      Price: ₦${item.price}<br>
-    </div>
+  const orderId = getOrderId()
+
+  if(!orderId){
+    alert("Invalid order access")
+    window.location.href = "index.html"
+    return
+  }
+
+  try{
+
+    const res = await fetch(`https://subuluke.onrender.com/api/orders/${orderId}`)
+    const data = await res.json()
+
+    if(data.status !== "success"){
+      throw new Error("Order not found")
+    }
+
+    order = data.order
+
+    renderOrder()
+
+  }catch(err){
+    console.error(err)
+    alert("Could not load order")
+    window.location.href = "index.html"
+  }
+}
+
+/* ================= RENDER ORDER ================= */
+function renderOrder(){
+
+  document.getElementById("orderId").innerText = "Order ID: " + order.orderId
+
+  let itemsHTML = ""
+  order.items.forEach(item=>{
+    itemsHTML += `
+      <div class="item">
+        <strong>${item.name}</strong><br>
+        Qty: ${item.qty}<br>
+        Price: ₦${item.price}<br>
+      </div>
+    `
+  })
+
+  document.getElementById("items").innerHTML = itemsHTML
+
+  document.getElementById("total").innerText = "Total: ₦" + order.amount
+
+  document.getElementById("delivery").innerHTML = `
+    Name: ${order.customer.name}<br>
+    Phone: ${order.customer.phone}<br>
+    Address: ${order.customer.address}
   `
-})
-document.getElementById("items").innerHTML = itemsHTML
-
-document.getElementById("total").innerText = "Total: ₦" + order.total
-
-document.getElementById("delivery").innerHTML = `
-Name: ${order.customer.name}<br>
-Phone: ${order.customer.phone}<br>
-Address: ${order.customer.address}
-`
+}
 
 /* ================= WHATSAPP ================= */
 function sendWhatsApp(){
+
+  if(!order) return
 
   let message = `🛒 NEW ORDER - SUBULUKE\n\n`
   message += `Order ID: ${order.orderId}\n\n`
@@ -216,16 +254,15 @@ function sendWhatsApp(){
     message += `Image: ${item.image}\n\n`
   })
 
-  message += `💰 Total: ₦${order.total}\n`
+  message += `💰 Total: ₦${order.amount}\n`
   message += `✅ Payment Status: Paid`
 
   const encoded = encodeURIComponent(message)
 
-  const phone = "234XXXXXXXXXX" // 🔥 PUT YOUR WHATSAPP NUMBER
+  const phone = "234XXXXXXXXXX" // 🔥 PUT YOUR NUMBER
 
   window.open(`https://wa.me/${phone}?text=${encoded}`, "_blank")
 
-  // mark as sent
   localStorage.setItem("whatsapp_sent", "true")
 }
 
@@ -239,15 +276,20 @@ window.addEventListener("beforeunload", function (e) {
 
 /* ================= BACK BUTTON ================= */
 function goHome(){
+
   if(localStorage.getItem("whatsapp_sent") !== "true"){
     alert("Please send your order to WhatsApp before leaving.")
     return
   }
 
-  localStorage.removeItem("last_order")
   localStorage.removeItem("whatsapp_sent")
 
   window.location.href = "index.html"
+}
+
+/* ================= INIT ================= */
+window.onload = () => {
+  fetchOrder()
 }
 
 </script>
