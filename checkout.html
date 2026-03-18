@@ -154,7 +154,48 @@ HEADER
   margin-top:20px;  
   display:none;  
 }  
-  
+
+/* COLLAPSIBLE SUMMARY */
+.summary-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  cursor:pointer;
+  font-weight:600;
+  margin-bottom:10px;
+}
+
+.summary-content{
+  display:none;
+}
+
+/* PRODUCT ITEM */
+.cart-item{
+  display:flex;
+  gap:10px;
+  margin-bottom:10px;
+  align-items:center;
+}
+
+.cart-item img{
+  width:50px;
+  height:50px;
+  border-radius:8px;
+  object-fit:cover;
+}
+
+.cart-details{
+  flex:1;
+}
+
+.cart-details p{
+  font-size:14px;
+}
+
+.cart-price{
+  font-weight:600;
+  font-size:14px;
+}
 </style>
 
   </head> 
@@ -205,21 +246,40 @@ HEADER
   </div>   
 
  <!-- SUMMARY -->  
+<div class="summary">
 
-  <div class="summary">  
-    <div class="row">  
-      <span>Subtotal</span>  
-      <span>₦<span id="subtotal">0</span></span>  
-    </div> 
+  <!-- COLLAPSIBLE HEADER -->
+  <div class="summary-header" onclick="toggleSummary()">
+    <span>Order Summary</span>
+    <span id="toggleIcon">▼</span>
+  </div>
 
- <div class="row">  
-  <span>Delivery</span>  
-  <span>₦1500</span>  
-</div>  
+  <!-- COLLAPSIBLE CONTENT -->
+  <div id="summaryContent" class="summary-content">
 
-<div class="row total">  
-  <span>Total</span>  
-  <span>₦<span id="total">0</span></span>  
+    <!-- PRODUCTS LIST -->
+    <div id="cartItems"></div>
+
+    <hr style="margin:12px 0; opacity:0.2">
+
+    <!-- TOTALS -->
+    <div class="row">
+      <span>Subtotal</span>
+      <span>₦<span id="subtotal">0</span></span>
+    </div>
+
+    <div class="row">
+      <span>Delivery</span>
+      <span>₦1500</span>
+    </div>
+
+    <div class="row total">
+      <span>Total</span>
+      <span>₦<span id="total">0</span></span>
+    </div>
+
+  </div>
+
 </div>
 
   </div>  <button class="pay-btn" onclick="pay()">Proceed to Payment</button>
@@ -230,9 +290,7 @@ HEADER
 
 <script>
 
-/* =========================
-THEME
-========================= */
+/* ========================= THEME ========================= */
 function toggleTheme(){
   document.body.classList.toggle("dark")
   const isDark = document.body.classList.contains("dark")
@@ -267,6 +325,49 @@ let total = subtotal + delivery
 
 document.getElementById("subtotal").innerText = subtotal
 document.getElementById("total").innerText = total
+
+/* ========================= RENDER CART ========================= */
+function renderCart(){
+
+  const container = document.getElementById("cartItems")
+  if(!container) return
+
+  container.innerHTML = ""
+
+  cart.forEach(item => {
+
+    const div = document.createElement("div")
+    div.className = "cart-item"
+
+    div.innerHTML = `
+      <img src="${item.mainImage}" alt="${item.name}">
+      <div class="cart-details">
+        <p>${item.name}</p>
+        <small>Qty: ${item.qty}</small>
+      </div>
+      <div class="cart-price">₦${item.price * item.qty}</div>
+    `
+
+    container.appendChild(div)
+  })
+}
+
+/* ========================= TOGGLE SUMMARY ========================= */
+function toggleSummary(){
+
+  const content = document.getElementById("summaryContent")
+  const icon = document.getElementById("toggleIcon")
+
+  if(!content) return
+
+  if(content.style.display === "none" || content.style.display === ""){
+    content.style.display = "block"
+    icon.innerText = "▲"
+  }else{
+    content.style.display = "none"
+    icon.innerText = "▼"
+  }
+}
 
 /* ========================= PAYMENT ========================= */
 async function pay(){
@@ -311,7 +412,6 @@ async function pay(){
     const data = await res.json()
 
     if(data.authorization_url){
-      // Redirect to Paystack
       window.location.href = data.authorization_url
     }else{
       alert("Payment initialization failed")
@@ -354,13 +454,11 @@ function checkPaymentStatus(){
   const status = params.get("status")
 
   if(reference){
-    // If Paystack explicitly says failed
     if(status === "failed"){
       showError("Transaction failed or was cancelled.")
       return
     }
 
-    // Otherwise verify from backend
     verifyPayment(reference)
   }
 }
@@ -391,6 +489,7 @@ function showError(message){
 /* ========================= INIT ========================= */
 window.onload = () => {
   checkPaymentStatus()
+  renderCart()
 }
 
 /* ========================= NAV ========================= */
@@ -399,6 +498,5 @@ function goBack(){
 }
 
 </script>
-
  </body>  
 </html>  
