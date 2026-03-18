@@ -1,8 +1,11 @@
-<!DOCTYPE html>  <html lang="en">  
+<!DOCTYPE html> 
+ <html lang="en">  
 <head>  
 <meta charset="UTF-8">  
 <meta name="viewport" content="width=device-width, initial-scale=1.0">  
-<title>Checkout - Subuluke</title>  <script src="https://js.paystack.co/v1/inline.js"></script>  <style>  
+<title>Checkout - Subuluke</title> 
+ <script src="https://js.paystack.co/v1/inline.js"></script>
+  <style>  
   
 /* ========================= THEME ========================= */  
 :root {  
@@ -224,10 +227,7 @@ async function pay(){
     const data = await res.json()
 
     if(data.authorization_url){
-      // Save reference for verification later
-      localStorage.setItem("payment_ref", data.reference)
-
-      // Redirect to Paystack hosted page (BEST PRACTICE)
+      // Redirect to Paystack
       window.location.href = data.authorization_url
     }else{
       alert("Payment initialization failed")
@@ -239,11 +239,8 @@ async function pay(){
   }
 }
 
-/* ========================= VERIFY AFTER REDIRECT ========================= */
-async function verifyPayment(){
-
-  const reference = localStorage.getItem("payment_ref")
-  if(!reference) return
+/* ========================= VERIFY ========================= */
+async function verifyPayment(reference){
 
   document.getElementById("loader").style.display = "block"
 
@@ -252,24 +249,64 @@ async function verifyPayment(){
     const data = await res.json()
 
     if(data.status === "success"){
-
-      localStorage.removeItem("payment_ref")
       localStorage.removeItem("cart")
-
       window.location.href = "success.html"
-
     }else{
-      alert("Payment not successful")
+      showError("Payment was not successful. Please try again.")
     }
 
   }catch(err){
     console.error(err)
+    showError("Could not verify payment. Try again.")
   }
 }
 
-/* ========================= AUTO VERIFY ON LOAD ========================= */
+/* ========================= HANDLE REDIRECT ========================= */
+function checkPaymentStatus(){
+
+  const params = new URLSearchParams(window.location.search)
+
+  const reference = params.get("reference") || params.get("trxref")
+  const status = params.get("status")
+
+  if(reference){
+    // If Paystack explicitly says failed
+    if(status === "failed"){
+      showError("Transaction failed or was cancelled.")
+      return
+    }
+
+    // Otherwise verify from backend
+    verifyPayment(reference)
+  }
+}
+
+/* ========================= ERROR UI ========================= */
+function showError(message){
+
+  document.getElementById("loader").style.display = "none"
+
+  let errorBox = document.getElementById("errorBox")
+
+  if(!errorBox){
+    errorBox = document.createElement("div")
+    errorBox.id = "errorBox"
+    errorBox.style.marginTop = "15px"
+    errorBox.style.padding = "12px"
+    errorBox.style.borderRadius = "8px"
+    errorBox.style.background = "#ffdddd"
+    errorBox.style.color = "#900"
+    errorBox.style.fontWeight = "500"
+
+    document.querySelector(".checkout").appendChild(errorBox)
+  }
+
+  errorBox.innerText = message
+}
+
+/* ========================= INIT ========================= */
 window.onload = () => {
-  verifyPayment()
+  checkPaymentStatus()
 }
 
 /* ========================= NAV ========================= */
@@ -278,5 +315,6 @@ function goBack(){
 }
 
 </script>
+
  </body>  
 </html>  
