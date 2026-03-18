@@ -8,35 +8,98 @@
 
 <style>
 
-/* ================= THEME ================= */
-:root {
-  --bg-gradient: linear-gradient(180deg,#FFF8E7 0%,#FFE9A8 40%,#FFD77A 100%);
-  --card: rgba(255,248,231,0.9);
-  --text: #3a2a00;
-  --accent: #E6A520;
-  --muted: #777;
-}
+/* ========================= THEME ========================= */  
+:root {  
+  --bg-gradient: linear-gradient(to bottom, #F7E7CE 0%, #FFD77A 100%);  
+  --bg: #FFF8E7;  
+  --header-gradient: linear-gradient(135deg, #E6A520 0%, #FFD77A 100%);  
+  --card: rgba(255,248,231,0.65);  
+  --text: #3a2a00;  
+  --muted: #777;  
+  --border: rgba(255,255,255,0.25);  
+  --accent: #E6A520;  
+}  
 
-body.dark {
-  --bg-gradient: linear-gradient(180deg,#0F0F0F 0%,#151515 40%,#1A1A1A 100%);
-  --card: rgba(26,26,26,0.85);
-  --text: #F5F5F5;
-  --muted: #bbb;
-}
+body.dark {  
+  --bg-gradient: linear-gradient(to bottom, #121212 0%, #1A1A1A 100%);  
+  --bg: #0F0F0F;  
+  --header-gradient: linear-gradient(135deg, #121212 0%, #1A1A1A 100%);  
+  --card: rgba(26,26,26,0.65);  
+  --text: #F5F5F5;  
+  --muted: #BBBBBB;  
+  --border: rgba(255,255,255,0.15);  
+}  
 
-/* ================= BASE ================= */
+/* ========================= BASE ========================= */  
+*{margin:0;padding:0;box-sizing:border-box;}  
+
 html, body {
   height: 100%;
 }
 
 body{
-  margin:0;
-  font-family:system-ui;
-  background:var(--bg-gradient);
-  background-attachment:fixed;
-  background-size:cover;
+  font-family: system-ui;
+  color: var(--text);
+
+  /* FULL PAGE GRADIENT FIX */
+  background: var(--bg-gradient);
+  background-repeat: no-repeat;
+  background-attachment: fixed; /* 🔥 important */
+  background-size: cover;
+
+  min-height: 100vh;
+}
+
+/* =========================
+HEADER
+========================= */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+
+  background: var(--header-gradient);
+  border-bottom: 1px solid rgba(255,255,255,0.18);
+  border-radius: 0 0 14px 14px;
+
+  box-shadow: 0 6px 18px rgba(0,0,0,0.18);
+}
+
+.header-left{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.logo {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.header-right{
+  display:flex;
+  align-items:center;
+}
+
+.back-btn{
+  background: transparent;
+  border:1px solid var(--border);
+  width:36px;
+  height:36px;
+  border-radius:8px;
+  cursor:pointer;
   color:var(--text);
-  min-height:100vh;
+}
+
+.back-btn:hover{
+  background: var(--accent);
+  color:#000;
 }
 
 /* ================= CONTAINER ================= */
@@ -126,6 +189,40 @@ body.dark .warning{
 
 <div class="container">
 
+<!-- HEADER -->
+<header class="header">
+  <div class="header-left">
+    <button onclick="goBack()" class="back-btn">←</button>
+    <div class="logo">Subuluke</div>
+  </div>
+
+  <div class="header-right">
+    <div class="theme-toggle" onclick="toggleTheme()">
+
+      <svg id="moonIcon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+      </svg>
+
+        <!-- Sun Icon -->
+  <svg id="sunIcon" width="22" height="22" viewBox="0 0 24 24" fill="none"
+       stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+       style="display:none">
+    <circle cx="12" cy="12" r="5"></circle>
+    <line x1="12" y1="1" x2="12" y2="3"></line>
+    <line x1="12" y1="21" x2="12" y2="23"></line>
+    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+    <line x1="1" y1="12" x2="3" y2="12"></line>
+    <line x1="21" y1="12" x2="23" y2="12"></line>
+    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+  </svg>
+
+    </div>
+  </div>
+
+</header>
+
   <!-- SUCCESS -->
   <div class="card success">
     <div class="success-icon">✔</div>
@@ -160,10 +257,31 @@ body.dark .warning{
 
 <script>
 
-/* ================= THEME ================= */
-if(localStorage.getItem("theme")==="dark"){
+/* ========================= THEME ========================= */
+function toggleTheme(){
+  document.body.classList.toggle("dark")
+  const isDark = document.body.classList.contains("dark")
+  localStorage.setItem("theme", isDark ? "dark" : "light")
+  updateThemeIcon()
+}
+
+function updateThemeIcon(){
+  const moon = document.getElementById("moonIcon")
+  const sun = document.getElementById("sunIcon")
+
+  if(document.body.classList.contains("dark")){
+    moon.style.display = "none"
+    sun.style.display = "block"
+  }else{
+    moon.style.display = "block"
+    sun.style.display = "none"
+  }
+}
+
+if(localStorage.getItem("theme") === "dark"){
   document.body.classList.add("dark")
 }
+updateThemeIcon()
 
 /* ================= GLOBAL ORDER ================= */
 let order = null
