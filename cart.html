@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cart - Subuluke</title>
+
+<style>
+/* =========================
+CART PAGE
+========================= */
+
+.cart-page{
+  padding: 20px;
+  max-width: 1000px;
+  margin: auto;
+}
+
+/* HEADER */
+.cart-header{
+  display:flex;
+  justify-content: space-between;
+  align-items:center;
+  margin-bottom: 20px;
+}
+
+.back-btn{
+  background: transparent;
+  border:1px solid var(--border);
+  padding:8px 14px;
+  border-radius:8px;
+  cursor:pointer;
+  color:var(--text);
+}
+
+.back-btn:hover{
+  background: var(--accent);
+  color:#000;
+}
+
+/* CART ITEMS */
+.cart-items{
+  display:flex;
+  flex-direction: column;
+  gap:15px;
+}
+
+/* ITEM */
+.cart-item{
+  display:flex;
+  gap:15px;
+  align-items:center;
+  background: var(--card);
+  padding:12px;
+  border-radius:12px;
+  border:1px solid var(--border);
+}
+
+/* IMAGE */
+.cart-item img{
+  width:70px;
+  height:70px;
+  object-fit:cover;
+  border-radius:8px;
+}
+
+/* DETAILS */
+.cart-details{
+  flex:1;
+}
+
+.cart-name{
+  font-weight:600;
+}
+
+.cart-price{
+  color: var(--accent);
+  font-weight:600;
+}
+
+/* QTY CONTROL */
+.cart-qty{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.cart-qty button{
+  width:30px;
+  height:30px;
+  border:none;
+  border-radius:6px;
+  background: var(--accent);
+  color:#000;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+/* SUMMARY */
+.cart-summary{
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top:1px solid var(--border);
+  text-align:center;
+}
+
+.checkout-btn{
+  margin-top: 10px;
+  padding:12px 20px;
+  border:none;
+  border-radius:10px;
+  background: var(--accent);
+  color:#000;
+  font-weight:600;
+  cursor:pointer;
+}
+
+.checkout-btn:hover{
+  opacity:0.9;
+}
+
+/* EMPTY */
+.empty-cart{
+  text-align:center;
+  margin-top:40px;
+  color:var(--muted);
+  display:none;
+}
+</style>
+
+</head>
+<body>
+
+<div class="cart-page">
+
+  <!-- HEADER -->
+  <div class="cart-header">
+    <button onclick="goHome()" class="back-btn">← Back to Home</button>
+    <h1>Your Cart</h1>
+  </div>
+
+  <!-- CART ITEMS -->
+  <div id="cartItems" class="cart-items"></div>
+
+  <!-- EMPTY STATE -->
+  <div id="emptyCart" class="empty-cart">
+    <p>Your cart is empty</p>
+  </div>
+
+  <!-- SUMMARY -->
+  <div class="cart-summary">
+    <h2>Total: ₦<span id="cartTotal">0</span></h2>
+    <button onclick="goCheckout()" class="checkout-btn">Proceed to Checkout</button>
+  </div>
+
+</div>
+
+<script>
+let cart = JSON.parse(localStorage.getItem("cart")) || []
+
+const cartItems = document.getElementById("cartItems")
+const cartTotal = document.getElementById("cartTotal")
+const emptyCart = document.getElementById("emptyCart")
+
+function renderCart(){
+
+  cartItems.innerHTML = ""
+
+  if(cart.length === 0){
+    emptyCart.style.display = "block"
+    return
+  }else{
+    emptyCart.style.display = "none"
+  }
+
+  let total = 0
+
+  cart.forEach(item=>{
+
+    total += item.price * item.qty
+
+    const div = document.createElement("div")
+    div.className = "cart-item"
+
+    div.innerHTML = `
+      <img src="${item.image}">
+      
+      <div class="cart-details">
+        <div class="cart-name">${item.name}</div>
+        <div class="cart-price">₦${item.price}</div>
+      </div>
+
+      <div class="cart-qty">
+        <button onclick="decreaseQty('${item._id}')">-</button>
+        <span>${item.qty}</span>
+        <button onclick="increaseQty('${item._id}')">+</button>
+      </div>
+    `
+
+    cartItems.appendChild(div)
+  })
+
+  cartTotal.innerText = total
+}
+
+/* INCREASE */
+function increaseQty(id){
+  const item = cart.find(i=>i._id === id)
+  if(item){
+    item.qty++
+    saveCart()
+  }
+}
+
+/* DECREASE */
+function decreaseQty(id){
+  const item = cart.find(i=>i._id === id)
+
+  if(item){
+    item.qty--
+
+    if(item.qty <= 0){
+      cart = cart.filter(i=>i._id !== id)
+    }
+
+    saveCart()
+  }
+}
+
+function saveCart(){
+  localStorage.setItem("cart", JSON.stringify(cart))
+  renderCart()
+}
+
+/* NAVIGATION */
+function goCheckout(){
+  window.location.href = "checkout.html"
+}
+
+function goHome(){
+  window.location.href = "index.html"
+}
+
+/* INIT */
+renderCart()
+</script>
+</body>
+</html>
