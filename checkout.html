@@ -1,0 +1,282 @@
+<!DOCTYPE html>  <html lang="en">  
+<head>  
+<meta charset="UTF-8">  
+<meta name="viewport" content="width=device-width, initial-scale=1.0">  
+<title>Checkout - Subuluke</title>  <script src="https://js.paystack.co/v1/inline.js"></script>  <style>  
+  
+/* ========================= THEME ========================= */  
+:root {  
+  --bg-gradient: linear-gradient(to bottom, #FFF8E7 0%, #FFD77A 100%);  
+  --bg: #FFF8E7;  
+  --header-gradient: linear-gradient(135deg, #E6A520 0%, #FFD77A 100%);  
+  --card: rgba(255,248,231,0.65);  
+  --text: #3a2a00;  
+  --muted: #777;  
+  --border: rgba(255,255,255,0.25);  
+  --accent: #E6A520;  
+}  
+  
+body.dark {  
+  --bg-gradient: linear-gradient(to bottom, #121212 0%, #1A1A1A 100%);  
+  --bg: #0F0F0F;  
+  --header-gradient: linear-gradient(135deg, #121212 0%, #1A1A1A 100%);  
+  --card: rgba(26,26,26,0.65);  
+  --text: #F5F5F5;  
+  --muted: #BBBBBB;  
+  --border: rgba(255,255,255,0.15);  
+}  
+  
+/* ========================= BASE ========================= */  
+*{margin:0;padding:0;box-sizing:border-box;}  
+  
+body{  
+  font-family:system-ui;  
+  background:var(--bg-gradient);  
+  color:var(--text);  
+}  
+  
+/* ========================= HEADER ========================= */  
+.header{  
+  height:70px;  
+  display:flex;  
+  justify-content:space-between;  
+  align-items:center;  
+  padding:0 20px;  
+  background:var(--header-gradient);  
+}  
+  
+.header-left{  
+  display:flex;  
+  align-items:center;  
+  gap:10px;  
+}  
+  
+.back-btn{  
+  width:36px;height:36px;  
+  border:1px solid var(--border);  
+  background:transparent;  
+  border-radius:8px;  
+  cursor:pointer;  
+}  
+  
+.logo{font-weight:700;}  
+  
+.theme-toggle{cursor:pointer;}  
+  
+/* ========================= PAGE ========================= */  
+.checkout{  
+  max-width:700px;  
+  margin:auto;  
+  padding:20px;  
+}  
+  
+/* FORM */  
+.form{  
+  display:flex;  
+  flex-direction:column;  
+  gap:12px;  
+  background:var(--card);  
+  padding:15px;  
+  border-radius:12px;  
+  border:1px solid var(--border);  
+}  
+  
+.form input{  
+  padding:12px;  
+  border-radius:8px;  
+  border:1px solid var(--border);  
+  background:transparent;  
+  color:var(--text);  
+}  
+  
+/* SUMMARY */  
+.summary{  
+  margin-top:20px;  
+  background:var(--card);  
+  padding:15px;  
+  border-radius:12px;  
+  border:1px solid var(--border);  
+}  
+  
+.row{  
+  display:flex;  
+  justify-content:space-between;  
+  margin:8px 0;  
+}  
+  
+.total{  
+  font-weight:700;  
+  font-size:18px;  
+}  
+  
+/* BUTTON */  
+.pay-btn{  
+  margin-top:20px;  
+  width:100%;  
+  padding:14px;  
+  border:none;  
+  border-radius:10px;  
+  background:var(--accent);  
+  font-weight:600;  
+  cursor:pointer;  
+}  
+  
+/* LOADER */  
+.loader{  
+  text-align:center;  
+  margin-top:20px;  
+  display:none;  
+}  
+  
+</style>  </head>  <body>  <!-- HEADER -->  <header class="header">  
+  <div class="header-left">  
+    <button onclick="goBack()" class="back-btn">←</button>  
+    <div class="logo">Subuluke</div>  
+  </div>    <div class="theme-toggle" onclick="toggleTheme()">  
+    <span id="themeIcon">🌙</span>  
+  </div>  
+</header>  <!-- PAGE -->  <div class="checkout">    <!-- FORM -->    <div class="form">  
+    <input id="name" placeholder="Full Name">  
+    <input id="email" placeholder="Email">  
+    <input id="phone" placeholder="Phone Number">  
+    <input id="address" placeholder="Delivery Address">  
+  </div>    <!-- SUMMARY -->    <div class="summary">  
+    <div class="row">  
+      <span>Subtotal</span>  
+      <span>₦<span id="subtotal">0</span></span>  
+    </div>  <div class="row">  
+  <span>Delivery</span>  
+  <span>₦1500</span>  
+</div>  
+
+<div class="row total">  
+  <span>Total</span>  
+  <span>₦<span id="total">0</span></span>  
+</div>
+
+  </div>  <button class="pay-btn" onclick="pay()">Proceed to Payment</button>
+
+  <div class="loader" id="loader">Checking payment...</div> 
+
+ </div>  
+
+<script>
+
+/* ========================= THEME ========================= */
+function toggleTheme(){
+  document.body.classList.toggle("dark")
+  localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark":"light")
+}
+if(localStorage.getItem("theme")==="dark"){
+  document.body.classList.add("dark")
+}
+
+/* ========================= CART ========================= */
+let cart = JSON.parse(localStorage.getItem("cart")) || []
+
+let subtotal = cart.reduce((sum,i)=>sum + i.price * i.qty,0)
+let delivery = 1500
+let total = subtotal + delivery
+
+document.getElementById("subtotal").innerText = subtotal
+document.getElementById("total").innerText = total
+
+/* ========================= PAYMENT ========================= */
+async function pay(){
+
+  const name = document.getElementById("name").value
+  const email = document.getElementById("email").value
+  const phone = document.getElementById("phone").value
+  const address = document.getElementById("address").value
+
+  if(!name || !email || !phone || !address){
+    alert("Please fill all fields")
+    return
+  }
+
+  if(cart.length === 0){
+    alert("Cart is empty")
+    return
+  }
+
+  document.getElementById("loader").style.display = "block"
+
+  try{
+
+    const res = await fetch("https://subuluke.onrender.com/api/paystack/initialize",{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json"
+      },
+      body: JSON.stringify({
+        email,
+        amount: total * 100,
+        metadata:{
+          name,
+          email,
+          phone,
+          address,
+          items: cart
+        }
+      })
+    })
+
+    const data = await res.json()
+
+    if(data.authorization_url){
+      // Save reference for verification later
+      localStorage.setItem("payment_ref", data.reference)
+
+      // Redirect to Paystack hosted page (BEST PRACTICE)
+      window.location.href = data.authorization_url
+    }else{
+      alert("Payment initialization failed")
+    }
+
+  }catch(err){
+    console.error(err)
+    alert("Something went wrong")
+  }
+}
+
+/* ========================= VERIFY AFTER REDIRECT ========================= */
+async function verifyPayment(){
+
+  const reference = localStorage.getItem("payment_ref")
+  if(!reference) return
+
+  document.getElementById("loader").style.display = "block"
+
+  try{
+    const res = await fetch(`https://subuluke.onrender.com/api/paystack/verify/${reference}`)
+    const data = await res.json()
+
+    if(data.status === "success"){
+
+      localStorage.removeItem("payment_ref")
+      localStorage.removeItem("cart")
+
+      window.location.href = "success.html"
+
+    }else{
+      alert("Payment not successful")
+    }
+
+  }catch(err){
+    console.error(err)
+  }
+}
+
+/* ========================= AUTO VERIFY ON LOAD ========================= */
+window.onload = () => {
+  verifyPayment()
+}
+
+/* ========================= NAV ========================= */
+function goBack(){
+  window.location.href = "cart.html"
+}
+
+</script>
+ </body>  
+</html>  
