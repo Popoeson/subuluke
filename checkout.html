@@ -450,8 +450,13 @@ async function verifyPayment(reference){
     const data = await res.json()
 
     if(data.status === "success"){
+
+      // ✅ CLEAR CART
       localStorage.removeItem("cart")
-      window.location.href = "success.html"
+
+      // 🔥 REDIRECT WITH ORDER ID (IMPORTANT)
+      window.location.href = `success.html?orderId=${data.orderId}`
+
     }else{
       showError("Payment was not successful. Please try again.")
     }
