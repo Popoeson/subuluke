@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Order Confirmed | Subuluke</title>
+
+<style>
+
+/* ================= THEME ================= */
+:root {
+  --bg-gradient: linear-gradient(180deg,#FFF8E7 0%,#FFE9A8 40%,#FFD77A 100%);
+  --card: rgba(255,248,231,0.9);
+  --text: #3a2a00;
+  --accent: #E6A520;
+  --muted: #777;
+}
+
+body.dark {
+  --bg-gradient: linear-gradient(180deg,#0F0F0F 0%,#151515 40%,#1A1A1A 100%);
+  --card: rgba(26,26,26,0.85);
+  --text: #F5F5F5;
+  --muted: #bbb;
+}
+
+/* ================= BASE ================= */
+html, body {
+  height: 100%;
+}
+
+body{
+  margin:0;
+  font-family:system-ui;
+  background:var(--bg-gradient);
+  background-attachment:fixed;
+  background-size:cover;
+  color:var(--text);
+  min-height:100vh;
+}
+
+/* ================= CONTAINER ================= */
+.container{
+  max-width:700px;
+  margin:auto;
+  padding:20px;
+}
+
+/* ================= CARD ================= */
+.card{
+  background:var(--card);
+  backdrop-filter: blur(10px);
+  border-radius:16px;
+  padding:25px;
+  margin-top:20px;
+}
+
+/* ================= SUCCESS ================= */
+.success{
+  text-align:center;
+}
+
+.success-icon{
+  font-size:60px;
+  color:green;
+}
+
+h1{
+  margin-top:10px;
+}
+
+.note{
+  margin-top:10px;
+  font-size:14px;
+  color:var(--muted);
+}
+
+/* ================= ORDER ================= */
+.item{
+  margin-bottom:15px;
+  border-bottom:1px solid #ddd;
+  padding-bottom:10px;
+}
+
+/* ================= BUTTONS ================= */
+.btn{
+  display:block;
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:10px;
+  font-size:16px;
+  cursor:pointer;
+  margin-top:10px;
+}
+
+.whatsapp{
+  background:#25D366;
+  color:white;
+}
+
+.home{
+  background:var(--accent);
+  color:white;
+}
+
+/* ================= WARNING ================= */
+.warning{
+  margin-top:15px;
+  background:#fff3cd;
+  color:#856404;
+  padding:10px;
+  border-radius:8px;
+  font-size:14px;
+}
+
+body.dark .warning{
+  background:#332701;
+  color:#FFD77A;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <!-- SUCCESS -->
+  <div class="card success">
+    <div class="success-icon">✔</div>
+    <h1>Order Confirmed</h1>
+    <p>Thank you for your patronage 🙏</p>
+    <p id="orderId"></p>
+  </div>
+
+  <!-- ORDER DETAILS -->
+  <div class="card">
+    <h3>Order Details</h3>
+    <div id="items"></div>
+
+    <h4 id="total"></h4>
+
+    <hr>
+
+    <h3>Delivery Info</h3>
+    <p id="delivery"></p>
+  </div>
+
+  <!-- WARNING -->
+  <div class="warning">
+    ⚠️ Please send your order to WhatsApp to ensure it is processed.
+  </div>
+
+  <!-- BUTTONS -->
+  <button class="btn whatsapp" onclick="sendWhatsApp()">Send Order to WhatsApp</button>
+  <button class="btn home" onclick="goHome()">Back to Home</button>
+
+</div>
+
+<script>
+
+/* ================= THEME ================= */
+if(localStorage.getItem("theme")==="dark"){
+  document.body.classList.add("dark")
+}
+
+/* ================= LOAD ORDER ================= */
+let order = JSON.parse(localStorage.getItem("last_order"))
+
+if(!order){
+  alert("No order found")
+  window.location.href = "index.html"
+}
+
+/* ================= DISPLAY ================= */
+document.getElementById("orderId").innerText = "Order ID: " + order.orderId
+
+let itemsHTML = ""
+order.items.forEach(item=>{
+  itemsHTML += `
+    <div class="item">
+      <strong>${item.name}</strong><br>
+      Qty: ${item.qty}<br>
+      Price: ₦${item.price}<br>
+    </div>
+  `
+})
+document.getElementById("items").innerHTML = itemsHTML
+
+document.getElementById("total").innerText = "Total: ₦" + order.total
+
+document.getElementById("delivery").innerHTML = `
+Name: ${order.customer.name}<br>
+Phone: ${order.customer.phone}<br>
+Address: ${order.customer.address}
+`
+
+/* ================= WHATSAPP ================= */
+function sendWhatsApp(){
+
+  let message = `🛒 NEW ORDER - SUBULUKE\n\n`
+  message += `Order ID: ${order.orderId}\n\n`
+
+  message += `👤 Customer Details:\n`
+  message += `Name: ${order.customer.name}\n`
+  message += `Phone: ${order.customer.phone}\n`
+  message += `Address: ${order.customer.address}\n\n`
+
+  message += `🛍 Order Items:\n\n`
+
+  order.items.forEach((item,index)=>{
+    message += `${index+1}. ${item.name}\n`
+    message += `Qty: ${item.qty}\n`
+    message += `Price: ₦${item.price}\n`
+    message += `Image: ${item.image}\n\n`
+  })
+
+  message += `💰 Total: ₦${order.total}\n`
+  message += `✅ Payment Status: Paid`
+
+  const encoded = encodeURIComponent(message)
+
+  const phone = "234XXXXXXXXXX" // 🔥 PUT YOUR WHATSAPP NUMBER
+
+  window.open(`https://wa.me/${phone}?text=${encoded}`, "_blank")
+
+  // mark as sent
+  localStorage.setItem("whatsapp_sent", "true")
+}
+
+/* ================= BLOCK EXIT ================= */
+window.addEventListener("beforeunload", function (e) {
+  if(localStorage.getItem("whatsapp_sent") !== "true"){
+    e.preventDefault()
+    e.returnValue = ""
+  }
+})
+
+/* ================= BACK BUTTON ================= */
+function goHome(){
+  if(localStorage.getItem("whatsapp_sent") !== "true"){
+    alert("Please send your order to WhatsApp before leaving.")
+    return
+  }
+
+  localStorage.removeItem("last_order")
+  localStorage.removeItem("whatsapp_sent")
+
+  window.location.href = "index.html"
+}
+
+</script>
+
+</body>
+</html>
