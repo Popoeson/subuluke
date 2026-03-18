@@ -400,6 +400,72 @@ padding:90px 20px 40px;
 }
 
 }
+
+/* ================= ORDERS ================= */
+
+.order-controls{
+  display:flex;
+  gap:10px;
+  margin-top:15px;
+  flex-wrap:wrap;
+}
+
+.order-controls input,
+.order-controls select{
+  padding:10px;
+  border-radius:8px;
+  border:1px solid #ccc;
+  flex:1;
+}
+
+.order-card{
+  background:var(--card);
+  border-radius:14px;
+  padding:15px;
+  margin-top:15px;
+  transition:0.3s;
+}
+
+.order-header{
+  display:flex;
+  justify-content:space-between;
+  cursor:pointer;
+}
+
+.order-body{
+  display:none;
+  margin-top:10px;
+  border-top:1px solid #ddd;
+  padding-top:10px;
+}
+
+.status{
+  padding:4px 10px;
+  border-radius:20px;
+  font-size:12px;
+}
+
+.status.success{ background:#d4edda; color:#155724; }
+.status.pending{ background:#fff3cd; color:#856404; }
+.status.failed{ background:#f8d7da; color:#721c24; }
+
+.order-items{
+  margin-top:10px;
+}
+
+.order-item{
+  display:flex;
+  gap:10px;
+  margin-bottom:10px;
+  align-items:center;
+}
+
+.order-item img{
+  width:50px;
+  height:50px;
+  object-fit:cover;
+  border-radius:8px;
+}
 </style>
 </head>
 
@@ -585,7 +651,20 @@ padding:90px 20px 40px;
 <h1 class="page-title">Orders</h1>
 <p class="subtitle">Manage customer orders</p>
 
+<!-- SEARCH + FILTER -->
+<div class="order-controls">
+  <input type="text" id="searchInput" placeholder="Search by name, phone or order ID..." oninput="filterOrders()">
+
+  <select id="statusFilter" onchange="filterOrders()">
+    <option value="all">All Orders</option>
+    <option value="success">Successful</option>
+    <option value="pending">Pending</option>
+    <option value="failed">Failed</option>
+  </select>
 </div>
+
+<!-- ORDERS LIST -->
+<div id="ordersContainer"></div>
 
 </div>
 
@@ -1035,7 +1114,110 @@ function filterProducts(){
 searchInput.addEventListener("input", filterProducts);
 categoryFilter.addEventListener("change", filterProducts);
 featuredFilter.addEventListener("change", filterProducts);
+order.status
 
+let allOrders = []
+
+/* ================= FETCH ORDERS ================= */
+async function fetchOrders(){
+
+  const container = document.getElementById("ordersContainer")
+  container.innerHTML = "Loading..."
+
+  try{
+    const res = await fetch("https://subuluke.onrender.com/api/orders")
+    const data = await res.json()
+
+    if(data.status !== "success") throw new Error()
+
+    allOrders = data.orders
+    renderOrders(allOrders)
+
+  }catch(err){
+    container.innerHTML = "Failed to load orders"
+  }
+}
+
+/* ================= RENDER ================= */
+function renderOrders(orders){
+
+  const container = document.getElementById("ordersContainer")
+
+  if(orders.length === 0){
+    container.innerHTML = "<p>No orders found</p>"
+    return
+  }
+
+  container.innerHTML = orders.map(order => `
+    <div class="order-card">
+
+      <div class="order-header" onclick="toggleOrder('${order._id}')">
+        <div>
+          <strong>${order.orderId}</strong><br>
+          <small>${order.customer.name}</small>
+        </div>
+
+        <div>
+          <span class="status ${order.status}">${order.status}</span><br>
+          <strong>₦${order.amount}</strong>
+        </div>
+      </div>
+
+      <div class="order-body" id="order-${order._id}">
+
+        <p><strong>Phone:</strong> ${order.customer.phone}</p>
+        <p><strong>Address:</strong> ${order.customer.address}</p>
+
+        <div class="order-items">
+          ${order.items.map(item => `
+            <div class="order-item">
+              <img src="${item.image}" alt="">
+              <div>
+                <strong>${item.name}</strong><br>
+                Qty: ${item.qty} • ₦${item.price}
+              </div>
+            </div>
+          `).join("")}
+        </div>
+
+        <p><strong>Date:</strong> ${new Date(order.createdAt).toLocaleString()}</p>
+
+      </div>
+
+    </div>
+  `).join("")
+}
+
+/* ================= TOGGLE ================= */
+function toggleOrder(id){
+  const el = document.getElementById(`order-${id}`)
+  el.style.display = el.style.display === "block" ? "none" : "block"
+}
+
+/* ================= SEARCH + FILTER ================= */
+function filterOrders(){
+
+  const search = document.getElementById("searchInput").value.toLowerCase()
+  const status = document.getElementById("statusFilter").value
+
+  let filtered = allOrders.filter(order => {
+
+    const matchSearch =
+      order.orderId.toLowerCase().includes(search) ||
+      order.customer.name.toLowerCase().includes(search) ||
+      order.customer.phone.includes(search)
+
+    const matchStatus =
+      status === "all" || order.status === status
+
+    return matchSearch && matchStatus
+  })
+
+  renderOrders(filtered)
+}
+
+/* ================= INIT ================= */
+fetchOrders()
 </script>
 </body>
 </html>
