@@ -32,11 +32,22 @@ body.dark {
 /* ========================= BASE ========================= */  
 *{margin:0;padding:0;box-sizing:border-box;}  
   
-body{  
-  font-family:system-ui;  
-  background:var(--bg-gradient);  
-  color:var(--text);  
-}  
+html, body {
+  height: 100%;
+}
+
+body{
+  font-family: system-ui;
+  color: var(--text);
+
+  /* FULL PAGE GRADIENT FIX */
+  background: var(--bg-gradient);
+  background-repeat: no-repeat;
+  background-attachment: fixed; /* 🔥 important */
+  background-size: cover;
+
+  min-height: 100vh;
+}
   
 /* =========================
 HEADER
