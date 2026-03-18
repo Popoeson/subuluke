@@ -363,15 +363,22 @@ app.get('/api/paystack/verify/:reference', async (req, res) => {
         orderId: order.orderId
       });
     }
-
-    const response = await axios.get(
-      `https://api.paystack.co/transaction/verify/${reference}`,
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`
-        }
-      }
-    );
+     
+const response = await axios.post(
+  "https://api.paystack.co/transaction/initialize",
+  {
+    email,
+    amount,
+    metadata,
+    callback_url: "https://subuluke.vercel.app/checkout.html" //redirect back to checkout page 
+  },
+  {
+    headers: {
+      Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
+      "Content-Type": "application/json"
+    }
+  }
+);
 
     const data = response.data.data;
 
