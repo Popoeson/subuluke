@@ -6,28 +6,90 @@
 <title>Cart - Subuluke</title>
 
 <style>
-/* =========================
-CART PAGE
-========================= */
 
-.cart-page{
-  padding: 20px;
-  max-width: 1000px;
-  margin: auto;
+/* =========================
+THEME VARIABLES
+========================= */
+:root {
+  --bg-gradient: linear-gradient(to bottom, #FFF8E7 0%, #FFD77A 100%);
+  --bg: #FFF8E7;
+  --header-gradient: linear-gradient(135deg, #E6A520 0%, #FFD77A 100%);
+  --card: rgba(255,248,231,0.65);
+  --text: #3a2a00;
+  --muted: #777;
+  --border: rgba(255,255,255,0.25);
+  --accent: #E6A520;
+  --softGold: #FFD77A;
 }
 
-/* HEADER */
-.cart-header{
-  display:flex;
+body.dark {
+  --bg-gradient: linear-gradient(to bottom, #121212 0%, #1A1A1A 100%);
+  --bg: #0F0F0F;
+  --header-gradient: linear-gradient(135deg, #121212 0%, #1A1A1A 100%);
+  --card: rgba(26,26,26,0.65);
+  --text: #F5F5F5;
+  --muted: #BBBBBB;
+  --border: rgba(255,255,255,0.15);
+}
+
+/* =========================
+BASE
+========================= */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  min-height: 100vh;
+  background: var(--bg-gradient);
+  color: var(--text);
+}
+
+/* =========================
+HEADER
+========================= */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+
+  height: 72px;
+  display: flex;
+  align-items: center;
   justify-content: space-between;
+  padding: 0 20px;
+
+  background: var(--header-gradient);
+  border-bottom: 1px solid rgba(255,255,255,0.18);
+  border-radius: 0 0 14px 14px;
+
+  box-shadow: 0 6px 18px rgba(0,0,0,0.18);
+}
+
+.header-left{
+  display:flex;
   align-items:center;
-  margin-bottom: 20px;
+  gap:12px;
+}
+
+.logo {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.header-right{
+  display:flex;
+  align-items:center;
 }
 
 .back-btn{
   background: transparent;
   border:1px solid var(--border);
-  padding:8px 14px;
+  width:36px;
+  height:36px;
   border-radius:8px;
   cursor:pointer;
   color:var(--text);
@@ -38,7 +100,15 @@ CART PAGE
   color:#000;
 }
 
-/* CART ITEMS */
+/* =========================
+CART PAGE
+========================= */
+.cart-page{
+  padding: 20px;
+  max-width: 900px;
+  margin: auto;
+}
+
 .cart-items{
   display:flex;
   flex-direction: column;
@@ -56,15 +126,13 @@ CART PAGE
   border:1px solid var(--border);
 }
 
-/* IMAGE */
 .cart-item img{
-  width:70px;
-  height:70px;
+  width:65px;
+  height:65px;
   object-fit:cover;
   border-radius:8px;
 }
 
-/* DETAILS */
 .cart-details{
   flex:1;
 }
@@ -75,10 +143,9 @@ CART PAGE
 
 .cart-price{
   color: var(--accent);
-  font-weight:600;
 }
 
-/* QTY CONTROL */
+/* QTY */
 .cart-qty{
   display:flex;
   align-items:center;
@@ -93,19 +160,16 @@ CART PAGE
   background: var(--accent);
   color:#000;
   cursor:pointer;
-  font-weight:bold;
 }
 
 /* SUMMARY */
 .cart-summary{
   margin-top: 30px;
-  padding-top: 20px;
-  border-top:1px solid var(--border);
   text-align:center;
 }
 
 .checkout-btn{
-  margin-top: 10px;
+  margin-top:10px;
   padding:12px 20px;
   border:none;
   border-radius:10px;
@@ -115,10 +179,6 @@ CART PAGE
   cursor:pointer;
 }
 
-.checkout-btn:hover{
-  opacity:0.9;
-}
-
 /* EMPTY */
 .empty-cart{
   text-align:center;
@@ -126,28 +186,50 @@ CART PAGE
   color:var(--muted);
   display:none;
 }
-</style>
 
+/* =========================
+THEME TOGGLE
+========================= */
+.theme-toggle{
+  cursor:pointer;
+}
+
+</style>
 </head>
+
 <body>
 
-<div class="cart-page">
-
-  <!-- HEADER -->
-  <div class="cart-header">
-    <button onclick="goHome()" class="back-btn">← Back to Home</button>
-    <h1>Your Cart</h1>
+<!-- HEADER -->
+<header class="header">
+  <div class="header-left">
+    <button onclick="goHome()" class="back-btn">←</button>
+    <div class="logo">Subuluke</div>
   </div>
 
-  <!-- CART ITEMS -->
+  <div class="header-right">
+    <div class="theme-toggle" onclick="toggleTheme()">
+
+      <svg id="moonIcon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+      </svg>
+
+      <svg id="sunIcon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none">
+        <circle cx="12" cy="12" r="5"></circle>
+      </svg>
+
+    </div>
+  </div>
+</header>
+
+<!-- CART -->
+<div class="cart-page">
+
   <div id="cartItems" class="cart-items"></div>
 
-  <!-- EMPTY STATE -->
   <div id="emptyCart" class="empty-cart">
     <p>Your cart is empty</p>
   </div>
 
-  <!-- SUMMARY -->
   <div class="cart-summary">
     <h2>Total: ₦<span id="cartTotal">0</span></h2>
     <button onclick="goCheckout()" class="checkout-btn">Proceed to Checkout</button>
@@ -156,6 +238,38 @@ CART PAGE
 </div>
 
 <script>
+
+/* =========================
+THEME
+========================= */
+function toggleTheme(){
+  document.body.classList.toggle("dark")
+  const isDark = document.body.classList.contains("dark")
+  localStorage.setItem("theme", isDark ? "dark" : "light")
+  updateThemeIcon()
+}
+
+function updateThemeIcon(){
+  const moon = document.getElementById("moonIcon")
+  const sun = document.getElementById("sunIcon")
+
+  if(document.body.classList.contains("dark")){
+    moon.style.display = "none"
+    sun.style.display = "block"
+  }else{
+    moon.style.display = "block"
+    sun.style.display = "none"
+  }
+}
+
+if(localStorage.getItem("theme") === "dark"){
+  document.body.classList.add("dark")
+}
+updateThemeIcon()
+
+/* =========================
+CART LOGIC
+========================= */
 let cart = JSON.parse(localStorage.getItem("cart")) || []
 
 const cartItems = document.getElementById("cartItems")
@@ -163,7 +277,6 @@ const cartTotal = document.getElementById("cartTotal")
 const emptyCart = document.getElementById("emptyCart")
 
 function renderCart(){
-
   cartItems.innerHTML = ""
 
   if(cart.length === 0){
@@ -176,7 +289,6 @@ function renderCart(){
   let total = 0
 
   cart.forEach(item=>{
-
     total += item.price * item.qty
 
     const div = document.createElement("div")
@@ -184,7 +296,6 @@ function renderCart(){
 
     div.innerHTML = `
       <img src="${item.image}">
-      
       <div class="cart-details">
         <div class="cart-name">${item.name}</div>
         <div class="cart-price">₦${item.price}</div>
@@ -203,7 +314,6 @@ function renderCart(){
   cartTotal.innerText = total
 }
 
-/* INCREASE */
 function increaseQty(id){
   const item = cart.find(i=>i._id === id)
   if(item){
@@ -212,7 +322,6 @@ function increaseQty(id){
   }
 }
 
-/* DECREASE */
 function decreaseQty(id){
   const item = cart.find(i=>i._id === id)
 
@@ -232,17 +341,21 @@ function saveCart(){
   renderCart()
 }
 
-/* NAVIGATION */
-function goCheckout(){
-  window.location.href = "checkout.html"
-}
-
+/* =========================
+NAVIGATION
+========================= */
 function goHome(){
   window.location.href = "index.html"
 }
 
+function goCheckout(){
+  window.location.href = "checkout.html"
+}
+
 /* INIT */
 renderCart()
+
 </script>
+
 </body>
 </html>
