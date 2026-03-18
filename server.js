@@ -293,19 +293,20 @@ app.post('/api/paystack/initialize', async (req, res) => {
     }
 
     const response = await axios.post(
-      "https://api.paystack.co/transaction/initialize",
-      {
-        email,
-        amount,
-        metadata
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
-          "Content-Type": "application/json"
-        }
-      }
-    );
+  "https://api.paystack.co/transaction/initialize",
+  {
+    email,
+    amount,
+    metadata,
+    callback_url: "https://subuluke.vercel.app/checkout.html" //redirect back to checkout
+  },
+  {
+    headers: {
+      Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
+      "Content-Type": "application/json"
+    }
+  }
+);
 
     const reference = response.data.data.reference;
 
@@ -341,6 +342,7 @@ app.post('/api/paystack/initialize', async (req, res) => {
 });
 
 // ---- Verify Payment ----
+
 app.get('/api/paystack/verify/:reference', async (req, res) => {
   try {
     const { reference } = req.params;
@@ -363,22 +365,15 @@ app.get('/api/paystack/verify/:reference', async (req, res) => {
         orderId: order.orderId
       });
     }
-     
-const response = await axios.post(
-  "https://api.paystack.co/transaction/initialize",
-  {
-    email,
-    amount,
-    metadata,
-    callback_url: "https://subuluke.vercel.app/checkout.html" //redirect back to checkout page 
-  },
-  {
-    headers: {
-      Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
-      "Content-Type": "application/json"
-    }
-  }
-);
+
+    const response = await axios.get(
+      `https://api.paystack.co/transaction/verify/${reference}`,
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`
+        }
+      }
+    );
 
     const data = response.data.data;
 
