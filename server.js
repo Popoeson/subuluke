@@ -426,6 +426,37 @@ app.get('/api/orders', async (req,res)=>{
 });
 
 // =====================
+// GET ORDER BY ORDER ID
+// =====================
+app.get('/api/orders/:orderId', async (req, res) => {
+  try {
+    const { orderId } = req.params;
+
+    const order = await Order.findOne({ orderId });
+
+    if (!order) {
+      return res.status(404).json({
+        status: "error",
+        message: "Order not found"
+      });
+    }
+
+    res.json({
+      status: "success",
+      order
+    });
+
+  } catch (error) {
+    console.error("Fetch Order Error:", error.message);
+
+    res.status(500).json({
+      status: "error",
+      message: "Server error"
+    });
+  }
+});
+
+// =====================
 // Start Server
 // =====================
 const PORT = process.env.PORT || 5000;
