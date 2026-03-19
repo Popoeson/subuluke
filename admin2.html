@@ -419,29 +419,41 @@ padding:90px 20px 40px;
 }
 
 .order-card{
-  background:var(--card);
-  border-radius:14px;
-  padding:15px;
-  margin-top:15px;
-  transition:0.3s;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  margin-bottom: 15px;
+  overflow: hidden;
 }
 
 .order-header{
   display:flex;
   justify-content:space-between;
+  padding:15px;
   cursor:pointer;
 }
 
 .order-body{
-  display:none;
-  margin-top:10px;
-  border-top:1px solid #ddd;
-  padding-top:10px;
+  padding:15px;
+  border-top:1px solid var(--border);
+}
+
+.order-item{
+  display:flex;
+  gap:10px;
+  margin-bottom:10px;
+}
+
+.order-item img{
+  width:50px;
+  height:50px;
+  object-fit:cover;
+  border-radius:8px;
 }
 
 .status{
-  padding:4px 10px;
-  border-radius:20px;
+  padding:3px 8px;
+  border-radius:6px;
   font-size:12px;
 }
 
