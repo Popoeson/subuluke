@@ -1116,62 +1116,71 @@ categoryFilter.addEventListener("change", filterProducts);
 featuredFilter.addEventListener("change", filterProducts);
 order.status
 
+/* ================= ORDER GLOBAL ================= */
 let allOrders = []
 
 /* ================= FETCH ORDERS ================= */
 async function fetchOrders(){
 
   const container = document.getElementById("ordersContainer")
-  container.innerHTML = "Loading..."
+  if(!container) return
+
+  container.innerHTML = "Loading orders..."
 
   try{
     const res = await fetch("https://subuluke.onrender.com/api/orders")
     const data = await res.json()
 
-    if(data.status !== "success") throw new Error()
+    // ✅ Backend returns array directly
+    allOrders = data
 
-    allOrders = data.orders
     renderOrders(allOrders)
 
   }catch(err){
-    container.innerHTML = "Failed to load orders"
+    console.error("Fetch Orders Error:", err)
+    container.innerHTML = "<p>Failed to load orders</p>"
   }
 }
 
-/* ================= RENDER ================= */
+/* ================= RENDER ORDERS ================= */
 function renderOrders(orders){
 
   const container = document.getElementById("ordersContainer")
 
-  if(orders.length === 0){
+  if(!orders || orders.length === 0){
     container.innerHTML = "<p>No orders found</p>"
     return
   }
 
   container.innerHTML = orders.map(order => `
+
     <div class="order-card">
 
+      <!-- HEADER -->
       <div class="order-header" onclick="toggleOrder('${order._id}')">
+
         <div>
-          <strong>${order.orderId}</strong><br>
-          <small>${order.customer.name}</small>
+          <strong>${order.orderId || "N/A"}</strong><br>
+          <small>${order.customer?.name || "No Name"}</small>
         </div>
 
         <div>
           <span class="status ${order.status}">${order.status}</span><br>
-          <strong>₦${order.amount}</strong>
+          <strong>₦${order.amount || 0}</strong>
         </div>
+
       </div>
 
-      <div class="order-body" id="order-${order._id}">
+      <!-- BODY -->
+      <div class="order-body" id="order-${order._id}" style="display:none">
 
-        <p><strong>Phone:</strong> ${order.customer.phone}</p>
-        <p><strong>Address:</strong> ${order.customer.address}</p>
+        <p><strong>Phone:</strong> ${order.customer?.phone || "-"}</p>
+        <p><strong>Address:</strong> ${order.customer?.address || "-"}</p>
 
         <div class="order-items">
-          ${order.items.map(item => `
+          ${(order.items || []).map(item => `
             <div class="order-item">
-              <img src="${item.image}" alt="">
+              <img src="${item.image}" alt="${item.name}">
               <div>
                 <strong>${item.name}</strong><br>
                 Qty: ${item.qty} • ₦${item.price}
@@ -1185,12 +1194,16 @@ function renderOrders(orders){
       </div>
 
     </div>
+
   `).join("")
 }
 
-/* ================= TOGGLE ================= */
+/* ================= TOGGLE ORDER ================= */
 function toggleOrder(id){
+
   const el = document.getElementById(`order-${id}`)
+  if(!el) return
+
   el.style.display = el.style.display === "block" ? "none" : "block"
 }
 
@@ -1200,12 +1213,16 @@ function filterOrders(){
   const search = document.getElementById("searchInput").value.toLowerCase()
   const status = document.getElementById("statusFilter").value
 
-  let filtered = allOrders.filter(order => {
+  const filtered = allOrders.filter(order => {
+
+    const orderId = order.orderId?.toLowerCase() || ""
+    const name = order.customer?.name?.toLowerCase() || ""
+    const phone = order.customer?.phone || ""
 
     const matchSearch =
-      order.orderId.toLowerCase().includes(search) ||
-      order.customer.name.toLowerCase().includes(search) ||
-      order.customer.phone.includes(search)
+      orderId.includes(search) ||
+      name.includes(search) ||
+      phone.includes(search)
 
     const matchStatus =
       status === "all" || order.status === status
@@ -1216,8 +1233,23 @@ function filterOrders(){
   renderOrders(filtered)
 }
 
+/* ================= OPTIONAL: AUTO REFRESH ================= */
+// Refresh every 30 seconds (optional)
+setInterval(() => {
+  if(document.getElementById("orders")?.style.display !== "none"){
+    fetchOrders()
+  }
+}, 30000)
+
 /* ================= INIT ================= */
-fetchOrders()
+// ⚠️ IMPORTANT: Call this ONLY when Orders tab is opened
+// Example:
+// showOrders()
+
+function initOrders(){
+  fetchOrders()
+}
+
 </script>
 </body>
 </html>
