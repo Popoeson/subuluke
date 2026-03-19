@@ -774,8 +774,14 @@ navItems.forEach(item => {
     sections.forEach(s => s.classList.remove("active"));
 
     const target = item.dataset.target;
+
     if(target){
       document.getElementById(target).classList.add("active");
+
+      // ✅🔥 LOAD ORDERS WHEN ORDERS TAB IS CLICKED
+      if(target === "orders"){
+        fetchOrders()
+      }
     }
 
     document.querySelector(".sidebar").classList.remove("show");
