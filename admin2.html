@@ -799,6 +799,77 @@ document.addEventListener("click", function(e){
   }
 });
 
+// ========= DASHBOARD STATS ======
+async function fetchDashboardStats(){
+
+  try{
+    const [productsRes, ordersRes] = await Promise.all([
+      fetch(`${API_BASE}/api/products`),
+      fetch(`${API_BASE}/api/orders`)
+    ])
+
+    const products = await productsRes.json()
+    const orders = await ordersRes.json()
+
+    // TOTAL PRODUCTS
+    document.getElementById("totalProducts").innerText = products.length
+
+    // TOTAL ORDERS
+    document.getElementById("totalOrders").innerText = orders.length
+
+    // REVENUE (only successful)
+    let revenue = 0
+    let pending = 0
+
+    orders.forEach(order=>{
+      if(order.status === "success"){
+        revenue += order.amount || 0
+      }
+      if(order.status === "pending"){
+        pending++
+      }
+    })
+
+    document.getElementById("totalRevenue").innerText = `₦${revenue}`
+    document.getElementById("pendingOrders").innerText = pending
+
+  }catch(err){
+    console.error("Dashboard Stats Error:", err)
+  }
+}
+
+//========== TOP 10 ORDERS ========
+async function fetchTopOrders(){
+
+  const tbody = document.getElementById("topOrdersBody")
+
+  try{
+    const res = await fetch(`${API_BASE}/api/orders`)
+    const orders = await res.json()
+
+    // Get latest 10 (already sorted from backend)
+    const topOrders = orders.slice(0,10)
+
+    tbody.innerHTML = topOrders.map(order => `
+      <tr>
+        <td>${order.orderId || "-"}</td>
+        <td>${order.customer?.name || "N/A"}</td>
+        <td class="amount">₦${order.amount || 0}</td>
+        <td>
+          <span class="status ${order.status}">
+            ${order.status}
+          </span>
+        </td>
+        <td>${new Date(order.createdAt).toLocaleDateString()}</td>
+      </tr>
+    `).join("")
+
+  }catch(err){
+    console.error("Top Orders Error:", err)
+    tbody.innerHTML = `<tr><td colspan="5">Failed to load</td></tr>`
+  }
+}
+
 /* =====================
 PRODUCT MODAL
 ===================== */
