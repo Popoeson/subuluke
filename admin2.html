@@ -779,6 +779,15 @@ navItems.forEach(item => {
       document.getElementById(target).classList.add("active");
 
       // ✅🔥 LOAD ORDERS WHEN ORDERS TAB IS CLICKED
+
+      if(target === "dashboard"){
+  initDashboard()
+}
+
+if(target === "orders"){
+  initOrders()
+}
+
       if(target === "orders"){
         fetchOrders()
       }
@@ -1334,6 +1343,10 @@ setInterval(() => {
 // Example:
 // showOrders()
 
+function initDashboard(){
+  fetchDashboardStats()
+  fetchTopOrders()
+}
 function initOrders(){
   fetchOrders()
 }
