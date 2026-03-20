@@ -285,10 +285,10 @@ HEADER
       <span>₦<span id="subtotal">0</span></span>
     </div>
 
-    <div class="row">
+  <!--  <div class="row">
       <span>Delivery</span>
       <span>₦1500</span>
-    </div>
+    </div> -->
 
     <div class="row total">
       <span>Total</span>
@@ -337,8 +337,9 @@ updateThemeIcon()
 let cart = JSON.parse(localStorage.getItem("cart")) || []
 
 let subtotal = cart.reduce((sum,i)=>sum + i.price * i.qty,0)
-let delivery = 1500
-let total = subtotal + delivery
+//let delivery = 1500
+//let total = subtotal + delivery
+let total = subtotal
 
 document.getElementById("subtotal").innerText = subtotal
 document.getElementById("total").innerText = total
