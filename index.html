@@ -324,24 +324,22 @@ Responsive
 }
 
 /* =========================
-HERO
+HERO (REFINED)
 ===========================*/
 
 .hero{
   width:100%;
-  height:500px;
+
+  /* 🔥 Responsive height (fix stretch + crop) */
+  height: clamp(320px, 60vh, 520px);
 
   position:relative;
   overflow:hidden;
 
   margin:0;
-  border-radius:0;
-
-  box-shadow:none;
 }
 
 /* TRACK */
-
 .hero-track{
   position:relative;
   width:100%;
@@ -349,7 +347,6 @@ HERO
 }
 
 /* SLIDE */
-
 .hero-slide{
   position:absolute;
   inset:0;
@@ -362,59 +359,71 @@ HERO
   z-index:2;
 }
 
+/* IMAGE FIX */
 .hero-slide img{
   width:100%;
   height:100%;
+
   object-fit:cover;
+
+  /* 🔥 Prevent awkward cropping */
+  object-position:center;
 }
 
-/* OVERLAY */
-
+/* =========================
+OVERLAY (BALANCED)
+===========================*/
 .hero-overlay{
   position:absolute;
   top:50%;
   left:50%;
   transform:translate(-50%,-50%);
+
   text-align:center;
   color:#fff;
 
-  padding:22px 36px;
+  padding:18px 28px;
   border-radius:14px;
 
-  background:rgba(0,0,0,0.35);
+  /* 🔥 lighter overlay */
+  background:rgba(0,0,0,0.28);
 
-  backdrop-filter:blur(8px);
-  -webkit-backdrop-filter:blur(8px);
+  backdrop-filter:blur(6px);
+  -webkit-backdrop-filter:blur(6px);
 
-  box-shadow:0 10px 24px rgba(0,0,0,0.25);
+  box-shadow:0 8px 20px rgba(0,0,0,0.2);
+
+  max-width:90%;
 }
 
+/* TEXT */
 .hero-overlay h1{
-  font-size:48px;
-  margin-bottom:12px;
+  font-size:42px;
+  margin-bottom:10px;
   font-weight:700;
 }
 
 .hero-overlay p{
-  font-size:20px;
+  font-size:18px;
   opacity:0.9;
 }
 
-/* ARROWS */
-
+/* =========================
+ARROWS
+===========================*/
 .hero-arrow{
   position:absolute;
   top:50%;
   transform:translateY(-50%);
-  width:48px;
-  height:48px;
+  width:46px;
+  height:46px;
 
   border:none;
   border-radius:50%;
 
-  background:rgba(0,0,0,0.4);
+  background:rgba(0,0,0,0.35);
   color:#fff;
-  font-size:24px;
+  font-size:22px;
 
   cursor:pointer;
   z-index:5;
@@ -422,33 +431,29 @@ HERO
   backdrop-filter:blur(6px);
 }
 
-.hero-prev{
-  left:24px;
-}
-
-.hero-next{
-  right:24px;
-}
+.hero-prev{ left:20px; }
+.hero-next{ right:20px; }
 
 .hero-arrow:hover{
-  background:rgba(0,0,0,0.65);
+  background:rgba(0,0,0,0.6);
 }
 
-/* DOTS */
-
+/* =========================
+DOTS
+===========================*/
 .hero-dots{
   position:absolute;
-  bottom:24px;
+  bottom:18px;
   left:50%;
   transform:translateX(-50%);
   display:flex;
-  gap:10px;
+  gap:8px;
   z-index:5;
 }
 
 .hero-dot{
-  width:12px;
-  height:12px;
+  width:10px;
+  height:10px;
   border-radius:50%;
   background:rgba(255,255,255,0.5);
   cursor:pointer;
@@ -460,27 +465,43 @@ HERO
   transform:scale(1.2);
 }
 
-/* RESPONSIVE */
-
+/* =========================
+MOBILE FIX (KEY PART)
+===========================*/
 @media(max-width:768px){
 
-.hero{
-  height:360px;
-}
+  .hero{
+    height:300px; /* slightly smaller */
+  }
 
-.hero-overlay h1{
-  font-size:32px;
-}
+  .hero-slide img{
+    object-position:top; /* 🔥 shows more important parts */
+  }
 
-.hero-overlay p{
-  font-size:16px;
-}
+  .hero-overlay{
+    padding:14px 18px;
 
-.hero-arrow{
-  width:38px;
-  height:38px;
-}
+    /* 🔥 MUCH lighter overlay for visibility */
+    background:rgba(0,0,0,0.18);
 
+    backdrop-filter:blur(3px);
+
+    max-width:92%;
+  }
+
+  .hero-overlay h1{
+    font-size:26px;
+  }
+
+  .hero-overlay p{
+    font-size:14px;
+  }
+
+  .hero-arrow{
+    width:34px;
+    height:34px;
+    font-size:18px;
+  }
 }
 
 /* =========================
