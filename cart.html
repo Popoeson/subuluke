@@ -290,6 +290,13 @@ if(localStorage.getItem("theme") === "dark"){
 }
 updateThemeIcon()
 
+
+// ===== PRICE FORMAT ====
+function formatPrice(amount){
+  return Number(amount).toLocaleString("en-NG")
+}
+
+
 /* =========================
 CART LOGIC
 ========================= */
@@ -321,7 +328,7 @@ function renderCart(){
       <img src="${item.image}">
       <div class="cart-details">
         <div class="cart-name">${item.name}</div>
-        <div class="cart-price">₦${item.price}</div>
+        <div class="cart-price">₦${formatPrice(item.price)}</div>
       </div>
 
       <div class="cart-qty">
