@@ -1292,6 +1292,11 @@ async function loadProducts(){
   }
 }
 
+// ===== PRICE FORMAT ====
+function formatPrice(amount){
+  return Number(amount).toLocaleString("en-NG")
+}
+
 /* =========================
 RENDER PRODUCTS
 ========================= */
@@ -1330,8 +1335,8 @@ function renderProducts(products){
         <div class="product-name">${p.name}</div>
 
         <div class="price">
-          ${p.slashPrice>0 ? `<span class="old-price">₦${p.slashPrice}</span>` : ""}
-          <span class="new-price">₦${p.price}</span>
+          ${p.slashPrice>0 ? `<span class="old-price">₦${format price(p.slashPrice)}</span>` : ""}
+          <span class="new-price">₦${format price(p.price)}</span>
         </div>
 
         <button 
