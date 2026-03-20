@@ -774,51 +774,67 @@ PAGINATION
 }
 
 /* =========================
-FOOTER
+GLASSMORPHISM FOOTER
 ========================= */
 .footer {
-  margin-top: 80px;
-  padding: 60px 20px 30px 20px;
-  background: var(--header-gradient);
+  margin-top: 50px;
+  padding: 35px 20px 18px;
+
+  /* 🔥 Glass effect */
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+
+  border-top: 1px solid rgba(255,255,255,0.15);
+  border-radius: 14px 14px 0 0;
+
   color: var(--text);
-  border-radius: 12px 12px 0 0;
-  box-shadow: 0 -4px 12px rgba(122,74,0,0.25);
-  transition: background 0.4s, color 0.4s;
-  font-family: 'Inter', sans-serif;
+  box-shadow: 0 -6px 20px rgba(0,0,0,0.25);
+
+  transition: all 0.4s ease;
 }
 
+/* Dark mode glass */
+body.dark .footer {
+  background: rgba(20, 20, 20, 0.55);
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+
+/* ================= CONTAINER ================= */
 .footer-container {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  gap: 30px;
-  max-width: 1200px;
+  gap: 18px;
+  max-width: 1100px;
   margin: 0 auto;
 }
 
+/* ================= ABOUT ================= */
 .footer-about {
-  flex: 1 1 250px;
-  text-align: left;
+  flex: 1 1 220px;
 }
 
 .footer-logo {
-  width: 140px;
-  margin-bottom: 16px;
+  width: 105px;
+  margin-bottom: 10px;
 }
 
 .footer-description {
-  font-size: 14px;
-  line-height: 1.6;
+  font-size: 13px;
+  line-height: 1.5;
   color: var(--muted);
 }
 
+/* ================= CONTACT ================= */
 .footer-contact {
-  flex: 1 1 250px;
+  flex: 1 1 220px;
 }
 
 .footer-contact h3 {
-  margin-bottom: 16px;
-  font-size: 18px;
+  margin-bottom: 10px;
+  font-size: 15px;
+  letter-spacing: 0.5px;
 }
 
 .footer-contact ul {
@@ -830,57 +846,89 @@ FOOTER
 .footer-contact li {
   display: flex;
   align-items: center;
-  margin-bottom: 12px;
-  font-size: 14px;
-  gap: 8px;
+  margin-bottom: 7px;
+  font-size: 13px;
+  gap: 6px;
   color: var(--text);
 }
 
+/* ICON */
 .footer-icon {
-  width: 20px;
-  height: 20px;
+  width: 17px;
+  height: 17px;
   stroke: var(--accent);
-  flex-shrink: 0;
+  opacity: 0.9;
 }
 
+/* LINKS */
 .footer-contact a {
   color: var(--text);
   text-decoration: none;
-  transition: color 0.3s;
+  transition: 0.3s ease;
 }
 
 .footer-contact a:hover {
   color: var(--accent);
+  transform: translateX(2px);
 }
 
+/* ================= COPY ================= */
 .footer-copy {
   text-align: center;
-  margin-top: 40px;
-  font-size: 13px;
+  margin-top: 18px;
+  font-size: 11.5px;
   color: var(--muted);
+  opacity: 0.85;
 }
 
-/* RESPONSIVE */
+/* ================= DIVIDER LINE ================= */
+.footer::before {
+  content: "";
+  display: block;
+  height: 1px;
+  width: 90%;
+  margin: 0 auto 18px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(255,255,255,0.25),
+    transparent
+  );
+}
+
+/* ================= MOBILE ================= */
 @media (max-width: 768px){
+
+  .footer {
+    padding: 28px 15px 14px;
+  }
+
   .footer-container {
     flex-direction: column;
     text-align: center;
-    gap: 12px; /* reduced from 20px to tighten spacing */
+    gap: 10px;
   }
 
-  .footer-about, .footer-contact {
+  .footer-about,
+  .footer-contact {
     text-align: center;
+  }
+
+  .footer-logo {
+    margin: 0 auto 8px;
   }
 
   .footer-contact li {
     justify-content: center;
+    margin-bottom: 6px;
   }
 
-  /* Reduce space between contact and copyright */
   .footer-copy {
-    margin-top: 20px; /* reduced from 40px */
+    margin-top: 12px;
+    font-size: 11px;
   }
 }
+
 </style>
 </head>
 
