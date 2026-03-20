@@ -910,6 +910,41 @@ window.onclick = function(e){
   }
 };
 
+/* =====================
+TOGGLE LOGIC (FIXED)
+===================== */
+function setupToggles(){
+
+  const inStall = document.getElementById("inStall");
+  const outStall = document.getElementById("outStall");
+
+  const featuredYes = document.getElementById("featuredYes");
+  const featuredNo = document.getElementById("featuredNo");
+
+  if(!inStall || !outStall || !featuredYes || !featuredNo) return;
+
+  // STATUS
+  inStall.onclick = () => {
+    inStall.classList.add("active");
+    outStall.classList.remove("active");
+  };
+
+  outStall.onclick = () => {
+    outStall.classList.add("active");
+    inStall.classList.remove("active");
+  };
+
+  // FEATURED
+  featuredYes.onclick = () => {
+    featuredYes.classList.add("active");
+    featuredNo.classList.remove("active");
+  };
+
+  featuredNo.onclick = () => {
+    featuredNo.classList.add("active");
+    featuredYes.classList.remove("active");
+  };
+}
 
 /* =====================  
 SAVE PRODUCT  
@@ -1316,6 +1351,11 @@ INIT ON LOAD
 window.onload = () => {
   initDashboard();
 };
+
+// ====== featured toggke
+document.addEventListener("DOMContentLoaded", () => {
+  setupToggles();
+});
 </script>
 
 </body>
