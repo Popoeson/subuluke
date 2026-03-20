@@ -1335,7 +1335,7 @@ function renderProducts(products){
         <div class="product-name">${p.name}</div>
 
         <div class="price">
-          ${p.slashPrice>0 ? `<span class="old-price">₦${format price(p.slashPrice)}</span>` : ""}
+          ${p.slashPrice>0 ? `<span class="old-price">₦${formatPrice(p.slashPrice)}</span>` : ""}
           <span class="new-price">₦${format price(p.price)}</span>
         </div>
 
