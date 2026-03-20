@@ -365,8 +365,6 @@ HERO (REFINED)
   height:100%;
 
   object-fit:cover;
-
-  /* 🔥 Prevent awkward cropping */
   object-position:center;
 }
 
@@ -473,9 +471,10 @@ MOBILE FIX (KEY PART)
   .hero{
     height:300px; /* slightly smaller */
   }
-
+  
   .hero-slide img{
-    object-position:top; /* 🔥 shows more important parts */
+    object-fit:cover;
+  object-position:center;
   }
 
   .hero-overlay{
