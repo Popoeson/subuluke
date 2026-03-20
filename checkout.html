@@ -102,6 +102,19 @@ HEADER
   color:#000;
 }
 
+/* -------------------------
+Header Icons
+------------------------- */
+:root { --icon-color: #3a2a00; }      /* light mode */
+body.dark { --icon-color: var(--softGold); } /* dark mode */
+
+/* ICON COLOR CONTROL */
+.header svg,
+.footer svg,
+.icon {
+  color: var(--icon-color);
+}
+
 /* ========================= PAGE ========================= */  
 .checkout{  
   max-width:700px;  
