@@ -742,10 +742,10 @@ function toggleTheme(){
 
   if(document.body.classList.contains("dark")){
     localStorage.setItem("theme","dark");
-    icon.textContent = "☀️";
+    if(icon) icon.textContent = "☀️";
   } else {
     localStorage.setItem("theme","light");
-    icon.textContent = "🌙";
+    if(icon) icon.textContent = "🌙";
   }
 }
 
@@ -756,12 +756,8 @@ if(localStorage.getItem("theme") === "dark"){
 }
 
 /* =====================
-SIDEBAR TOGGLE
+SIDEBAR NAVIGATION
 ===================== */
-function toggleSidebar(){
-  document.querySelector(".sidebar").classList.toggle("show");
-}
-
 const navItems = document.querySelectorAll(".nav-item");
 const sections = document.querySelectorAll(".section");
 
@@ -778,24 +774,26 @@ navItems.forEach(item => {
     if(target){
       document.getElementById(target).classList.add("active");
 
-      // ✅🔥 LOAD ORDERS WHEN ORDERS TAB IS CLICKED
-
+      // 🔥 Load data dynamically
       if(target === "dashboard"){
-  initDashboard()
-}
-
-if(target === "orders"){
-  initOrders()
-}
+        initDashboard();
+      }
 
       if(target === "orders"){
-        fetchOrders()
+        initOrders();
       }
     }
 
-    document.querySelector(".sidebar").classList.remove("show");
+    document.querySelector(".sidebar")?.classList.remove("show");
   };
 });
+
+/* =====================
+SIDEBAR TOGGLE
+===================== */
+function toggleSidebar(){
+  document.querySelector(".sidebar")?.classList.toggle("show");
+}
 
 document.addEventListener("click", function(e){
   const sidebar = document.querySelector(".sidebar");
@@ -808,88 +806,102 @@ document.addEventListener("click", function(e){
   }
 });
 
-// ========= DASHBOARD STATS ======
+/* =====================
+DASHBOARD STATS
+===================== */
 async function fetchDashboardStats(){
-
   try{
     const [productsRes, ordersRes] = await Promise.all([
       fetch(`${API_BASE}/api/products`),
       fetch(`${API_BASE}/api/orders`)
-    ])
+    ]);
 
-    const products = await productsRes.json()
-    const orders = await ordersRes.json()
+    const products = await productsRes.json();
+    const orders = await ordersRes.json();
 
     // TOTAL PRODUCTS
-    document.getElementById("totalProducts").innerText = products.length
+    const totalProductsEl = document.getElementById("totalProducts");
+    if(totalProductsEl) totalProductsEl.innerText = products.length;
 
     // TOTAL ORDERS
-    document.getElementById("totalOrders").innerText = orders.length
+    const totalOrdersEl = document.getElementById("totalOrders");
+    if(totalOrdersEl) totalOrdersEl.innerText = orders.length;
 
-    // REVENUE (only successful)
-    let revenue = 0
-    let pending = 0
+    // REVENUE + PENDING
+    let revenue = 0;
+    let pending = 0;
 
-    orders.forEach(order=>{
+    orders.forEach(order => {
       if(order.status === "success"){
-        revenue += order.amount || 0
+        revenue += order.amount || 0;
       }
       if(order.status === "pending"){
-        pending++
+        pending++;
       }
-    })
+    });
 
-    document.getElementById("totalRevenue").innerText = `₦${revenue}`
-    document.getElementById("pendingOrders").innerText = pending
+    const revenueEl = document.getElementById("totalRevenue");
+    if(revenueEl) revenueEl.innerText = `₦${revenue.toLocaleString()}`;
+
+    const pendingEl = document.getElementById("pendingOrders");
+    if(pendingEl) pendingEl.innerText = pending;
 
   }catch(err){
-    console.error("Dashboard Stats Error:", err)
+    console.error("Dashboard Stats Error:", err);
   }
 }
 
-//========== TOP 10 ORDERS ========
+/* =====================
+TOP 10 ORDERS
+===================== */
 async function fetchTopOrders(){
 
-  const tbody = document.getElementById("topOrdersBody")
+  const tbody = document.getElementById("topOrdersBody");
+  if(!tbody) return;
 
   try{
-    const res = await fetch(`${API_BASE}/api/orders`)
-    const orders = await res.json()
+    const res = await fetch(`${API_BASE}/api/orders`);
+    const orders = await res.json();
 
-    // Get latest 10 (already sorted from backend)
-    const topOrders = orders.slice(0,10)
+    const topOrders = orders.slice(0,10);
 
     tbody.innerHTML = topOrders.map(order => `
       <tr>
         <td>${order.orderId || "-"}</td>
         <td>${order.customer?.name || "N/A"}</td>
-        <td class="amount">₦${order.amount || 0}</td>
+        <td class="amount">₦${(order.amount || 0).toLocaleString()}</td>
         <td>
-          <span class="status ${order.status}">
-            ${order.status}
+          <span class="status ${order.status || "pending"}">
+            ${order.status || "pending"}
           </span>
         </td>
         <td>${new Date(order.createdAt).toLocaleDateString()}</td>
       </tr>
-    `).join("")
+    `).join("");
 
   }catch(err){
-    console.error("Top Orders Error:", err)
-    tbody.innerHTML = `<tr><td colspan="5">Failed to load</td></tr>`
+    console.error("Top Orders Error:", err);
+    tbody.innerHTML = `<tr><td colspan="5">Failed to load</td></tr>`;
   }
+}
+
+/* =====================
+INIT DASHBOARD
+===================== */
+function initDashboard(){
+  fetchDashboardStats();
+  fetchTopOrders();
 }
 
 /* =====================
 PRODUCT MODAL
 ===================== */
 function openModal(){
-  const modal = document.getElementById("productModal");
-  modal.style.display = "flex";
+  document.getElementById("productModal").style.display = "flex";
 }
 
 function closeModal(){
-  const modal = document.getElementById("productModal");
-  modal.style.display = "none";
+  document.getElementById("productModal").style.display = "none";
 }
 
 window.onclick = function(e){
@@ -906,7 +918,6 @@ const imageInput = document.getElementById("image");
 if(imageInput){
   imageInput.addEventListener("change", function(){
     const file = this.files[0];
-
     if(!file) return;
 
     const reader = new FileReader();
@@ -922,54 +933,20 @@ if(imageInput){
 }
 
 /* =====================
-TOGGLE LOGIC
-===================== */
-function setupToggles(){
-
-  const inStall = document.getElementById("inStall");
-  const outStall = document.getElementById("outStall");
-
-  const featuredYes = document.getElementById("featuredYes");
-  const featuredNo = document.getElementById("featuredNo");
-
-  inStall.onclick = () => {
-    inStall.classList.add("active");
-    outStall.classList.remove("active");
-  };
-
-  outStall.onclick = () => {
-    outStall.classList.add("active");
-    inStall.classList.remove("active");
-  };
-
-  featuredYes.onclick = () => {
-    featuredYes.classList.add("active");
-    featuredNo.classList.remove("active");
-  };
-
-  featuredNo.onclick = () => {
-    featuredNo.classList.add("active");
-    featuredYes.classList.remove("active");
-  };
-}
-
-setupToggles();
-
-/* =====================
 FETCH PRODUCTS
 ===================== */
 async function fetchProducts(){
 
   try {
-
     const res = await fetch(`${API_BASE}/api/products`);
     const products = await res.json();
 
     const table = document.querySelector("#productTable tbody");
+    if(!table) return;
+
     table.innerHTML = "";
 
     products.forEach(p => {
-
       const row = document.createElement("tr");
       row.dataset.id = p._id;
 
@@ -978,8 +955,8 @@ async function fetchProducts(){
         <td>${p.name}</td>
         <td>${p.category}</td>
         <td class="amount">
-          $${p.price}
-          ${p.slashPrice ? `<s>$${p.slashPrice}</s>` : ""}
+          ₦${p.price}
+          ${p.slashPrice ? `<s>₦${p.slashPrice}</s>` : ""}
         </td>
         <td>${p.status === "in_stall" ? "In Stall" : "Out of Stall"}</td>
         <td>${p.featured ? "Yes" : "No"}</td>
@@ -990,285 +967,65 @@ async function fetchProducts(){
       `;
 
       table.appendChild(row);
-
     });
 
   } catch(err){
-
     console.error("Fetch products error:", err);
-
   }
-
 }
 
 fetchProducts();
 
 /* =====================
-SAVE PRODUCT
+ORDERS SECTION
 ===================== */
-async function saveProduct(){
+let allOrders = [];
 
-  const modal = document.getElementById("productModal");
-  const editingId = modal.dataset.editingId;
+async function fetchOrders(){
 
-  const name = document.getElementById("name").value;
-  const price = document.getElementById("price").value;
-  const slashPrice = document.getElementById("slash").value;
-  const category = document.getElementById("category").value;
+  const container = document.getElementById("ordersContainer");
+  if(!container) return;
 
-  const featured = document.getElementById("featuredYes").classList.contains("active");
+  container.innerHTML = "Loading orders...";
 
-  const status = document.getElementById("inStall").classList.contains("active")
-    ? "in_stall"
-    : "out_of_stall";
+  try{
+    const res = await fetch(`${API_BASE}/api/orders`);
+    const data = await res.json();
 
-  const imageFile = document.getElementById("image").files[0];
+    allOrders = data;
 
-  if(!name || !price || !category){
-    alert("Please fill all required fields");
+    renderOrders(allOrders);
+
+  }catch(err){
+    console.error("Fetch Orders Error:", err);
+    container.innerHTML = "<p>Failed to load orders</p>";
+  }
+}
+
+function renderOrders(orders){
+
+  const container = document.getElementById("ordersContainer");
+
+  if(!orders || orders.length === 0){
+    container.innerHTML = "<p>No orders found</p>";
     return;
   }
 
-  const formData = new FormData();
-
-  formData.append("name", name);
-  formData.append("price", price);
-  formData.append("slashPrice", slashPrice || 0);
-  formData.append("category", category);
-  formData.append("featured", featured);
-  formData.append("status", status);
-
-  if(imageFile){
-    formData.append("images", imageFile);
-  }
-
-  try {
-
-    if(editingId){
-
-      await fetch(`${API_BASE}/api/products/${editingId}`, {
-        method: "PUT",
-        body: formData
-      });
-
-    } else {
-
-      await fetch(`${API_BASE}/api/products`, {
-        method: "POST",
-        body: formData
-      });
-
-    }
-
-    fetchProducts();
-
-    closeModal();
-    resetForm();
-
-  } catch(err){
-
-    console.error("Save product error:", err);
-    alert("Failed to save product");
-
-  }
-
-}
-
-/* =====================
-RESET FORM
-===================== */
-function resetForm(){
-
-  document.getElementById("name").value = "";
-  document.getElementById("price").value = "";
-  document.getElementById("slash").value = "";
-  document.getElementById("category").selectedIndex = 0;
-
-  document.getElementById("preview").src = "";
-  document.getElementById("preview").style.display = "none";
-
-  document.getElementById("image").value = "";
-
-  const modal = document.getElementById("productModal");
-  modal.dataset.editingId = "";
-
-  document.getElementById("inStall").classList.add("active");
-  document.getElementById("outStall").classList.remove("active");
-
-  document.getElementById("featuredYes").classList.remove("active");
-  document.getElementById("featuredNo").classList.add("active");
-
-}
-
-/* =====================
-EDIT PRODUCT
-===================== */
-function editProduct(el){
-
-  const row = el.closest("tr");
-  const id = row.dataset.id;
-
-  const modal = document.getElementById("productModal");
-
-  document.getElementById("name").value = row.children[1].textContent;
-
-  const priceText = row.children[3].childNodes[0].textContent.replace("$","");
-  document.getElementById("price").value = priceText.trim();
-
-  const slashText =
-    row.children[3].querySelector("s")?.textContent.replace("$","") || "";
-
-  document.getElementById("slash").value = slashText;
-
-  document.getElementById("category").value = row.children[2].textContent;
-
-  const preview = document.getElementById("preview");
-  preview.src = row.children[0].querySelector("img").src;
-  preview.style.display = "block";
-
-  if(row.children[4].textContent === "In Stall"){
-    document.getElementById("inStall").classList.add("active");
-    document.getElementById("outStall").classList.remove("active");
-  } else {
-    document.getElementById("inStall").classList.remove("active");
-    document.getElementById("outStall").classList.add("active");
-  }
-
-  if(row.children[5].textContent === "Yes"){
-    document.getElementById("featuredYes").classList.add("active");
-    document.getElementById("featuredNo").classList.remove("active");
-  } else {
-    document.getElementById("featuredYes").classList.remove("active");
-    document.getElementById("featuredNo").classList.add("active");
-  }
-
-  modal.dataset.editingId = id;
-
-  openModal();
-
-}
-
-/* =====================
-DELETE PRODUCT
-===================== */
-async function deleteProduct(el){
-
-  if(!confirm("Are you sure you want to delete this product?")) return;
-
-  const row = el.closest("tr");
-  const id = row.dataset.id;
-
-  try {
-
-    await fetch(`${API_BASE}/api/products/${id}`, {
-      method: "DELETE"
-    });
-
-    row.remove();
-
-  } catch(err){
-
-    console.error("Delete product error:", err);
-    alert("Failed to delete product");
-
-  }
-
-}
-
-/* =====================
-FILTER & SEARCH
-===================== */
-const searchInput = document.getElementById("productSearch");
-const categoryFilter = document.getElementById("categoryFilter");
-const featuredFilter = document.getElementById("featuredFilter");
-
-function filterProducts(){
-
-  const searchTerm = searchInput.value.toLowerCase();
-  const categoryTerm = categoryFilter.value;
-  const featuredTerm = featuredFilter.value;
-
-  const rows = document.querySelectorAll("#productTable tbody tr");
-
-  rows.forEach(row => {
-
-    const name = row.children[1].textContent.toLowerCase();
-    const category = row.children[2].textContent;
-    const featured = row.children[5].textContent;
-
-    const matchesSearch = name.includes(searchTerm);
-    const matchesCategory = categoryTerm === "all" || category === categoryTerm;
-    const matchesFeatured = featuredTerm === "all" || featured === featuredTerm;
-
-    row.style.display =
-      matchesSearch && matchesCategory && matchesFeatured
-        ? ""
-        : "none";
-
-  });
-
-}
-
-searchInput.addEventListener("input", filterProducts);
-categoryFilter.addEventListener("change", filterProducts);
-featuredFilter.addEventListener("change", filterProducts);
-
-/* ================= ORDER GLOBAL ================= */
-let allOrders = []
-
-/* ================= FETCH ORDERS ================= */
-async function fetchOrders(){
-
-  const container = document.getElementById("ordersContainer")
-  if(!container) return
-
-  container.innerHTML = "Loading orders..."
-
-  try{
-    const res = await fetch("https://subuluke.onrender.com/api/orders")
-    const data = await res.json()
-
-    // ✅ Backend returns array directly
-    allOrders = data
-
-    renderOrders(allOrders)
-
-  }catch(err){
-    console.error("Fetch Orders Error:", err)
-    container.innerHTML = "<p>Failed to load orders</p>"
-  }
-}
-
-/* ================= RENDER ORDERS ================= */
-function renderOrders(orders){
-
-  const container = document.getElementById("ordersContainer")
-
-  if(!orders || orders.length === 0){
-    container.innerHTML = "<p>No orders found</p>"
-    return
-  }
-
   container.innerHTML = orders.map(order => `
-
     <div class="order-card">
 
-      <!-- HEADER -->
       <div class="order-header" onclick="toggleOrder('${order._id}')">
-
         <div>
           <strong>${order.orderId || "N/A"}</strong><br>
           <small>${order.customer?.name || "No Name"}</small>
         </div>
 
         <div>
-          <span class="status ${order.status}">${order.status}</span><br>
-          <strong>₦${order.amount || 0}</strong>
+          <span class="status ${order.status || "pending"}">${order.status || "pending"}</span><br>
+          <strong>₦${(order.amount || 0).toLocaleString()}</strong>
         </div>
-
       </div>
 
-      <!-- BODY -->
       <div class="order-body" id="order-${order._id}" style="display:none">
 
         <p><strong>Phone:</strong> ${order.customer?.phone || "-"}</p>
@@ -1291,66 +1048,62 @@ function renderOrders(orders){
       </div>
 
     </div>
-
-  `).join("")
+  `).join("");
 }
 
-/* ================= TOGGLE ORDER ================= */
 function toggleOrder(id){
+  const el = document.getElementById(`order-${id}`);
+  if(!el) return;
 
-  const el = document.getElementById(`order-${id}`)
-  if(!el) return
-
-  el.style.display = el.style.display === "block" ? "none" : "block"
+  el.style.display = el.style.display === "block" ? "none" : "block";
 }
 
-/* ================= SEARCH + FILTER ================= */
 function filterOrders(){
 
-  const search = document.getElementById("searchInput").value.toLowerCase()
-  const status = document.getElementById("statusFilter").value
+  const search = document.getElementById("searchInput").value.toLowerCase();
+  const status = document.getElementById("statusFilter").value;
 
   const filtered = allOrders.filter(order => {
 
-    const orderId = order.orderId?.toLowerCase() || ""
-    const name = order.customer?.name?.toLowerCase() || ""
-    const phone = order.customer?.phone || ""
+    const orderId = order.orderId?.toLowerCase() || "";
+    const name = order.customer?.name?.toLowerCase() || "";
+    const phone = order.customer?.phone || "";
 
     const matchSearch =
       orderId.includes(search) ||
       name.includes(search) ||
-      phone.includes(search)
+      phone.includes(search);
 
     const matchStatus =
-      status === "all" || order.status === status
+      status === "all" || order.status === status;
 
-    return matchSearch && matchStatus
-  })
+    return matchSearch && matchStatus;
+  });
 
-  renderOrders(filtered)
+  renderOrders(filtered);
 }
 
-/* ================= OPTIONAL: AUTO REFRESH ================= */
-// Refresh every 30 seconds (optional)
-setInterval(() => {
-  if(document.getElementById("orders")?.style.display !== "none"){
-    fetchOrders()
-  }
-}, 30000)
-
-/* ================= INIT ================= */
-// ⚠️ IMPORTANT: Call this ONLY when Orders tab is opened
-// Example:
-// showOrders()
-
-function initDashboard(){
-  fetchDashboardStats()
-  fetchTopOrders()
-}
 function initOrders(){
-  fetchOrders()
+  fetchOrders();
 }
 
+/* =====================
+AUTO REFRESH (ORDERS)
+===================== */
+setInterval(() => {
+  const ordersSection = document.getElementById("orders");
+  if(ordersSection?.classList.contains("active")){
+    fetchOrders();
+  }
+}, 30000);
+
+/* =====================
+INIT ON LOAD
+===================== */
+window.onload = () => {
+  initDashboard();
+};
 </script>
+
 </body>
 </html>
