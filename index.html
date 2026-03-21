@@ -928,61 +928,60 @@ body.dark .footer {
 @media (max-width: 768px){
 
   .footer {
-    padding: 18px 10px 10px; /* slightly tighter */
+    padding: 20px 12px 12px;
   }
 
+  /* 🔥 SWITCH TO GRID (KEY FIX) */
   .footer-container {
-    flex-direction: column;
-    text-align: center;
-    gap: 4px; /* 🔥 reduced more */
-  }
-
-  .footer-about,
-  .footer-contact {
+    display: grid;
+    grid-template-columns: 1fr; /* single column */
+    gap: 8px; /* controlled spacing */
     text-align: center;
   }
 
   /* LOGO */
   .footer-logo {
-    width: 80px;
-    margin: 0 auto 3px; /* tighter */
+    width: 85px;
+    margin: 0 auto 4px;
   }
 
   /* DESCRIPTION */
   .footer-description {
-    font-size: 11.5px;
-    line-height: 1.35;
-    margin-bottom: 3px;
-
-    max-height: 34px; /* slightly tighter */
-    overflow: hidden;
+    font-size: 12px;
+    line-height: 1.4;
+    margin: 0; /* 🔥 remove extra spacing */
   }
 
   /* CONTACT */
   .footer-contact h3 {
-    font-size: 13.5px;
-    margin-bottom: 3px;
+    font-size: 14px;
+    margin: 6px 0 4px; /* tighter control */
+  }
+
+  .footer-contact ul {
+    margin: 0;
+    padding: 0;
   }
 
   .footer-contact li {
     justify-content: center;
-    margin-bottom: 3px;
-    font-size: 11.5px;
-    gap: 4px;
+    margin: 3px 0; /* 🔥 consistent spacing */
+    font-size: 12px;
+    gap: 5px;
   }
 
   .footer-icon {
-    width: 14px;
-    height: 14px;
+    width: 15px;
+    height: 15px;
   }
 
   /* COPYRIGHT */
   .footer-copy {
-    margin-top: 4px; /* 🔥 tighter */
-    font-size: 10px;
-    opacity: 0.8;
+    margin-top: 8px;
+    font-size: 10.5px;
   }
 }
+
 </style>
 </head>
 
