@@ -358,6 +358,12 @@ let total = subtotal
 document.getElementById("subtotal").innerText = subtotal
 document.getElementById("total").innerText = total
 
+// ===== PRICE FORMAT ====
+function formatPrice(amount){
+  return Number(amount).toLocaleString("en-NG")
+}
+
+
 /* ========================= RENDER CART ========================= */
 function renderCart(){
 
@@ -377,7 +383,7 @@ function renderCart(){
         <p>${item.name}</p>
         <small>Qty: ${item.qty}</small>
       </div>
-      <div class="cart-price">₦${item.price * item.qty}</div>
+      <div class="cart-price">₦${formatPrice(item.price * item.qty)}</div>
     `
 
     container.appendChild(div)
