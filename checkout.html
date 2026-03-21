@@ -361,9 +361,8 @@ let subtotal = cart.reduce((sum,i)=>sum + i.price * i.qty,0)
 //let total = subtotal + delivery
 let total = subtotal
 
-document.getElementById("subtotal").innerText = subtotal
-document.getElementById("total").innerText = total
-
+document.getElementById("subtotal").innerText = `₦${formatPrice(subtotal)}`
+document.getElementById("total").innerText = `₦${formatPrice(total)}`
 
 /* ========================= RENDER CART ========================= */
 function renderCart(){
