@@ -347,6 +347,12 @@ if(localStorage.getItem("theme") === "dark"){
 }
 updateThemeIcon()
 
+// ===== PRICE FORMAT ====
+function formatPrice(amount){
+  return Number(amount).toLocaleString("en-NG")
+}
+
+
 /* ========================= CART ========================= */
 let cart = JSON.parse(localStorage.getItem("cart")) || []
 
@@ -357,11 +363,6 @@ let total = subtotal
 
 document.getElementById("subtotal").innerText = subtotal
 document.getElementById("total").innerText = total
-
-// ===== PRICE FORMAT ====
-function formatPrice(amount){
-  return Number(amount).toLocaleString("en-NG")
-}
 
 
 /* ========================= RENDER CART ========================= */
