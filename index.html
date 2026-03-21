@@ -928,14 +928,13 @@ body.dark .footer {
 @media (max-width: 768px){
 
   .footer {
-    padding: 28px 15px 14px;
+    padding: 20px 12px 12px;
   }
 
   .footer-container {
     flex-direction: column;
     text-align: center;
-    gap: 10px;
-    Height: 200px;
+    gap: 6px; /* tighter spacing */
   }
 
   .footer-about,
@@ -943,21 +942,47 @@ body.dark .footer {
     text-align: center;
   }
 
+  /* LOGO smaller */
   .footer-logo {
-    margin: 0 auto 8px;
+    width: 85px;
+    margin: 0 auto 4px;
+  }
+
+  /* DESCRIPTION tighter */
+  .footer-description {
+    font-size: 12px;
+    line-height: 1.4;
+    margin-bottom: 4px;
+
+    /* 🔥 limit height without cutting badly */
+    max-height: 38px;
+    overflow: hidden;
+  }
+
+  /* CONTACT tighter */
+  .footer-contact h3 {
+    font-size: 14px;
+    margin-bottom: 4px;
   }
 
   .footer-contact li {
     justify-content: center;
-    margin-bottom: 6px;
+    margin-bottom: 4px;
+    font-size: 12px;
+    gap: 5px;
   }
 
+  .footer-icon {
+    width: 15px;
+    height: 15px;
+  }
+
+  /* COPYRIGHT */
   .footer-copy {
-    margin-top: 8px;
-    font-size: 11px;
+    margin-top: 6px;
+    font-size: 10.5px;
   }
 }
-
 </style>
 </head>
 
