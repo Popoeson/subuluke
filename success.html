@@ -272,6 +272,11 @@ async function fetchOrder(){
   }
 }
 
+// ===== PRICE FORMAT ====
+function formatPrice(amount){
+  return Number(amount).toLocaleString("en-NG")
+}
+
 /* ================= RENDER ================= */
 function renderOrder(){
 
@@ -287,9 +292,9 @@ function renderOrder(){
         <img src="${item.image}" class="item-img">
         <div class="item-info">
           <div class="item-name">${item.name}</div>
-          <div class="item-meta">Qty: ${item.qty} • ₦${item.price}</div>
+          <div class="item-meta">Qty: ${item.qty} • ₦${formatPrice(item.price)}</div>
         </div>
-        <div class="item-total">₦${subtotal}</div>
+        <div class="item-total">₦${formatPrice(subtotal)}</div>
       </div>
     `
   })
