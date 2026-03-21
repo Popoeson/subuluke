@@ -928,13 +928,13 @@ body.dark .footer {
 @media (max-width: 768px){
 
   .footer {
-    padding: 20px 12px 12px;
+    padding: 18px 10px 10px; /* slightly tighter */
   }
 
   .footer-container {
     flex-direction: column;
     text-align: center;
-    gap: 6px; /* tighter spacing */
+    gap: 4px; /* 🔥 reduced more */
   }
 
   .footer-about,
@@ -942,45 +942,45 @@ body.dark .footer {
     text-align: center;
   }
 
-  /* LOGO smaller */
+  /* LOGO */
   .footer-logo {
-    width: 85px;
-    margin: 0 auto 4px;
+    width: 80px;
+    margin: 0 auto 3px; /* tighter */
   }
 
-  /* DESCRIPTION tighter */
+  /* DESCRIPTION */
   .footer-description {
-    font-size: 12px;
-    line-height: 1.4;
-    margin-bottom: 4px;
+    font-size: 11.5px;
+    line-height: 1.35;
+    margin-bottom: 3px;
 
-    /* 🔥 limit height without cutting badly */
-    max-height: 38px;
+    max-height: 34px; /* slightly tighter */
     overflow: hidden;
   }
 
-  /* CONTACT tighter */
+  /* CONTACT */
   .footer-contact h3 {
-    font-size: 14px;
-    margin-bottom: 4px;
+    font-size: 13.5px;
+    margin-bottom: 3px;
   }
 
   .footer-contact li {
     justify-content: center;
-    margin-bottom: 4px;
-    font-size: 12px;
-    gap: 5px;
+    margin-bottom: 3px;
+    font-size: 11.5px;
+    gap: 4px;
   }
 
   .footer-icon {
-    width: 15px;
-    height: 15px;
+    width: 14px;
+    height: 14px;
   }
 
   /* COPYRIGHT */
   .footer-copy {
- /*   margin-top: 6px;*/
-    font-size: 10.5px;
+    margin-top: 4px; /* 🔥 tighter */
+    font-size: 10px;
+    opacity: 0.8;
   }
 }
 </style>
