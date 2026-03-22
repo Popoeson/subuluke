@@ -50,6 +50,55 @@ body {
   transition: background 0.4s, color 0.4s;
 }
 
+/* ==========================
+   PAGE LOADER
+========================== */
+#pageLoader{
+  position:fixed;
+  inset:0;
+  background:rgba(245, 240, 225, 0.95);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  z-index:5000;
+  transition:opacity 0.4s ease, visibility 0.4s ease;
+}
+
+#pageLoader.hidden{
+  opacity:0;
+  visibility:hidden;
+}
+
+/* Spinner */
+.spinner{
+  width:52px;
+  height:52px;
+  border:4px solid rgba(0,0,0,0.15);
+  border-top-color: var(--softGold);
+  border-radius:50%;
+  animation:spin 1s linear infinite;
+  margin-bottom:12px;
+}
+
+@keyframes spin{
+  to{ transform:rotate(360deg); }
+}
+
+#pageLoader p{
+  font-size:0.85rem;
+  color:#555;
+  letter-spacing:0.4px;
+}
+
+/* Blur effect while loading */
+body.loading .page-content{
+  filter:blur(6px);
+  pointer-events:none;
+}
+
 /* =========================
 HEADER
 ========================= */
@@ -1129,6 +1178,31 @@ body.dark .footer {
 
 <script>
 const API = "https://subuluke.onrender.com"
+
+// ===============================
+// PAGE LOADER CONTROL
+// ===============================
+document.body.classList.add("loading");
+
+async function wakeServer(){
+  try{
+    await fetch(`${API}/api/health`);
+  }catch(err){
+    console.warn("Server wake attempt failed:", err);
+  }
+}
+
+window.addEventListener("load", async () => {
+  const loader = document.getElementById("pageLoader");
+
+  await wakeServer();
+
+  setTimeout(() => {
+    loader.classList.add("hidden");
+    document.body.classList.remove("loading");
+  }, 400);
+});
+
 
 /* =========================
 GLOBAL STATE
