@@ -456,6 +456,13 @@ app.get('/api/orders/:orderId', async (req, res) => {
   }
 });
 
+// HEALTH CHECK
+
+app.get("/api/health", (req, res) => {
+  res.json({ status: "ok" });
+});
+
+
 // =====================
 // Start Server
 // =====================
