@@ -128,32 +128,30 @@ const uploadHeroToCloudinary = (buffer) => {
 // Routes
 // =====================
 
-// ---- Create Product ----
-app.post('/api/products', upload.single('images'), async (req, res) => {
+//--- CREATE HERO -----
+app.post('/api/hero-images', upload.single('image'), async (req, res) => {
   try {
-    const { name, category, price, slashPrice, description, status, featured } = req.body;
 
     if (!req.file) {
       return res.status(400).json({ error: 'No image uploaded' });
     }
 
-    // Upload main image to Cloudinary
-    const uploadResult = await uploadToCloudinary(req.file.buffer);
-    const mainImage = uploadResult.secure_url;
+    const result = await uploadHeroToCloudinary(req.file.buffer);
 
-     const newProduct = new Product({
-  name,
-  category,
-  price: Number(price),
-  slashPrice: Number(slashPrice || 0),
-  description: description || "",
-  status: status || "in_stall",
-  featured: featured === 'true',
-  mainImage
-});
+    // 🔥 Optimize hero image
+    const optimizedHeroUrl = result.secure_url.replace(
+      "/upload/",
+      "/upload/f_auto,q_auto,w_1600/"
+    );
 
-    await newProduct.save();
-    res.status(201).json(newProduct);
+    const hero = new HeroImage({
+      imageUrl: optimizedHeroUrl,
+      isActive: req.body.isActive === 'true' || req.body.isActive === true
+    });
+
+    await hero.save();
+
+    res.status(201).json(hero);
 
   } catch (err) {
     console.error(err);
@@ -224,18 +222,26 @@ app.delete('/api/products/:id', async (req, res) => {
 //--- CREATE HERO -----
 app.post('/api/hero-images', upload.single('image'), async (req, res) => {
   try {
+
     if (!req.file) {
       return res.status(400).json({ error: 'No image uploaded' });
     }
 
     const result = await uploadHeroToCloudinary(req.file.buffer);
 
+    // 🔥 Optimize hero image
+    const optimizedHeroUrl = result.secure_url.replace(
+      "/upload/",
+      "/upload/f_auto,q_auto,w_1600/"
+    );
+
     const hero = new HeroImage({
-      imageUrl: result.secure_url,
+      imageUrl: optimizedHeroUrl,
       isActive: req.body.isActive === 'true' || req.body.isActive === true
     });
 
     await hero.save();
+
     res.status(201).json(hero);
 
   } catch (err) {
