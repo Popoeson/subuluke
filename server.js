@@ -171,6 +171,7 @@ app.post('/api/products', upload.single('images'), async (req, res) => {
 // ---- Update Product ----
 app.put('/api/products/:id', upload.single('images'), async (req, res) => {
   try {
+
     const { name, category, price, slashPrice, description, status, featured } = req.body;
 
     const updateData = {
@@ -179,13 +180,22 @@ app.put('/api/products/:id', upload.single('images'), async (req, res) => {
       price: Number(price),
       slashPrice: Number(slashPrice || 0),
       description: description || "",
-      status: status || "in_stall", // ✅ save status properly
+      status: status || "in_stall",
       featured: featured === 'true'
     };
 
+    // 🔥 If a new image is uploaded
     if (req.file) {
+
       const uploadResult = await uploadToCloudinary(req.file.buffer);
-      updateData.mainImage = uploadResult.secure_url;
+
+      // 🔥 Optimize image before saving
+      const optimizedImage = uploadResult.secure_url.replace(
+        "/upload/",
+        "/upload/f_auto,q_auto,w_800/"
+      );
+
+      updateData.mainImage = optimizedImage;
     }
 
     const updatedProduct = await Product.findByIdAndUpdate(
