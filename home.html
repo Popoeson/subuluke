@@ -390,124 +390,116 @@ font-size:17px;
 /* =========================
 HERO SECTION
 ========================= */
-.hero-section{
-  position:relative;
-  width:100vw; /* full screen width */
-  height:100vh; /* increase height by 15% */
-  max-height:110vh; /* optional max for large screens */
-  overflow:hidden;
-  opacity:0;
-  transform:translateX(-100%);
-  animation:heroSlideIn 1s ease forwards;
-  animation-delay:1s; /* after header */
+.hero-section {
+  position: relative;
+  width: 100vw;           /* full viewport width */
+  height: 115vh;          /* slightly taller than 100vh */
+  overflow: hidden;
+  opacity: 0;
+  transform: translateX(-100%);
+  animation: heroSlideIn 1s ease forwards;
+  animation-delay: 1s;    /* after header */
 
   /* Glassmorphism container */
-  background: rgba(255,255,255,0.08);
+  background: rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-  border-radius:0; /* full width, no corners */
-  border:1px solid rgba(255,255,255,0.12);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.12);
-  z-index:1;
+  border-radius: 0;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+
+  margin: 0;   /* remove spacing */
+  left: 0;     /* align to left */
+  top: 0;
+  z-index: 1;
 }
 
-/* Dark mode adjustments */
-body.dark .hero-section{
-  background: rgba(30,30,30,0.4);
-  border:1px solid rgba(255,215,122,0.2);
+body.dark .hero-section {
+  background: rgba(30, 30, 30, 0.4);
+  border: 1px solid rgba(255, 215, 122, 0.2);
 }
 
 /* Slides */
-.hero-slide{
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-  opacity:0;
-  transition:opacity .8s ease;
+.hero-slide {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.8s ease;
 }
 
-.hero-slide.active{
-  opacity:1;
-  z-index:1;
+.hero-slide.active {
+  opacity: 1;
+  z-index: 1;
 }
 
-.hero-slide img{
-  width:100%;
-  height:100%;
-  object-fit:cover; /* cover entire container */
-  object-position:center center;
+.hero-slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;       /* fills the container */
+  object-position: center; /* center image */
 }
 
-/* Remove overlay button */
-.hero-explore{
-  display:none;
+/* Navigation Buttons */
+.hero-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.2);
+  border: none;
+  color: #fff;
+  font-size: 28px;
+  padding: 12px 16px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 2;
 }
 
-/* Prev/Next Buttons */
-.hero-btn{
-  position:absolute;
-  top:50%;
-  transform:translateY(-50%);
-  background:rgba(0,0,0,0.2);
-  border:none;
-  color:#fff;
-  font-size:28px;
-  padding:12px 16px;
-  border-radius:50%;
-  cursor:pointer;
-  transition:all .3s ease;
-  z-index:2;
+.hero-btn:hover {
+  background: rgba(0, 0, 0, 0.4);
 }
 
-.hero-btn:hover{
-  background:rgba(0,0,0,0.4);
-}
-
-.hero-btn.prev{
-  left:20px;
-}
-
-.hero-btn.next{
-  right:20px;
-}
+.hero-btn.prev { left: 20px; }
+.hero-btn.next { right: 20px; }
 
 /* Dots */
-.hero-dots{
-  position:absolute;
-  bottom:15px;
-  left:50%;
-  transform:translateX(-50%);
-  display:flex;
-  gap:10px;
-  z-index:2;
+.hero-dots {
+  position: absolute;
+  bottom: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+  z-index: 2;
 }
 
-.hero-dot{
-  width:12px;
-  height:12px;
-  border-radius:50%;
-  background:var(--muted);
-  cursor:pointer;
-  transition:all .3s ease;
+.hero-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--muted);
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
-.hero-dot.active{
-  background:var(--accent);
+.hero-dot.active {
+  background: var(--accent);
 }
 
-/* Slide in animation */
-@keyframes heroSlideIn{
-  to{
-    opacity:1;
-    transform:translateX(0);
+/* Slide-in animation */
+@keyframes heroSlideIn {
+  to {
+    opacity: 1;
+    transform: translateX(0);
   }
 }
 
-/* MOBILE */
-@media(max-width:768px){
-  .hero-section{
-    height:85vh; /* responsive height */
+/* MOBILE ADJUSTMENTS */
+@media(max-width: 768px) {
+  .hero-section {
+    height: 85vh;
   }
 }
 
