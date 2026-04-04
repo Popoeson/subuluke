@@ -534,17 +534,20 @@ body.dark .hero {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: 32px; /* slightly more space */
 }
 
 .collections-header h2 {
-  font-size: 28px;
-  font-weight: 700;
-  letter-spacing: 1px;
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  border-bottom: 3px solid var(--accent);
+  padding-bottom: 4px;
 }
 
 .btn-pill {
-  padding: 8px 20px;
+  padding: 10px 22px;
   background: var(--accent);
   color: #fff;
   border-radius: 50px;
@@ -559,13 +562,27 @@ body.dark .hero {
 
 /* CATEGORY SUBSECTION */
 .category-section {
-  margin-bottom: 40px;
+  margin-bottom: 60px; /* more spacing between categories */
 }
 
 .category-section h3 {
-  font-size: 22px;
-  margin-bottom: 12px;
-  font-weight: 600;
+  font-size: 24px;
+  margin-bottom: 20px; /* more spacing before carousel */
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  position: relative;
+}
+
+.category-section h3::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -6px;
+  width: 50px;
+  height: 3px;
+  background: var(--accent);
+  border-radius: 2px;
 }
 
 /* CAROUSEL CONTAINER */
@@ -573,12 +590,13 @@ body.dark .hero {
   position: relative;
   overflow: hidden;
   width: 100%;
+  padding: 10px 0; /* spacing around carousel */
 }
 
 /* CAROUSEL TRACK */
 .category-track {
   display: flex;
-  gap: 12px;
+  gap: 16px; /* more gap for visual clarity */
   transition: transform 0.5s ease;
 }
 
@@ -589,7 +607,9 @@ body.dark .hero {
   border-radius: 16px;
   overflow: hidden;
   flex-shrink: 0;
-  background: #f5f5f5;
+  background: #f9f9f9;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+  transition: transform 0.3s ease;
 }
 
 .product-card img {
@@ -598,6 +618,10 @@ body.dark .hero {
   object-fit: cover;
   display: block;
   border-radius: 16px;
+}
+
+.product-card:hover {
+  transform: scale(1.05);
 }
 
 /* MOBILE TOUCH CURSOR */
@@ -630,9 +654,9 @@ body.dark .hero {
 /* RESPONSIVE */
 @media(max-width:768px){
   .product-card { min-width: 140px; height: 160px; }
-  .collections-header h2 { font-size: 24px; }
+  .collections-header h2 { font-size: 28px; }
+  .category-section h3 { font-size: 20px; }
 }
-
 </style>
 </head>
 
@@ -909,171 +933,141 @@ window.addEventListener("load", async () => {
     loadHero();
 });
 
-
 /* =========================
 COLLECTIONS SECTION
 ========================= */
 async function loadCollections() {
-    try {
-        const res = await fetch(API + "/api/products");
-        const products = await res.json();
-        if (!products.length) return;
+  try {
+    const res = await fetch(API + "/api/products");
+    const products = await res.json();
+    if (!products.length) return;
 
-        // Group by category
-        const categories = {};
-        products.forEach(p => {
-            if (!categories[p.category]) categories[p.category] = [];
-            categories[p.category].push(p);
-        });
+    // Group products by category
+    const categories = {};
+    products.forEach(p => {
+      if (!categories[p.category]) categories[p.category] = [];
+      categories[p.category].push(p);
+    });
 
-        const main = document.getElementById("mainContent");
-        const collectionSection = document.createElement("section");
-        collectionSection.id = "collectionSection";
-        collectionSection.innerHTML = `
-            <div class="collection-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
-                <h2 style="font-size:28px;">COLLECTIONS</h2>
-                <a href="store.html" class="pill-button" style="padding:8px 18px;border-radius:24px;background:var(--accent);color:#fff;text-decoration:none;">Go to Store</a>
-            </div>
-        `;
-        main.appendChild(collectionSection);
+    const container = document.getElementById("categoriesContainer");
+    container.innerHTML = ""; // clear existing
 
-        Object.keys(categories).forEach(cat => {
-            // Shuffle and limit to 15
-            const shuffled = categories[cat].sort(() => 0.5 - Math.random()).slice(0, 15);
+    // Collections header
+    const headerRow = document.createElement("div");
+    headerRow.className = "collections-header";
+    headerRow.innerHTML = `
+      <h2>COLLECTIONS</h2>
+      <a href="store.html" class="btn-pill">Go to Store</a>
+    `;
+    container.appendChild(headerRow);
 
-            const catContainer = document.createElement("div");
-            catContainer.className = "collection-category";
-            catContainer.innerHTML = `
-                <h3 style="margin-bottom:12px;">${cat}</h3>
-                <div class="collection-carousel" style="display:flex;gap:12px;overflow:hidden;position:relative;">
-                </div>
-            `;
-            collectionSection.appendChild(catContainer);
+    // Loop through each category
+    Object.keys(categories).forEach(cat => {
+      // Shuffle products & limit to 15
+      const shuffled = categories[cat].sort(() => 0.5 - Math.random()).slice(0, 15);
 
-            const carousel = catContainer.querySelector(".collection-carousel");
+      // Category section
+      const catSection = document.createElement("div");
+      catSection.className = "category-section";
+      catSection.innerHTML = `
+        <h3>${cat}</h3>
+        <div class="category-carousel">
+          <button class="carousel-arrow carousel-prev">&#10094;</button>
+          <div class="category-track"></div>
+          <button class="carousel-arrow carousel-next">&#10095;</button>
+        </div>
+      `;
+      container.appendChild(catSection);
 
-            // Append product images
-            shuffled.forEach(prod => {
-                const card = document.createElement("div");
-                card.className = "collection-card";
-                card.style.minWidth = "180px";
-                card.style.flex = "0 0 auto";
-                card.style.height = "180px";
-                card.style.borderRadius = "16px";
-                card.style.overflow = "hidden";
-                card.style.background = "#eee";
-                card.innerHTML = `<img src="${prod.mainImage}" style="width:100%;height:100%;object-fit:cover;">`;
-                carousel.appendChild(card);
-            });
+      const track = catSection.querySelector(".category-track");
 
-            // Start carousel animation
-            startCarousel(carousel);
-        });
+      // Append product cards
+      shuffled.forEach(prod => {
+        const card = document.createElement("div");
+        card.className = "product-card";
+        card.innerHTML = `<img src="${prod.mainImage}" alt="${prod.name || 'Product'}">`;
+        track.appendChild(card);
+      });
 
-    } catch (err) {
-        console.log("Collections load error:", err);
-    }
+      // Initialize carousel
+      initCategoryCarousel(catSection);
+    });
+
+  } catch (err) {
+    console.log("Collections load error:", err);
+  }
 }
 
-/* -------------------------
-CAROUSEL LOGIC
-------------------------- */
-function startCarousel(carousel) {
-    let scrollAmount = 0;
-    const cards = carousel.querySelectorAll(".collection-card");
-    if (!cards.length) return;
+/* =========================
+CATEGORY CAROUSEL FUNCTION
+========================= */
+function initCategoryCarousel(catSection) {
+  const track = catSection.querySelector(".category-track");
+  const prev = catSection.querySelector(".carousel-prev");
+  const next = catSection.querySelector(".carousel-next");
 
-    // Clone cards for infinite effect
-    cards.forEach(card => {
-        const clone = card.cloneNode(true);
-        carousel.appendChild(clone);
-    });
+  let position = 0;
+  let slideWidth = track.children[0]?.offsetWidth + 16 || 0; // card width + gap
+  let autoSlide;
 
-    let speed = 1; // pixels per frame for auto-scroll
-    let paused = false;
+  // Auto slide function
+  function startAutoSlide() {
+    clearInterval(autoSlide);
+    autoSlide = setInterval(() => {
+      position -= slideWidth;
+      if (Math.abs(position) >= track.scrollWidth) position = 0;
+      track.style.transform = `translateX(${position}px)`;
+    }, 3000);
+  }
 
-    // Touch tracking
-    let touchStartX = 0;
-    let lastTouchTime = 0;
-    let lastTouchX = 0;
-    let touchVelocity = 0;
-    let lastInteraction = 0;
+  // Stop auto slide on hover or touch
+  function stopAutoSlide() {
+    clearInterval(autoSlide);
+  }
 
-    function animate() {
-        // Auto-scroll
-        if (!paused) {
-            scrollAmount += speed;
-            if (scrollAmount >= carousel.scrollWidth / 2) scrollAmount = 0;
-            carousel.scrollLeft = scrollAmount;
-        }
-        requestAnimationFrame(animate);
-    }
+  // Next / Prev buttons
+  next.addEventListener("click", () => {
+    stopAutoSlide();
+    position -= slideWidth;
+    if (Math.abs(position) >= track.scrollWidth) position = 0;
+    track.style.transform = `translateX(${position}px)`;
+    startAutoSlide();
+  });
 
-    animate();
+  prev.addEventListener("click", () => {
+    stopAutoSlide();
+    position += slideWidth;
+    if (position > 0) position = -(track.scrollWidth - slideWidth);
+    track.style.transform = `translateX(${position}px)`;
+    startAutoSlide();
+  });
 
-    // ---------------------------
-    // TOUCH EVENTS
-    // ---------------------------
+  // Touch swipe
+  let startX = 0;
+  track.addEventListener("touchstart", e => {
+    stopAutoSlide();
+    startX = e.touches[0].clientX;
+  });
+  track.addEventListener("touchend", e => {
+    const endX = e.changedTouches[0].clientX;
+    if (endX < startX - 40) next.click();
+    if (endX > startX + 40) prev.click();
+    startAutoSlide();
+  });
 
-    carousel.addEventListener("touchstart", (e) => {
-        paused = true;
-        const touch = e.touches[0];
-        touchStartX = touch.clientX;
-        lastTouchX = touch.clientX;
-        lastTouchTime = Date.now();
-        lastInteraction = Date.now();
-    });
+  // Initialize
+  startAutoSlide();
 
-    carousel.addEventListener("touchmove", (e) => {
-        const touch = e.touches[0];
-        const currentX = touch.clientX;
-        const now = Date.now();
-        const deltaX = lastTouchX - currentX; // distance moved since last move
-        const deltaTime = now - lastTouchTime; // time elapsed
-
-        // Calculate velocity (pixels per ms)
-        touchVelocity = deltaX / deltaTime;
-
-        // Apply scrolling proportional to swipe distance
-        carousel.scrollLeft += deltaX;
-
-        // Update trackers
-        lastTouchX = currentX;
-        lastTouchTime = now;
-        lastInteraction = now;
-    });
-
-    carousel.addEventListener("touchend", () => {
-        // Continue inertia based on last swipe speed
-        let inertia = touchVelocity * 20; // scale factor for natural feel
-        const inertiaDecay = 0.95; // slows down gradually
-
-        function applyInertia() {
-            if (Math.abs(inertia) < 0.1) return; // stop when velocity is very low
-            carousel.scrollLeft += inertia;
-            inertia *= inertiaDecay;
-            requestAnimationFrame(applyInertia);
-        }
-
-        applyInertia();
-
-        // Resume auto-scroll after 3s idle
-        setTimeout(function checkResume() {
-            const now = Date.now();
-            if (now - lastInteraction >= 3000) {
-                paused = false;
-            } else {
-                setTimeout(checkResume, 500);
-            }
-        }, 500);
-    });
+  // Recalculate slideWidth on resize
+  window.addEventListener("resize", () => {
+    slideWidth = track.children[0]?.offsetWidth + 16 || 0;
+  });
 }
 
-/* INITIALIZE COLLECTIONS AFTER MAIN LOAD */
-window.addEventListener("load", async () => {
-    loadCollections();
-});
-
+/* =========================
+LOAD COLLECTIONS ON PAGE LOAD
+========================= */
+window.addEventListener("load", loadCollections);
 </script>
 </body>
 </html>
