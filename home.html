@@ -387,6 +387,141 @@ font-size:17px;
 
 }
 
+/* =========================
+HERO SECTION
+========================= */
+.hero-section{
+  position:relative;
+  width:100%;
+  height:100vh;
+  overflow:hidden;
+  opacity:0;
+  transform:translateX(-100%);
+  animation:heroSlideIn 1s ease forwards;
+  animation-delay:1s; /* after header */
+}
+
+/* Slides */
+.hero-slide{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  opacity:0;
+  transition:opacity .8s ease;
+}
+
+.hero-slide.active{
+  opacity:1;
+  z-index:1;
+}
+
+.hero-slide img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+/* Overlay */
+.hero-overlay{
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  text-align:center;
+  color:var(--accent);
+}
+
+.hero-overlay h1{
+  font-size:48px;
+  margin-bottom:12px;
+}
+
+.hero-overlay p{
+  font-size:22px;
+}
+
+/* Explore button */
+.hero-explore{
+  position:absolute;
+  bottom:60px;
+  left:50%;
+  transform:translateX(-50%);
+  padding:12px 28px;
+  font-size:18px;
+  font-weight:600;
+  color:var(--text);
+  background:rgba(255,255,255,0.08);
+  backdrop-filter:blur(12px);
+  border:1px solid rgba(255,255,255,0.15);
+  border-radius:10px;
+  text-decoration:none;
+  transition:all .3s ease;
+}
+
+.hero-explore:hover{
+  transform:translateX(-50%) scale(1.05);
+  background:rgba(255,255,255,0.12);
+}
+
+/* Prev/Next Buttons */
+.hero-btn{
+  position:absolute;
+  top:50%;
+  transform:translateY(-50%);
+  background:rgba(0,0,0,0.2);
+  border:none;
+  color:#fff;
+  font-size:28px;
+  padding:12px 16px;
+  border-radius:50%;
+  cursor:pointer;
+  transition:all .3s ease;
+}
+
+.hero-btn:hover{
+  background:rgba(0,0,0,0.4);
+}
+
+.hero-btn.prev{
+  left:20px;
+}
+
+.hero-btn.next{
+  right:20px;
+}
+
+/* Dots */
+.hero-dots{
+  position:absolute;
+  bottom:20px;
+  left:50%;
+  transform:translateX(-50%);
+  display:flex;
+  gap:10px;
+}
+
+.hero-dot{
+  width:12px;
+  height:12px;
+  border-radius:50%;
+  background:var(--muted);
+  cursor:pointer;
+  transition:all .3s ease;
+}
+
+.hero-dot.active{
+  background:var(--accent);
+}
+
+/* Slide in animation */
+@keyframes heroSlideIn{
+  to{
+    opacity:1;
+    transform:translateX(0);
+  }
+}
+
 </style>
 </head>
 
@@ -458,6 +593,20 @@ MAIN CONTENT (HOMEPAGE)
 
 </header>
 
+<-- ========== HERO SECTION ==========-->
+<section id="heroSection" class="hero-section">
+  <div id="heroTrack" class="hero-track"></div>
+
+  <!-- Hero navigation dots -->
+  <div id="heroDots" class="hero-dots"></div>
+
+  <!-- Previous / Next buttons -->
+  <button id="heroPrev" class="hero-btn prev"><i class="fa-solid fa-chevron-left"></i></button>
+  <button id="heroNext" class="hero-btn next"><i class="fa-solid fa-chevron-right"></i></button>
+
+  <!-- Explore button -->
+  <a href="#collections" class="hero-explore">Explore our collections</a>
+</section>
 
 </div>
 
@@ -571,6 +720,153 @@ document.body.classList.add("dark")
 }
 
 updateThemeIcon()
+
+/* =========================
+HERO SECTION SCRIPT
+========================= */
+
+let heroIndex = 0;
+let heroTimer;
+
+/* -------------------------
+LOAD HERO IMAGES
+------------------------- */
+async function loadHero() {
+  try {
+    const res = await fetch(API + "/api/hero-images");
+    const heroes = await res.json();
+
+    // Only active heroes
+    const activeHeroes = heroes.filter(h => h.isActive);
+    if (!activeHeroes.length) return;
+
+    const track = document.getElementById("heroTrack");
+    const dotsContainer = document.getElementById("heroDots");
+
+    if (!track || !dotsContainer) return;
+
+    track.innerHTML = "";
+    dotsContainer.innerHTML = "";
+
+    activeHeroes.forEach((hero, i) => {
+      // Create slide
+      const slide = document.createElement("div");
+      slide.className = "hero-slide";
+      if (i === 0) slide.classList.add("active");
+
+      slide.innerHTML = `
+        <img src="${hero.imageUrl}" loading="${i === 0 ? "eager" : "lazy"}">
+        <div class="hero-overlay">
+          <h1>Welcome to Subuluke</h1>
+          <p>Explore our premium collection</p>
+        </div>
+      `;
+
+      track.appendChild(slide);
+
+      // Create dot
+      const dot = document.createElement("div");
+      dot.className = "hero-dot";
+      if (i === 0) dot.classList.add("active");
+      dot.onclick = () => goToHero(i);
+      dotsContainer.appendChild(dot);
+    });
+
+    startHeroSlider();
+
+  } catch (err) {
+    console.log("Hero load error:", err);
+  }
+}
+
+/* -------------------------
+SHOW SLIDE
+------------------------- */
+function showHero(index) {
+  const slides = document.querySelectorAll(".hero-slide");
+  const dots = document.querySelectorAll(".hero-dot");
+
+  slides.forEach(s => s.classList.remove("active"));
+  dots.forEach(d => d.classList.remove("active"));
+
+  slides[index]?.classList.add("active");
+  dots[index]?.classList.add("active");
+}
+
+/* -------------------------
+NEXT / PREV HERO
+------------------------- */
+function nextHero() {
+  const slides = document.querySelectorAll(".hero-slide");
+  if (!slides.length) return;
+  heroIndex = (heroIndex + 1) % slides.length;
+  showHero(heroIndex);
+}
+
+function prevHero() {
+  const slides = document.querySelectorAll(".hero-slide");
+  if (!slides.length) return;
+  heroIndex = (heroIndex - 1 + slides.length) % slides.length;
+  showHero(heroIndex);
+}
+
+function goToHero(index) {
+  heroIndex = index;
+  showHero(heroIndex);
+}
+
+/* -------------------------
+AUTO SLIDER
+------------------------- */
+function startHeroSlider() {
+  clearInterval(heroTimer);
+  heroTimer = setInterval(nextHero, 6000);
+}
+
+/* -------------------------
+BUTTON EVENTS
+------------------------- */
+const nextBtn = document.getElementById("heroNext");
+const prevBtn = document.getElementById("heroPrev");
+
+if (nextBtn) nextBtn.onclick = nextHero;
+if (prevBtn) prevBtn.onclick = prevHero;
+
+/* -------------------------
+TOUCH SWIPE (MOBILE)
+------------------------- */
+const hero = document.getElementById("heroSection");
+
+if (hero) {
+  let touchStartX = 0;
+
+  hero.addEventListener("touchstart", e => {
+    touchStartX = e.changedTouches[0].screenX;
+  });
+
+  hero.addEventListener("touchend", e => {
+    const touchEndX = e.changedTouches[0].screenX;
+    if (touchEndX < touchStartX - 50) nextHero();
+    if (touchEndX > touchStartX + 50) prevHero();
+  });
+}
+
+/* -------------------------
+INITIALIZATION
+------------------------- */
+window.addEventListener("load", async () => {
+  const heroSection = document.getElementById("heroSection");
+
+  // Wait for homepage content (header) to appear
+  setTimeout(() => {
+    if (heroSection) {
+      heroSection.style.animationPlayState = "running"; // slide-in left
+    }
+  }, 1800); // after header animation
+
+  loadHero(); // load slides
+});
+
 </script>
 
 </body>
