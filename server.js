@@ -128,30 +128,39 @@ const uploadHeroToCloudinary = (buffer) => {
 // Routes
 // =====================
 
-//--- CREATE HERO -----
-app.post('/api/hero-images', upload.single('image'), async (req, res) => {
+// ---- Create Product ----
+app.post('/api/products', upload.single('images'), async (req, res) => {
   try {
+
+    const { name, category, price, slashPrice, description, status, featured } = req.body;
 
     if (!req.file) {
       return res.status(400).json({ error: 'No image uploaded' });
     }
 
-    const result = await uploadHeroToCloudinary(req.file.buffer);
+    // Upload image to Cloudinary
+    const uploadResult = await uploadToCloudinary(req.file.buffer);
 
-    // 🔥 Optimize hero image
-    const optimizedHeroUrl = result.secure_url.replace(
+    // 🔥 Optimize product image
+    const mainImage = uploadResult.secure_url.replace(
       "/upload/",
-      "/upload/f_auto,q_auto,w_1600/"
+      "/upload/f_auto,q_auto,w_800/"
     );
 
-    const hero = new HeroImage({
-      imageUrl: optimizedHeroUrl,
-      isActive: req.body.isActive === 'true' || req.body.isActive === true
+    const newProduct = new Product({
+      name,
+      category,
+      price: Number(price),
+      slashPrice: Number(slashPrice || 0),
+      description: description || "",
+      status: status || "in_stall",
+      featured: featured === 'true',
+      mainImage
     });
 
-    await hero.save();
+    await newProduct.save();
 
-    res.status(201).json(hero);
+    res.status(201).json(newProduct);
 
   } catch (err) {
     console.error(err);
