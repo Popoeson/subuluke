@@ -989,11 +989,18 @@ function startCarousel(carousel) {
         carousel.appendChild(clone);
     });
 
-    let speed = 1; // pixels per frame
+    let speed = 1; // pixels per frame for auto-scroll
     let paused = false;
+
+    // Touch tracking
+    let touchStartX = 0;
     let lastTouchTime = 0;
+    let lastTouchX = 0;
+    let touchVelocity = 0;
+    let lastInteraction = 0;
 
     function animate() {
+        // Auto-scroll
         if (!paused) {
             scrollAmount += speed;
             if (scrollAmount >= carousel.scrollWidth / 2) scrollAmount = 0;
@@ -1004,22 +1011,61 @@ function startCarousel(carousel) {
 
     animate();
 
-    // Pause on touch
-    carousel.addEventListener("touchstart", () => {
+    // ---------------------------
+    // TOUCH EVENTS
+    // ---------------------------
+
+    carousel.addEventListener("touchstart", (e) => {
         paused = true;
+        const touch = e.touches[0];
+        touchStartX = touch.clientX;
+        lastTouchX = touch.clientX;
         lastTouchTime = Date.now();
+        lastInteraction = Date.now();
     });
 
-    carousel.addEventListener("touchend", (e) => {
-        const touchEndTime = Date.now();
-        const touchDuration = touchEndTime - lastTouchTime;
+    carousel.addEventListener("touchmove", (e) => {
+        const touch = e.touches[0];
+        const currentX = touch.clientX;
+        const now = Date.now();
+        const deltaX = lastTouchX - currentX; // distance moved since last move
+        const deltaTime = now - lastTouchTime; // time elapsed
 
-        const touch = e.changedTouches[0];
-        if (!touch) return;
-        const deltaX = touch.screenX - touch.clientX;
+        // Calculate velocity (pixels per ms)
+        touchVelocity = deltaX / deltaTime;
 
-        // resume after 3s
-        setTimeout(()=>{ paused = false; }, 3000);
+        // Apply scrolling proportional to swipe distance
+        carousel.scrollLeft += deltaX;
+
+        // Update trackers
+        lastTouchX = currentX;
+        lastTouchTime = now;
+        lastInteraction = now;
+    });
+
+    carousel.addEventListener("touchend", () => {
+        // Continue inertia based on last swipe speed
+        let inertia = touchVelocity * 20; // scale factor for natural feel
+        const inertiaDecay = 0.95; // slows down gradually
+
+        function applyInertia() {
+            if (Math.abs(inertia) < 0.1) return; // stop when velocity is very low
+            carousel.scrollLeft += inertia;
+            inertia *= inertiaDecay;
+            requestAnimationFrame(applyInertia);
+        }
+
+        applyInertia();
+
+        // Resume auto-scroll after 3s idle
+        setTimeout(function checkResume() {
+            const now = Date.now();
+            if (now - lastInteraction >= 3000) {
+                paused = false;
+            } else {
+                setTimeout(checkResume, 500);
+            }
+        }, 500);
     });
 }
 
