@@ -592,11 +592,17 @@ body.dark .hero {
   padding: 10px 0; /* spacing around carousel */
 }
 
-/* CAROUSEL TRACK */
+/* CAROUSEL TRACK
 .category-track {
   display: flex;
   gap: 16px; /* more gap for visual clarity */
   transition: transform 0.5s ease;
+}*/
+
+.category-track{
+  display:flex;
+  gap:16px;
+  will-change: transform;
 }
 
 /* PRODUCT CARD */
@@ -1014,9 +1020,15 @@ function initCategoryCarousel(catSection){
     track.appendChild(clone);
   });
 
-  let speed = 0.7;
+  let speed = 0.6;
   let position = 0;
   let paused = false;
+
+  let trackWidth = track.scrollWidth / 2;
+
+  /* =========================
+  ANIMATION LOOP
+  ========================= */
 
   function animate(){
 
@@ -1024,8 +1036,8 @@ function initCategoryCarousel(catSection){
 
       position += speed;
 
-      if(position >= track.scrollWidth / 2){
-        position -= track.scrollWidth / 2;
+      if(position >= trackWidth){
+        position = 0; // seamless reset
       }
 
       track.style.transform = `translateX(-${position}px)`;
@@ -1042,8 +1054,7 @@ function initCategoryCarousel(catSection){
   ========================= */
 
   let startX = 0;
-  let startTime = 0;
-  let currentX = 0;
+  let lastX = 0;
   let isDragging = false;
 
   track.addEventListener("touchstart", e=>{
@@ -1052,7 +1063,7 @@ function initCategoryCarousel(catSection){
     isDragging = true;
 
     startX = e.touches[0].clientX;
-    startTime = Date.now();
+    lastX = startX;
 
   });
 
@@ -1061,36 +1072,27 @@ function initCategoryCarousel(catSection){
 
     if(!isDragging) return;
 
-    currentX = e.touches[0].clientX;
+    let currentX = e.touches[0].clientX;
 
-    let delta = startX - currentX;
+    let delta = lastX - currentX;
 
-    track.style.transform = `translateX(-${position + delta}px)`;
+    position += delta;
+
+    if(position < 0) position += trackWidth;
+    if(position >= trackWidth) position -= trackWidth;
+
+    track.style.transform = `translateX(-${position}px)`;
+
+    lastX = currentX;
 
   });
 
 
-  track.addEventListener("touchend", e=>{
-
-    if(!isDragging) return;
-
-    let endX = e.changedTouches[0].clientX;
-    let endTime = Date.now();
-
-    let distance = startX - endX;
-    let duration = endTime - startTime;
-
-    /* velocity calculation */
-    let velocity = distance / duration;
-
-    /* add momentum */
-    let momentum = velocity * 200;
-
-    position += distance + momentum;
+  track.addEventListener("touchend", ()=>{
 
     isDragging = false;
 
-    /* resume autoplay after 3 seconds */
+    /* resume autoplay after delay */
     setTimeout(()=>{
       paused = false;
     },3000);
