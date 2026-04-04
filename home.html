@@ -393,7 +393,7 @@ HERO SECTION
 .hero-section{
   position:relative;
   width:100%;
-  height:100vh;
+  height:75vh; /* slightly smaller */
   overflow:hidden;
   opacity:0;
   transform:translateX(-100%);
@@ -419,32 +419,15 @@ HERO SECTION
 .hero-slide img{
   width:100%;
   height:100%;
-  object-fit:cover;
-}
-
-/* Overlay */
-.hero-overlay{
-  position:absolute;
-  top:50%;
-  left:50%;
-  transform:translate(-50%,-50%);
-  text-align:center;
-  color:var(--accent);
-}
-
-.hero-overlay h1{
-  font-size:48px;
-  margin-bottom:12px;
-}
-
-.hero-overlay p{
-  font-size:22px;
+  object-fit:contain; /* fit nicely */
+  object-position:center center;
+  background:var(--bg);
 }
 
 /* Explore button */
 .hero-explore{
   position:absolute;
-  bottom:60px;
+  bottom:40px;
   left:50%;
   transform:translateX(-50%);
   padding:12px 28px;
@@ -457,6 +440,7 @@ HERO SECTION
   border-radius:10px;
   text-decoration:none;
   transition:all .3s ease;
+  z-index:2;
 }
 
 .hero-explore:hover{
@@ -477,6 +461,7 @@ HERO SECTION
   border-radius:50%;
   cursor:pointer;
   transition:all .3s ease;
+  z-index:2;
 }
 
 .hero-btn:hover{
@@ -494,11 +479,12 @@ HERO SECTION
 /* Dots */
 .hero-dots{
   position:absolute;
-  bottom:20px;
+  bottom:15px;
   left:50%;
   transform:translateX(-50%);
   display:flex;
   gap:10px;
+  z-index:2;
 }
 
 .hero-dot{
@@ -519,6 +505,17 @@ HERO SECTION
   to{
     opacity:1;
     transform:translateX(0);
+  }
+}
+
+/* MOBILE */
+@media(max-width:768px){
+  .hero-section{
+    height:55vh;
+  }
+  .hero-explore{
+    padding:10px 20px;
+    font-size:16px;
   }
 }
 
@@ -721,9 +718,7 @@ document.body.classList.add("dark")
 
 updateThemeIcon()
 
-/* =========================
-HERO SECTION SCRIPT
-========================= */
+/* ========== HERO SECTION =========*/
 
 let heroIndex = 0;
 let heroTimer;
@@ -736,7 +731,6 @@ async function loadHero() {
     const res = await fetch(API + "/api/hero-images");
     const heroes = await res.json();
 
-    // Only active heroes
     const activeHeroes = heroes.filter(h => h.isActive);
     if (!activeHeroes.length) return;
 
@@ -753,15 +747,7 @@ async function loadHero() {
       const slide = document.createElement("div");
       slide.className = "hero-slide";
       if (i === 0) slide.classList.add("active");
-
-      slide.innerHTML = `
-        <img src="${hero.imageUrl}" loading="${i === 0 ? "eager" : "lazy"}">
-        <div class="hero-overlay">
-          <h1>Welcome to Subuluke</h1>
-          <p>Explore our premium collection</p>
-        </div>
-      `;
-
+      slide.innerHTML = `<img src="${hero.imageUrl}" loading="${i===0 ? "eager" : "lazy"}">`;
       track.appendChild(slide);
 
       // Create dot
@@ -826,28 +812,20 @@ function startHeroSlider() {
 /* -------------------------
 BUTTON EVENTS
 ------------------------- */
-const nextBtn = document.getElementById("heroNext");
-const prevBtn = document.getElementById("heroPrev");
-
-if (nextBtn) nextBtn.onclick = nextHero;
-if (prevBtn) prevBtn.onclick = prevHero;
+document.getElementById("heroNext")?.addEventListener("click", nextHero);
+document.getElementById("heroPrev")?.addEventListener("click", prevHero);
 
 /* -------------------------
 TOUCH SWIPE (MOBILE)
 ------------------------- */
 const hero = document.getElementById("heroSection");
-
-if (hero) {
+if (hero){
   let touchStartX = 0;
-
-  hero.addEventListener("touchstart", e => {
-    touchStartX = e.changedTouches[0].screenX;
-  });
-
+  hero.addEventListener("touchstart", e => { touchStartX = e.changedTouches[0].screenX; });
   hero.addEventListener("touchend", e => {
     const touchEndX = e.changedTouches[0].screenX;
-    if (touchEndX < touchStartX - 50) nextHero();
-    if (touchEndX > touchStartX + 50) prevHero();
+    if(touchEndX < touchStartX - 50) nextHero();
+    if(touchEndX > touchStartX + 50) prevHero();
   });
 }
 
@@ -856,15 +834,10 @@ INITIALIZATION
 ------------------------- */
 window.addEventListener("load", async () => {
   const heroSection = document.getElementById("heroSection");
-
-  // Wait for homepage content (header) to appear
   setTimeout(() => {
-    if (heroSection) {
-      heroSection.style.animationPlayState = "running"; // slide-in left
-    }
-  }, 1800); // after header animation
-
-  loadHero(); // load slides
+    if(heroSection) heroSection.style.animationPlayState = "running";
+  }, 1800); // after header
+  loadHero();
 });
 
 </script>
