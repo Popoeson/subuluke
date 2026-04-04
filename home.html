@@ -279,17 +279,22 @@ LOGO
 ========================= */
 
 .logo{
-font-size:20px;
-font-weight:700;
-letter-spacing:1px;
-color:var(--softGold);
+  font-size:20px;
+  font-weight:700;
+  letter-spacing:1px;
+  color:var(--text); /* Use text color in light mode */
+  
+  opacity:0;
+  animation:fadeIn 0.8s ease forwards;
+  animation-delay:0.6s;
 
-opacity:0;
-animation:fadeIn 0.8s ease forwards;
-animation-delay:0.6s;
+  /* subtle glow for dark mode only */
+  text-shadow:0 0 8px rgba(255,215,122,0.35);
+}
 
-/* luxury glow */
-text-shadow:0 0 8px rgba(255,215,122,0.35);
+/* In dark mode, logo uses soft gold */
+body.dark .logo{
+  color:var(--softGold);
 }
 
 /* =========================
@@ -297,39 +302,51 @@ ICONS
 ========================= */
 
 .header-icons{
-display:flex;
-align-items:center;
-gap:18px;
+  display:flex;
+  align-items:center;
+  gap:18px;
 }
 
 /* ICON STYLE */
 
 .icon{
-background:none;
-border:none;
-font-size:18px;
-cursor:pointer;
-color:var(--softGold);
+  background:none;
+  border:none;
+  font-size:18px;
+  cursor:pointer;
+  color:var(--text); /* default light mode */
 
-opacity:0;
-animation:fadeIn 0.8s ease forwards;
+  opacity:0;
+  animation:fadeIn 0.8s ease forwards;
 
-transition:.25s ease;
+  transition:.25s ease;
 }
 
 .icon:hover{
-color:var(--softGold);
-transform:scale(1.12);
+  transform:scale(1.12);
+}
+
+/* Hover color: accent glow in light mode, softGold in dark mode */
+body:not(.dark) .icon:hover{
+  color:var(--accent);
+}
+
+body.dark .icon{
+  color:var(--softGold);
+}
+
+body.dark .icon:hover{
+  color:var(--softGold);
 }
 
 /* STAGGER ANIMATION */
 
 .cart-icon{
-animation-delay:0.8s;
+  animation-delay:0.8s;
 }
 
 .theme-toggle{
-animation-delay:1s;
+  animation-delay:1s;
 }
 
 /* =========================
