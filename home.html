@@ -524,40 +524,39 @@ body.dark .hero {
 }
 
 /* ========== COLLECTIONS SECTION ========== */
-.collections {
-  max-width: 1200px;
-  margin: 60px auto;
-  padding: 0 20px;
-}
 
 .collections-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 32px; /* slightly more space */
+  margin-bottom: 24px; /* slightly less for mobile */
 }
 
 .collections-header h2 {
-  font-size: 32px;
-  font-weight: 800;
-  letter-spacing: 2px;
+  font-size: 28px; /* reduced slightly */
+  font-weight: 700;
+  letter-spacing: 1.5px;
   text-transform: uppercase;
-  border-bottom: 3px solid var(--accent);
-  padding-bottom: 4px;
+  border-bottom: 2px solid var(--accent);
+  padding-bottom: 3px;
 }
 
 .btn-pill {
-  padding: 10px 22px;
-  background: var(--accent);
-  color: #fff;
-  border-radius: 50px;
-  text-decoration: none;
-  font-weight: 600;
-  transition: background 0.3s ease;
+  padding: 6px 16px; /* smaller on mobile */
+  font-size: 14px;
 }
 
-.btn-pill:hover {
-  background: var(--softGold);
+/* RESPONSIVE */
+@media(max-width:768px){
+  .collections-header h2 { font-size: 22px; }
+  .btn-pill { padding: 5px 12px; font-size: 12px; }
+  .category-section h3 { font-size: 18px; }
+  .product-card { min-width: 140px; height: 160px; }
+}
+.collections {
+  max-width: 1200px;
+  margin: 60px auto;
+  padding: 0 20px;
 }
 
 /* CATEGORY SUBSECTION */
@@ -999,68 +998,43 @@ async function loadCollections() {
 }
 
 /* =========================
-CATEGORY CAROUSEL FUNCTION
+CATEGORY CAROUSEL FUNCTION (Continuous)
 ========================= */
 function initCategoryCarousel(catSection) {
   const track = catSection.querySelector(".category-track");
-  const prev = catSection.querySelector(".carousel-prev");
-  const next = catSection.querySelector(".carousel-next");
 
-  let position = 0;
-  let slideWidth = track.children[0]?.offsetWidth + 16 || 0; // card width + gap
-  let autoSlide;
+  if (!track) return;
 
-  // Auto slide function
-  function startAutoSlide() {
-    clearInterval(autoSlide);
-    autoSlide = setInterval(() => {
-      position -= slideWidth;
-      if (Math.abs(position) >= track.scrollWidth) position = 0;
-      track.style.transform = `translateX(${position}px)`;
+  // Clone children to make seamless infinite loop
+  const cards = Array.from(track.children);
+  cards.forEach(card => {
+    const clone = card.cloneNode(true);
+    track.appendChild(clone);
+  });
+
+  let scrollSpeed = 0.3; // pixels per frame (slow continuous motion)
+  let scrollLeft = 0;
+  let paused = false;
+
+  function animate() {
+    if (!paused) {
+      scrollLeft += scrollSpeed;
+      if (scrollLeft >= track.scrollWidth / 2) scrollLeft = 0; // seamless loop
+      track.style.transform = `translateX(-${scrollLeft}px)`;
+    }
+    requestAnimationFrame(animate);
+  }
+
+  animate();
+
+  // Pause on touch and resume after 3s
+  track.addEventListener("touchstart", () => {
+    paused = true;
+  });
+  track.addEventListener("touchend", () => {
+    setTimeout(() => {
+      paused = false;
     }, 3000);
-  }
-
-  // Stop auto slide on hover or touch
-  function stopAutoSlide() {
-    clearInterval(autoSlide);
-  }
-
-  // Next / Prev buttons
-  next.addEventListener("click", () => {
-    stopAutoSlide();
-    position -= slideWidth;
-    if (Math.abs(position) >= track.scrollWidth) position = 0;
-    track.style.transform = `translateX(${position}px)`;
-    startAutoSlide();
-  });
-
-  prev.addEventListener("click", () => {
-    stopAutoSlide();
-    position += slideWidth;
-    if (position > 0) position = -(track.scrollWidth - slideWidth);
-    track.style.transform = `translateX(${position}px)`;
-    startAutoSlide();
-  });
-
-  // Touch swipe
-  let startX = 0;
-  track.addEventListener("touchstart", e => {
-    stopAutoSlide();
-    startX = e.touches[0].clientX;
-  });
-  track.addEventListener("touchend", e => {
-    const endX = e.changedTouches[0].clientX;
-    if (endX < startX - 40) next.click();
-    if (endX > startX + 40) prev.click();
-    startAutoSlide();
-  });
-
-  // Initialize
-  startAutoSlide();
-
-  // Recalculate slideWidth on resize
-  window.addEventListener("resize", () => {
-    slideWidth = track.children[0]?.offsetWidth + 16 || 0;
   });
 }
 
