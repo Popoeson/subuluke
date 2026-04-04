@@ -998,44 +998,105 @@ async function loadCollections() {
 }
 
 /* =========================
-CATEGORY CAROUSEL FUNCTION (Continuous)
+CATEGORY CAROUSEL FUNCTION
 ========================= */
-function initCategoryCarousel(catSection) {
+
+function initCategoryCarousel(catSection){
+
   const track = catSection.querySelector(".category-track");
+  if(!track) return;
 
-  if (!track) return;
-
-  // Clone children to make seamless infinite loop
+  /* duplicate cards for seamless infinite loop */
   const cards = Array.from(track.children);
-  cards.forEach(card => {
+
+  cards.forEach(card=>{
     const clone = card.cloneNode(true);
     track.appendChild(clone);
   });
 
-  let scrollSpeed = 0.9; // pixels per frame (slow continuous motion)
-  let scrollLeft = 0;
+  let speed = 0.7;
+  let position = 0;
   let paused = false;
 
-  function animate() {
-    if (!paused) {
-      scrollLeft += scrollSpeed;
-      if (scrollLeft >= track.scrollWidth / 2) scrollLeft = 0; // seamless loop
-      track.style.transform = `translateX(-${scrollLeft}px)`;
+  function animate(){
+
+    if(!paused){
+
+      position += speed;
+
+      if(position >= track.scrollWidth / 2){
+        position -= track.scrollWidth / 2;
+      }
+
+      track.style.transform = `translateX(-${position}px)`;
     }
+
     requestAnimationFrame(animate);
   }
 
   animate();
 
-  // Pause on touch and resume after 3s
-  track.addEventListener("touchstart", () => {
+
+  /* =========================
+  TOUCH INTERACTION
+  ========================= */
+
+  let startX = 0;
+  let startTime = 0;
+  let currentX = 0;
+  let isDragging = false;
+
+  track.addEventListener("touchstart", e=>{
+
     paused = true;
+    isDragging = true;
+
+    startX = e.touches[0].clientX;
+    startTime = Date.now();
+
   });
-  track.addEventListener("touchend", () => {
-    setTimeout(() => {
+
+
+  track.addEventListener("touchmove", e=>{
+
+    if(!isDragging) return;
+
+    currentX = e.touches[0].clientX;
+
+    let delta = startX - currentX;
+
+    track.style.transform = `translateX(-${position + delta}px)`;
+
+  });
+
+
+  track.addEventListener("touchend", e=>{
+
+    if(!isDragging) return;
+
+    let endX = e.changedTouches[0].clientX;
+    let endTime = Date.now();
+
+    let distance = startX - endX;
+    let duration = endTime - startTime;
+
+    /* velocity calculation */
+    let velocity = distance / duration;
+
+    /* add momentum */
+    let momentum = velocity * 200;
+
+    position += distance + momentum;
+
+    isDragging = false;
+
+    /* resume autoplay after 3 seconds */
+    setTimeout(()=>{
       paused = false;
-    }, 3000);
+    },3000);
+
   });
+
 }
 
 /* =========================
