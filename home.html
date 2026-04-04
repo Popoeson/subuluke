@@ -523,6 +523,116 @@ body.dark .hero {
   }
 }
 
+/* ========== COLLECTIONS SECTION ========== */
+.collections {
+  max-width: 1200px;
+  margin: 60px auto;
+  padding: 0 20px;
+}
+
+.collections-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.collections-header h2 {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.btn-pill {
+  padding: 8px 20px;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 50px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: background 0.3s ease;
+}
+
+.btn-pill:hover {
+  background: var(--softGold);
+}
+
+/* CATEGORY SUBSECTION */
+.category-section {
+  margin-bottom: 40px;
+}
+
+.category-section h3 {
+  font-size: 22px;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+/* CAROUSEL CONTAINER */
+.category-carousel {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+}
+
+/* CAROUSEL TRACK */
+.category-track {
+  display: flex;
+  gap: 12px;
+  transition: transform 0.5s ease;
+}
+
+/* PRODUCT CARD */
+.product-card {
+  min-width: 180px;
+  height: 200px;
+  border-radius: 16px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: #f5f5f5;
+}
+
+.product-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: 16px;
+}
+
+/* MOBILE TOUCH CURSOR */
+.category-carousel:active {
+  cursor: grabbing;
+}
+
+/* ARROWS */
+.carousel-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0,0,0,0.35);
+  color: #fff;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.carousel-arrow:hover {
+  background: rgba(0,0,0,0.6);
+}
+
+.carousel-prev { left: 10px; }
+.carousel-next { right: 10px; }
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .product-card { min-width: 140px; height: 160px; }
+  .collections-header h2 { font-size: 24px; }
+}
+
 </style>
 </head>
 
@@ -607,6 +717,20 @@ MAIN CONTENT (HOMEPAGE)
   <button id="heroNext" class="hero-arrow hero-next"><i class="fa-solid fa-chevron-right"></i></button>
 </section>
 
+<!-- =========================
+COLLECTIONS SECTION
+========================= -->
+<section id="collectionsSection" class="collections">
+  <!-- Header row -->
+  <div class="collections-header">
+    <h2>COLLECTIONS</h2>
+    <a href="store.html" class="btn-pill">Go to Store</a>
+  </div>
+
+  <!-- Container for all categories -->
+  <div id="categoriesContainer"></div>
+</section>
+
 </div>
 
 
@@ -616,236 +740,294 @@ MAIN CONTENT (HOMEPAGE)
 /* =========================
 API
 ========================= */
-
 const API = "https://subuluke.onrender.com"
 
 
 /* =========================
 WAKE SERVER
 ========================= */
-
 async function wakeServer(){
-
-try{
-
-await fetch(API + "/api/health")
-
-}catch(err){
-
-console.log("Server wake failed")
-
-}
-
+    try{
+        await fetch(API + "/api/health")
+    }catch(err){
+        console.log("Server wake failed")
+    }
 }
 
 
 /* =========================
 INTRO + LOADING LOGIC
 ========================= */
-
 window.addEventListener("load", async ()=>{
+    const intro = document.getElementById("introScreen")
+    const main = document.getElementById("mainContent")
 
-const intro = document.getElementById("introScreen")
-const main = document.getElementById("mainContent")
+    /* animation minimum duration */
+    const animationDelay = new Promise(res => setTimeout(res, 3500))
+    /* server wake */
+    const serverWake = wakeServer()
+    /* wait for both */
+    await Promise.all([animationDelay, serverWake])
 
-/* animation minimum duration */
+    /* fade intro */
+    intro.classList.add("hide")
 
-const animationDelay = new Promise(res => setTimeout(res, 3500))
-
-/* server wake */
-
-const serverWake = wakeServer()
-
-/* wait for both */
-
-await Promise.all([animationDelay, serverWake])
-
-/* fade intro */
-
-intro.classList.add("hide")
-
-/* reveal homepage */
-
-setTimeout(()=>{
-
-main.classList.add("show")
-
-},800)
-
+    /* reveal homepage */
+    setTimeout(()=>{
+        main.classList.add("show")
+    },800)
 })
+
 
 /* =========================
 THEME TOGGLE
 ========================= */
-
 function toggleTheme(){
-
-document.body.classList.toggle("dark")
-
-const isDark = document.body.classList.contains("dark")
-
-localStorage.setItem("theme", isDark ? "dark" : "light")
-
-updateThemeIcon()
-
+    document.body.classList.toggle("dark")
+    const isDark = document.body.classList.contains("dark")
+    localStorage.setItem("theme", isDark ? "dark" : "light")
+    updateThemeIcon()
 }
 
 function updateThemeIcon(){
-
-const moon = document.getElementById("moonIcon")
-const sun = document.getElementById("sunIcon")
-
-if(!moon || !sun) return
-
-if(document.body.classList.contains("dark")){
-
-moon.style.display = "none"
-sun.style.display = "inline-block"
-
-}else{
-
-moon.style.display = "inline-block"
-sun.style.display = "none"
-
-}
-
+    const moon = document.getElementById("moonIcon")
+    const sun = document.getElementById("sunIcon")
+    if(!moon || !sun) return
+    if(document.body.classList.contains("dark")){
+        moon.style.display = "none"
+        sun.style.display = "inline-block"
+    }else{
+        moon.style.display = "inline-block"
+        sun.style.display = "none"
+    }
 }
 
 /* LOAD SAVED THEME */
-
 if(localStorage.getItem("theme") === "dark"){
-
-document.body.classList.add("dark")
-
+    document.body.classList.add("dark")
 }
-
 updateThemeIcon()
 
-/* ========== HERO SECTION SCRIPT ========== */
+
+/* =========================
+HERO SECTION SCRIPT
+========================= */
 let heroIndex = 0;
 let heroTimer;
 
-/* -------------------------
-LOAD HERO IMAGES
-------------------------- */
+/* LOAD HERO IMAGES */
 async function loadHero() {
-  try {
-    const res = await fetch(API + "/api/hero-images");
-    const heroes = await res.json();
+    try {
+        const res = await fetch(API + "/api/hero-images");
+        const heroes = await res.json();
+        const activeHeroes = heroes.filter(h => h.isActive);
+        if (!activeHeroes.length) return;
 
-    // Only active heroes
-    const activeHeroes = heroes.filter(h => h.isActive);
-    if (!activeHeroes.length) return;
+        const track = document.getElementById("heroTrack");
+        const dotsContainer = document.getElementById("heroDots");
+        if (!track || !dotsContainer) return;
 
-    const track = document.getElementById("heroTrack");
-    const dotsContainer = document.getElementById("heroDots");
+        track.innerHTML = "";
+        dotsContainer.innerHTML = "";
 
-    if (!track || !dotsContainer) return;
+        activeHeroes.forEach((hero, i) => {
+            const slide = document.createElement("div");
+            slide.className = "hero-slide";
+            if (i === 0) slide.classList.add("active");
+            slide.innerHTML = `<img src="${hero.imageUrl}" loading="${i===0 ? "eager" : "lazy"}">`;
+            track.appendChild(slide);
 
-    track.innerHTML = "";
-    dotsContainer.innerHTML = "";
+            const dot = document.createElement("div");
+            dot.className = "hero-dot";
+            if (i === 0) dot.classList.add("active");
+            dot.onclick = () => goToHero(i);
+            dotsContainer.appendChild(dot);
+        });
 
-    activeHeroes.forEach((hero, i) => {
-      // Create slide
-      const slide = document.createElement("div");
-      slide.className = "hero-slide";
-      if (i === 0) slide.classList.add("active");
-
-      // Add image only (no overlay)
-      slide.innerHTML = `<img src="${hero.imageUrl}" loading="${i===0 ? "eager" : "lazy"}">`;
-      track.appendChild(slide);
-
-      // Create dot
-      const dot = document.createElement("div");
-      dot.className = "hero-dot";
-      if (i === 0) dot.classList.add("active");
-      dot.onclick = () => goToHero(i);
-      dotsContainer.appendChild(dot);
-    });
-
-    startHeroSlider();
-
-  } catch (err) {
-    console.log("Hero load error:", err);
-  }
+        startHeroSlider();
+    } catch (err) {
+        console.log("Hero load error:", err);
+    }
 }
 
-/* -------------------------
-SHOW SLIDE
-------------------------- */
+/* SHOW SLIDE */
 function showHero(index) {
-  const slides = document.querySelectorAll(".hero-slide");
-  const dots = document.querySelectorAll(".hero-dot");
-
-  slides.forEach(s => s.classList.remove("active"));
-  dots.forEach(d => d.classList.remove("active"));
-
-  slides[index]?.classList.add("active");
-  dots[index]?.classList.add("active");
+    const slides = document.querySelectorAll(".hero-slide");
+    const dots = document.querySelectorAll(".hero-dot");
+    slides.forEach(s => s.classList.remove("active"));
+    dots.forEach(d => d.classList.remove("active"));
+    slides[index]?.classList.add("active");
+    dots[index]?.classList.add("active");
 }
 
-/* -------------------------
-NEXT / PREV HERO
-------------------------- */
+/* NEXT / PREV HERO */
 function nextHero() {
-  const slides = document.querySelectorAll(".hero-slide");
-  if (!slides.length) return;
-  heroIndex = (heroIndex + 1) % slides.length;
-  showHero(heroIndex);
+    const slides = document.querySelectorAll(".hero-slide");
+    if (!slides.length) return;
+    heroIndex = (heroIndex + 1) % slides.length;
+    showHero(heroIndex);
 }
-
 function prevHero() {
-  const slides = document.querySelectorAll(".hero-slide");
-  if (!slides.length) return;
-  heroIndex = (heroIndex - 1 + slides.length) % slides.length;
-  showHero(heroIndex);
+    const slides = document.querySelectorAll(".hero-slide");
+    if (!slides.length) return;
+    heroIndex = (heroIndex - 1 + slides.length) % slides.length;
+    showHero(heroIndex);
 }
-
 function goToHero(index) {
-  heroIndex = index;
-  showHero(heroIndex);
+    heroIndex = index;
+    showHero(heroIndex);
 }
 
-/* -------------------------
-AUTO SLIDER
-------------------------- */
+/* AUTO SLIDER */
 function startHeroSlider() {
-  clearInterval(heroTimer);
-  heroTimer = setInterval(nextHero, 6000);
+    clearInterval(heroTimer);
+    heroTimer = setInterval(nextHero, 6000);
 }
 
-/* -------------------------
-BUTTON EVENTS
-------------------------- */
+/* BUTTON EVENTS */
 document.getElementById("heroNext")?.addEventListener("click", nextHero);
 document.getElementById("heroPrev")?.addEventListener("click", prevHero);
 
-/* -------------------------
-TOUCH SWIPE (MOBILE)
-------------------------- */
+/* TOUCH SWIPE (MOBILE) */
 const hero = document.getElementById("heroSection");
 if (hero) {
-  let touchStartX = 0;
-  hero.addEventListener("touchstart", e => { touchStartX = e.changedTouches[0].screenX; });
-  hero.addEventListener("touchend", e => {
-    const touchEndX = e.changedTouches[0].screenX;
-    if (touchEndX < touchStartX - 50) nextHero();
-    if (touchEndX > touchStartX + 50) prevHero();
-  });
+    let touchStartX = 0;
+    hero.addEventListener("touchstart", e => { touchStartX = e.changedTouches[0].screenX; });
+    hero.addEventListener("touchend", e => {
+        const touchEndX = e.changedTouches[0].screenX;
+        if (touchEndX < touchStartX - 50) nextHero();
+        if (touchEndX > touchStartX + 50) prevHero();
+    });
+}
+
+/* INITIALIZATION HERO */
+window.addEventListener("load", async () => {
+    const heroSection = document.getElementById("heroSection");
+    setTimeout(() => {
+        if(heroSection) heroSection.style.animationPlayState = "running";
+    }, 1800); // after header animation
+    loadHero();
+});
+
+
+/* =========================
+COLLECTIONS SECTION
+========================= */
+async function loadCollections() {
+    try {
+        const res = await fetch(API + "/api/products");
+        const products = await res.json();
+        if (!products.length) return;
+
+        // Group by category
+        const categories = {};
+        products.forEach(p => {
+            if (!categories[p.category]) categories[p.category] = [];
+            categories[p.category].push(p);
+        });
+
+        const main = document.getElementById("mainContent");
+        const collectionSection = document.createElement("section");
+        collectionSection.id = "collectionSection";
+        collectionSection.innerHTML = `
+            <div class="collection-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+                <h2 style="font-size:28px;">COLLECTIONS</h2>
+                <a href="store.html" class="pill-button" style="padding:8px 18px;border-radius:24px;background:var(--accent);color:#fff;text-decoration:none;">Go to Store</a>
+            </div>
+        `;
+        main.appendChild(collectionSection);
+
+        Object.keys(categories).forEach(cat => {
+            // Shuffle and limit to 15
+            const shuffled = categories[cat].sort(() => 0.5 - Math.random()).slice(0, 15);
+
+            const catContainer = document.createElement("div");
+            catContainer.className = "collection-category";
+            catContainer.innerHTML = `
+                <h3 style="margin-bottom:12px;">${cat}</h3>
+                <div class="collection-carousel" style="display:flex;gap:12px;overflow:hidden;position:relative;">
+                </div>
+            `;
+            collectionSection.appendChild(catContainer);
+
+            const carousel = catContainer.querySelector(".collection-carousel");
+
+            // Append product images
+            shuffled.forEach(prod => {
+                const card = document.createElement("div");
+                card.className = "collection-card";
+                card.style.minWidth = "180px";
+                card.style.flex = "0 0 auto";
+                card.style.height = "180px";
+                card.style.borderRadius = "16px";
+                card.style.overflow = "hidden";
+                card.style.background = "#eee";
+                card.innerHTML = `<img src="${prod.imageUrl}" style="width:100%;height:100%;object-fit:cover;">`;
+                carousel.appendChild(card);
+            });
+
+            // Start carousel animation
+            startCarousel(carousel);
+        });
+
+    } catch (err) {
+        console.log("Collections load error:", err);
+    }
 }
 
 /* -------------------------
-INITIALIZATION
+CAROUSEL LOGIC
 ------------------------- */
+function startCarousel(carousel) {
+    let scrollAmount = 0;
+    const cards = carousel.querySelectorAll(".collection-card");
+    if (!cards.length) return;
+
+    // Clone cards for infinite effect
+    cards.forEach(card => {
+        const clone = card.cloneNode(true);
+        carousel.appendChild(clone);
+    });
+
+    let speed = 1; // pixels per frame
+    let paused = false;
+    let lastTouchTime = 0;
+
+    function animate() {
+        if (!paused) {
+            scrollAmount += speed;
+            if (scrollAmount >= carousel.scrollWidth / 2) scrollAmount = 0;
+            carousel.scrollLeft = scrollAmount;
+        }
+        requestAnimationFrame(animate);
+    }
+
+    animate();
+
+    // Pause on touch
+    carousel.addEventListener("touchstart", () => {
+        paused = true;
+        lastTouchTime = Date.now();
+    });
+
+    carousel.addEventListener("touchend", (e) => {
+        const touchEndTime = Date.now();
+        const touchDuration = touchEndTime - lastTouchTime;
+
+        const touch = e.changedTouches[0];
+        if (!touch) return;
+        const deltaX = touch.screenX - touch.clientX;
+
+        // resume after 3s
+        setTimeout(()=>{ paused = false; }, 3000);
+    });
+}
+
+/* INITIALIZE COLLECTIONS AFTER MAIN LOAD */
 window.addEventListener("load", async () => {
-  const heroSection = document.getElementById("heroSection");
-  setTimeout(() => {
-    if(heroSection) heroSection.style.animationPlayState = "running";
-  }, 1800); // after header animation
-  loadHero();
+    loadCollections();
 });
 
 </script>
-
 </body>
 </html>
