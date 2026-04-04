@@ -387,50 +387,45 @@ font-size:17px;
 
 }
 
+
 /* =========================
-HERO (GLASSMORPHISM CONTAINER)
+HERO SECTION (GLASSMORPHISM CARD)
 ===========================*/
 .hero {
-  width: 100vw; /* full viewport width */
-  height: clamp(360px, 65vh, 600px); /* taller hero */
-  position: relative;
-  overflow: hidden;
-  margin: 0;
+  width: 90vw; /* slightly narrower than viewport for card effect */
+  max-width: 1200px;
+  height: clamp(420px, 70vh, 700px); /* taller vertically */
+  margin: 40px auto; /* centered with spacing from top/bottom */
+  
   display: flex;
   justify-content: center;
   align-items: center;
-}
+  position: relative;
+  border-radius: 24px;
 
-/* GLASS CONTAINER */
-.hero-glass {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 90%;
-  height: 80%;
-  border-radius: 20px;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  background: rgba(255, 255, 255, 0.18); /* light mode default */
-  box-shadow: 0 12px 30px rgba(0,0,0,0.2);
-  z-index: 3;
+  /* Glassmorphism */
+  background: rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.25);
+
   overflow: hidden;
+  z-index: 1;
+  transition: background 0.3s ease;
 }
 
-/* DARK MODE GLASS */
-body.dark .hero-glass {
+/* Dark mode glass */
+body.dark .hero {
   background: rgba(20, 20, 20, 0.35);
 }
 
-/* TRACK (behind glass) */
+/* TRACK (slides inside hero) */
 .hero-track {
   position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
-  top: 0;
-  left: 0;
-  z-index: 1;
+  z-index: 0;
 }
 
 /* SLIDES */
@@ -443,7 +438,7 @@ body.dark .hero-glass {
 
 .hero-slide.active {
   opacity: 1;
-  z-index: 2;
+  z-index: 1;
 }
 
 .hero-slide img {
@@ -451,6 +446,7 @@ body.dark .hero-glass {
   height: 100%;
   object-fit: cover;
   object-position: center;
+  border-radius: 24px;
 }
 
 /* NAVIGATION */
@@ -466,7 +462,7 @@ body.dark .hero-glass {
   color: #fff;
   font-size: 22px;
   cursor: pointer;
-  z-index: 5;
+  z-index: 2;
   backdrop-filter: blur(6px);
   transition: background 0.3s ease;
 }
@@ -486,7 +482,7 @@ body.dark .hero-glass {
   transform: translateX(-50%);
   display: flex;
   gap: 8px;
-  z-index: 5;
+  z-index: 2;
 }
 
 .hero-dot {
@@ -506,24 +502,24 @@ body.dark .hero-glass {
 /* MOBILE FIX */
 @media(max-width:768px) {
   .hero {
-    height: 300px;
+    width: 95vw;
+    height: 360px;
+  }
+  .hero-slide img {
+    border-radius: 20px;
   }
   .hero-arrow {
     width: 34px;
     height: 34px;
     font-size: 18px;
   }
-  .hero-glass {
-    width: 95%;
-    height: 70%;
-  }
 }
 
 /* DESKTOP LARGE SCREENS */
 @media(min-width:1024px) {
   .hero-slide img {
-    object-fit: contain;
-    background: #000;
+    object-fit: cover;
+    background: transparent;
   }
 }
 
@@ -603,7 +599,6 @@ MAIN CONTENT (HOMEPAGE)
 
 <!-- ========== HERO SECTION ========== -->
 <section id="heroSection" class="hero">
-  <div class="hero-glass"></div> <!-- new glass container -->
   <div id="heroTrack" class="hero-track"></div>
 
   <!-- Hero navigation dots -->
