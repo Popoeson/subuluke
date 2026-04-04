@@ -388,17 +388,34 @@ font-size:17px;
 }
 
 /* =========================
-HERO SECTION
+HERO CARD CONTAINER
 ========================= */
 .hero-section{
   position:relative;
-  width:100%;
-  height:75vh; /* slightly smaller */
+  width:90%;
+  max-width:1400px;
+  height:85vh;
+  margin:40px auto; /* center */
   overflow:hidden;
   opacity:0;
   transform:translateX(-100%);
   animation:heroSlideIn 1s ease forwards;
   animation-delay:1s; /* after header */
+
+  /* Glassmorphism */
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-radius:18px;
+  border:1px solid rgba(255,255,255,0.15);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+  z-index:1;
+}
+
+/* Dark mode adjustments */
+body.dark .hero-section{
+  background: rgba(30,30,30,0.4);
+  border:1px solid rgba(255,215,122,0.2);
 }
 
 /* Slides */
@@ -409,6 +426,7 @@ HERO SECTION
   height:100%;
   opacity:0;
   transition:opacity .8s ease;
+  border-radius:18px; /* keep slides rounded */
 }
 
 .hero-slide.active{
@@ -421,31 +439,46 @@ HERO SECTION
   height:100%;
   object-fit:contain; /* fit nicely */
   object-position:center center;
-  background:var(--bg);
+  border-radius:18px;
 }
 
 /* Explore button */
 .hero-explore{
   position:absolute;
-  bottom:40px;
+  bottom:30px;
   left:50%;
   transform:translateX(-50%);
-  padding:12px 28px;
+  padding:14px 32px;
   font-size:18px;
   font-weight:600;
   color:var(--text);
-  background:rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.15);
   backdrop-filter:blur(12px);
-  border:1px solid rgba(255,255,255,0.15);
-  border-radius:10px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,0.25);
   text-decoration:none;
   transition:all .3s ease;
   z-index:2;
+  font-weight:700;
+  letter-spacing:1px;
+  text-align:center;
 }
 
+/* Explore button hover */
 .hero-explore:hover{
   transform:translateX(-50%) scale(1.05);
-  background:rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.25);
+  color:var(--softGold);
+}
+
+/* Make button visible in dark mode */
+body.dark .hero-explore{
+  background: rgba(255,215,122,0.15);
+  color: var(--softGold);
+}
+
+body.dark .hero-explore:hover{
+  background: rgba(255,215,122,0.3);
 }
 
 /* Prev/Next Buttons */
@@ -511,7 +544,8 @@ HERO SECTION
 /* MOBILE */
 @media(max-width:768px){
   .hero-section{
-    height:55vh;
+    height:65vh;
+    margin:20px 10px;
   }
   .hero-explore{
     padding:10px 20px;
