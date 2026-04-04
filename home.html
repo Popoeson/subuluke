@@ -388,25 +388,52 @@ font-size:17px;
 }
 
 /* =========================
-HERO (FINAL, NO OVERLAY)
+HERO (GLASSMORPHISM CONTAINER)
 ===========================*/
-
 .hero {
   width: 100vw; /* full viewport width */
-  height: clamp(360px, 65vh, 600px); /* slightly taller */
+  height: clamp(360px, 65vh, 600px); /* taller hero */
   position: relative;
   overflow: hidden;
   margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-/* TRACK */
+/* GLASS CONTAINER */
+.hero-glass {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  height: 80%;
+  border-radius: 20px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.18); /* light mode default */
+  box-shadow: 0 12px 30px rgba(0,0,0,0.2);
+  z-index: 3;
+  overflow: hidden;
+}
+
+/* DARK MODE GLASS */
+body.dark .hero-glass {
+  background: rgba(20, 20, 20, 0.35);
+}
+
+/* TRACK (behind glass) */
 .hero-track {
-  position: relative;
+  position: absolute;
   width: 100%;
   height: 100%;
+  top: 0;
+  left: 0;
+  z-index: 1;
 }
 
-/* SLIDE */
+/* SLIDES */
 .hero-slide {
   position: absolute;
   inset: 0;
@@ -419,17 +446,14 @@ HERO (FINAL, NO OVERLAY)
   z-index: 2;
 }
 
-/* IMAGE FIX */
 .hero-slide img {
   width: 100%;
   height: 100%;
-  object-fit: cover; /* fill container nicely */
+  object-fit: cover;
   object-position: center;
 }
 
-/* =========================
-NAVIGATION ARROWS
-===========================*/
+/* NAVIGATION */
 .hero-arrow {
   position: absolute;
   top: 50%;
@@ -451,12 +475,10 @@ NAVIGATION ARROWS
 .hero-next { right: 20px; }
 
 .hero-arrow:hover {
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0,0,0,0.6);
 }
 
-/* =========================
-DOTS
-===========================*/
+/* DOTS */
 .hero-dots {
   position: absolute;
   bottom: 18px;
@@ -477,37 +499,31 @@ DOTS
 }
 
 .hero-dot.active {
-  background: #E6A520; /* soft gold accent */
+  background: #E6A520;
   transform: scale(1.2);
 }
 
-/* =========================
-MOBILE FIX
-===========================*/
+/* MOBILE FIX */
 @media(max-width:768px) {
   .hero {
-    height: 300px; /* slightly smaller on mobile */
+    height: 300px;
   }
-
-  .hero-slide img {
-    object-fit: cover;
-    object-position: center;
-  }
-
   .hero-arrow {
     width: 34px;
     height: 34px;
     font-size: 18px;
   }
+  .hero-glass {
+    width: 95%;
+    height: 70%;
+  }
 }
 
-/* =========================
-DESKTOP HERO (LARGE SCREENS)
-===========================*/
+/* DESKTOP LARGE SCREENS */
 @media(min-width:1024px) {
   .hero-slide img {
-    object-fit: contain; /* show full image without cropping */
-    background: #000;    /* fill empty spaces on sides */
+    object-fit: contain;
+    background: #000;
   }
 }
 
@@ -584,6 +600,7 @@ MAIN CONTENT (HOMEPAGE)
 
 <!-- ========== HERO SECTION ========== -->
 <section id="heroSection" class="hero">
+  <div class="hero-glass"></div> <!-- new glass container -->
   <div id="heroTrack" class="hero-track"></div>
 
   <!-- Hero navigation dots -->
@@ -593,7 +610,6 @@ MAIN CONTENT (HOMEPAGE)
   <button id="heroPrev" class="hero-arrow hero-prev"><i class="fa-solid fa-chevron-left"></i></button>
   <button id="heroNext" class="hero-arrow hero-next"><i class="fa-solid fa-chevron-right"></i></button>
 </section>
-
 </div>
 
 
