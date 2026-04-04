@@ -541,9 +541,59 @@ body.dark .hero {
   padding-bottom: 3px;
 }
 
-.btn-pill {
-  padding: 6px 16px; /* smaller on mobile */
-  font-size: 14px;
+/* =========================
+PILL BUTTON
+========================= */
+
+.btn-pill{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:10px 22px;
+  font-size:14px;
+  font-weight:600;
+
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,0.25);
+
+  text-decoration:none;
+  cursor:pointer;
+
+  color:var(--text);
+
+  /* glass style */
+  background:rgba(255,255,255,0.25);
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+
+  transition:all .25s ease;
+}
+
+/* hover */
+.btn-pill:hover{
+  transform:translateY(-2px);
+  background:var(--accent);
+  color:#fff;
+  border-color:var(--accent);
+  box-shadow:0 6px 18px rgba(0,0,0,0.15);
+}
+
+/* active click */
+.btn-pill:active{
+  transform:scale(.96);
+}
+
+/* dark mode */
+body.dark .btn-pill{
+  background:rgba(255,255,255,0.08);
+  border:1px solid rgba(255,255,255,0.1);
+  color:var(--softGold);
+}
+
+body.dark .btn-pill:hover{
+  background:var(--accent);
+  color:#fff;
 }
 
 /* RESPONSIVE */
@@ -750,11 +800,11 @@ MAIN CONTENT (HOMEPAGE)
 COLLECTIONS SECTION
 ========================= -->
 <section id="collectionsSection" class="collections">
-  <!-- Header row 
+  <!-- Header row -->
   <div class="collections-header">
     <h2>COLLECTIONS</h2>
     <a href="store.html" class="btn-pill">Go to Store</a>
-  </div> -->
+  </div> 
 
   <!-- Container for all categories -->
   <div id="categoriesContainer"></div>
