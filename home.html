@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Subuluke</title>
+
+<style>
+
+/* =========================
+THEME
+========================= */
+
+:root{
+--bg:#FFF8E7;
+--header:#ffffff;
+--sidebar:#ffffff;
+--card:#ffffff;
+--text:#333;
+--muted:#777;
+--border:#eee;
+--accent:#E6A520;
+--softGold:#FFD77A;
+}
+
+body.dark{
+--bg:#0F0F0F;
+--header:#121212;
+--sidebar:#111;
+--card:#1A1A1A;
+--text:#F5F5F5;
+--muted:#BBBBBB;
+--border:#2A2A2A;
+}
+
+/* =========================
+BASE
+========================= */
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body{
+font-family:system-ui, -apple-system, sans-serif;
+background:var(--bg);
+color:var(--text);
+min-height:100vh;
+overflow-x:hidden;
+}
+
+/* =========================
+INTRO SCREEN
+========================= */
+
+#introScreen{
+position:fixed;
+inset:0;
+z-index:9999;
+
+display:flex;
+align-items:center;
+justify-content:center;
+
+background:var(--bg);
+color:var(--text);
+
+transition:opacity .8s ease, visibility .8s ease;
+}
+
+#introScreen.hide{
+opacity:0;
+visibility:hidden;
+}
+
+/* =========================
+INTRO CONTENT
+========================= */
+
+.intro-content{
+text-align:center;
+}
+
+/* WELCOME */
+
+.welcome{
+font-size:48px;
+font-weight:700;
+letter-spacing:5px;
+
+transform:translateY(-100vh);
+animation:slideDown 1s ease forwards;
+}
+
+/* TO */
+
+.to{
+font-size:26px;
+letter-spacing:6px;
+margin-top:8px;
+
+transform:translateX(100vw);
+animation:slideRight 1s ease forwards;
+animation-delay:.8s;
+}
+
+/* BRAND */
+
+.brand{
+font-size:58px;
+font-weight:700;
+margin-top:6px;
+
+color:var(--accent);
+
+opacity:0;
+animation:fadeIn 1s ease forwards;
+animation-delay:1.6s;
+}
+
+/* =========================
+LOADING TEXT
+========================= */
+
+.loading-text{
+margin-top:26px;
+font-size:14px;
+color:var(--muted);
+
+opacity:0;
+animation:fadeIn .8s ease forwards;
+animation-delay:2.2s;
+}
+
+/* =========================
+BOUNCING DOTS
+========================= */
+
+.dots{
+margin-top:10px;
+display:flex;
+justify-content:center;
+gap:6px;
+
+opacity:0;
+animation:fadeIn .8s ease forwards;
+animation-delay:2.4s;
+}
+
+.dots span{
+width:8px;
+height:8px;
+border-radius:50%;
+background:var(--accent);
+
+animation:bounce 1.2s infinite ease-in-out;
+}
+
+.dots span:nth-child(2){
+animation-delay:.2s;
+}
+
+.dots span:nth-child(3){
+animation-delay:.4s;
+}
+
+/* =========================
+ANIMATIONS
+========================= */
+
+@keyframes slideDown{
+to{
+transform:translateY(0);
+}
+}
+
+@keyframes slideRight{
+to{
+transform:translateX(0);
+}
+}
+
+@keyframes fadeIn{
+to{
+opacity:1;
+}
+}
+
+@keyframes bounce{
+0%,80%,100%{
+transform:scale(0);
+}
+40%{
+transform:scale(1);
+}
+}
+
+/* =========================
+MAIN HOMEPAGE
+========================= */
+
+#mainContent{
+opacity:0;
+transition:opacity 1s ease;
+padding:40px;
+text-align:center;
+}
+
+#mainContent.show{
+opacity:1;
+}
+
+/* =========================
+MOBILE
+========================= */
+
+@media(max-width:768px){
+
+.welcome{
+font-size:36px;
+}
+
+.brand{
+font-size:42px;
+}
+
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- =========================
+GREETING INTRO
+========================= -->
+
+<div id="introScreen">
+
+<div class="intro-content">
+
+<h1 class="welcome">WELCOME</h1>
+
+<h2 class="to">TO</h2>
+
+<h1 class="brand">Subuluke</h1>
+
+<p class="loading-text">
+Please wait while we load up the store for you
+</p>
+
+<div class="dots">
+<span></span>
+<span></span>
+<span></span>
+</div>
+
+</div>
+
+</div>
+
+<!-- =========================
+MAIN CONTENT (HOMEPAGE)
+========================= -->
+
+<div id="mainContent">
+
+<h1>Subuluke Store</h1>
+
+<p>The homepage content will appear here.</p>
+
+</div>
+
+
+<script>
+
+/* =========================
+API
+========================= */
+
+const API = "https://subuluke.onrender.com"
+
+
+/* =========================
+WAKE SERVER
+========================= */
+
+async function wakeServer(){
+
+try{
+
+await fetch(API + "/api/health")
+
+}catch(err){
+
+console.log("Server wake failed")
+
+}
+
+}
+
+
+/* =========================
+INTRO + LOADING LOGIC
+========================= */
+
+window.addEventListener("load", async ()=>{
+
+const intro = document.getElementById("introScreen")
+const main = document.getElementById("mainContent")
+
+/* animation minimum duration */
+
+const animationDelay = new Promise(res => setTimeout(res, 3500))
+
+/* server wake */
+
+const serverWake = wakeServer()
+
+/* wait for both */
+
+await Promise.all([animationDelay, serverWake])
+
+/* fade intro */
+
+intro.classList.add("hide")
+
+/* reveal homepage */
+
+setTimeout(()=>{
+
+main.classList.add("show")
+
+},800)
+
+})
+
+</script>
+
+</body>
+</html>
