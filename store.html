@@ -664,16 +664,22 @@ function createCategories() {
     side.innerHTML += `<li onclick="filterProducts('${cat}')">${cat}</li>`;
   });
 
-  /* Add "All" pill first */
-  pills.innerHTML = `<div class="category-pill active" onclick="filterProducts('All')">All</div>`;
-
-  /* Only add pills if screen is wider than 768px */
+  /* Only show category pills if screen is wider than 768px */
   if (window.innerWidth > 768) {
+    /* Add "All" pill first */
+    pills.innerHTML = `<div class="category-pill active" onclick="filterProducts('All')">All</div>`;
+
+    /* Add individual category pills */
     cats.forEach(cat => {
       pills.innerHTML += `<div class="category-pill" onclick="filterProducts('${cat}')">${cat}</div>`;
     });
   }
 }
+
+/* Optional: Re-run when window resizes to handle switching between mobile/desktop */
+window.addEventListener("resize", () => {
+  createCategories();
+});
 
 /* =========================
 RESPONSIVE REPOPULATE
