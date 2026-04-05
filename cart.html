@@ -5,208 +5,114 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cart - Subuluke</title>
 
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-pzwR4T+vJZ5Zj7+8PmF1Jg8kHg1kSxkDixB0vQkTnX1Nc7Ju7xP5zvV8N/1dpb1HhG+Z7y6YbK6bl5W7nsS7Hw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
 <style>
-
-/* =========================
-THEME VARIABLES
-========================= */
-:root {
-  --bg-gradient: linear-gradient(to bottom, #FFF8E7 0%, #FFD77A 100%);
-  --bg: #FFF8E7;
-  --header-gradient: linear-gradient(135deg, #E6A520 0%, #FFD77A 100%);
-  --card: rgba(255,248,231,0.65);
-  --text: #3a2a00;
-  --muted: #777;
-  --border: rgba(255,255,255,0.25);
-  --accent: #E6A520;
-  --softGold: #FFD77A;
+/* ========================= THEME ========================= */
+:root{
+  --bg:#FFF8E7;
+  --header:#ffffff;
+  --sidebar:#ffffff;
+  --card:#ffffff;
+  --text:#333;
+  --muted:#777;
+  --border:#eee;
+  --accent:#E6A520;
+  --softGold:#FFD77A;
+  --shadow: rgba(0,0,0,0.12);
 }
 
-body.dark {
-  --bg-gradient: linear-gradient(to bottom, #121212 0%, #1A1A1A 100%);
-  --bg: #0F0F0F;
-  --header-gradient: linear-gradient(135deg, #121212 0%, #1A1A1A 100%);
-  --card: rgba(26,26,26,0.65);
-  --text: #F5F5F5;
-  --muted: #BBBBBB;
-  --border: rgba(255,255,255,0.15);
+body.dark{
+  --bg:#0F0F0F;
+  --header:#121212;
+  --sidebar:#111;
+  --card:#1A1A1A;
+  --text:#F5F5F5;
+  --muted:#BBBBBB;
+  --border:#2A2A2A;
+  --accent:#E6A520;
+  --softGold:#FFD77A;
+  --shadow: rgba(0,0,0,0.5);
 }
 
-/* =========================
-BASE
-========================= */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+/* ========================= BASE ========================= */
+*{margin:0; padding:0; box-sizing:border-box;}
+body{font-family:system-ui, -apple-system, sans-serif; background:var(--bg); color:var(--text); min-height:100vh; overflow-x:hidden;}
+
+/* ========================= HEADER ========================= */
+.header{
+  position:sticky; top:0;
+  display:flex; justify-content:space-between; align-items:center;
+  padding:0 20px; height:72px; background:var(--header);
+  border-bottom:1px solid var(--border);
+  border-radius:0 0 14px 14px;
+  box-shadow:0 4px 10px var(--shadow);
+  z-index:1000;
 }
 
-body {
-  font-family: system-ui, -apple-system, sans-serif;
-  min-height: 100vh;
-  background: var(--bg-gradient);
-  color: var(--text);
-}
-
-/* =========================
-HEADER
-========================= */
-.header {
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-
-  height: 72px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 20px;
-
-  background: var(--header-gradient);
-  border-bottom: 1px solid rgba(255,255,255,0.18);
-  border-radius: 0 0 14px 14px;
-
-  box-shadow: 0 6px 18px rgba(0,0,0,0.18);
-}
-
-.header-left{
-  display:flex;
-  align-items:center;
-  gap:12px;
-}
-
-.logo {
-  font-size: 20px;
-  font-weight: 700;
-}
-
-.header-right{
-  display:flex;
-  align-items:center;
-}
+.header-left{display:flex; align-items:center; gap:12px;}
+.logo{font-size:22px; font-weight:700;}
+.header-right{display:flex; align-items:center; gap:15px;}
 
 .back-btn{
-  background: transparent;
-  border:1px solid var(--border);
-  width:36px;
-  height:36px;
-  border-radius:8px;
-  cursor:pointer;
-  color:var(--text);
+  background:transparent; border:1px solid var(--border);
+  width:36px; height:36px; border-radius:8px; cursor:pointer;
+  color:var(--text); font-size:16px; transition:0.2s;
 }
+.back-btn:hover{background:var(--accent); color:#000;}
 
-.back-btn:hover{
-  background: var(--accent);
-  color:#000;
-}
+.theme-toggle{cursor:pointer; font-size:18px; color:var(--accent); transition:0.2s;}
+.theme-toggle:hover{color:var(--softGold);}
 
-/* -------------------------
-Header Icons
-------------------------- */
-:root { --icon-color: #3a2a00; }      /* light mode */
-body.dark { --icon-color: var(--softGold); } /* dark mode */
+/* ========================= CART PAGE ========================= */
+.cart-page{padding:25px 15px; max-width:960px; margin:auto;}
+.cart-items{display:flex; flex-direction:column; gap:18px;}
 
-/* ICON COLOR CONTROL */
-.header svg,
-.footer svg,
-.icon {
-  color: var(--icon-color);
-}
-
-/* =========================
-CART PAGE
-========================= */
-.cart-page{
-  padding: 20px;
-  max-width: 900px;
-  margin: auto;
-}
-
-.cart-items{
-  display:flex;
-  flex-direction: column;
-  gap:15px;
-}
-
-/* ITEM */
+/* CART ITEM */
 .cart-item{
-  display:flex;
-  gap:15px;
-  align-items:center;
-  background: var(--card);
-  padding:12px;
-  border-radius:12px;
-  border:1px solid var(--border);
+  display:flex; gap:18px; align-items:center;
+  background: var(--card); padding:14px;
+  border-radius:16px; border:1px solid var(--border);
+  transition: transform 0.25s, box-shadow 0.25s;
 }
+.cart-item:hover{transform: translateY(-3px); box-shadow:0 8px 20px var(--shadow);}
 
-.cart-item img{
-  width:65px;
-  height:65px;
-  object-fit:cover;
-  border-radius:8px;
-}
+.cart-item img{width:70px; height:70px; object-fit:cover; border-radius:12px;}
+.cart-details{flex:1;}
+.cart-name{font-weight:700; font-size:16px; margin-bottom:6px;}
+.cart-price{color: var(--accent); font-weight:600; font-size:15px;}
 
-.cart-details{
-  flex:1;
-}
-
-.cart-name{
-  font-weight:600;
-}
-
-.cart-price{
-  color: var(--accent);
-}
-
-/* QTY */
-.cart-qty{
-  display:flex;
-  align-items:center;
-  gap:10px;
-}
-
+.cart-qty{display:flex; align-items:center; gap:12px;}
 .cart-qty button{
-  width:30px;
-  height:30px;
-  border:none;
-  border-radius:6px;
-  background: var(--accent);
-  color:#000;
-  cursor:pointer;
+  width:34px; height:34px; border:none; border-radius:8px;
+  background: var(--accent); color:#000; cursor:pointer;
+  font-weight:600; transition: background 0.2s, transform 0.2s;
 }
+.cart-qty button:hover{background: var(--softGold); transform: scale(1.1);}
+.cart-qty span{min-width:20px; text-align:center; display:inline-block; font-weight:500;}
 
-/* SUMMARY */
+/* CART SUMMARY */
 .cart-summary{
-  margin-top: 30px;
+  margin-top:35px;
   text-align:center;
-}
-
-.checkout-btn{
-  margin-top:10px;
-  padding:12px 20px;
-  border:none;
-  border-radius:10px;
-  background: var(--accent);
+  background: var(--softGold);
+  border-radius:14px;
+  padding:25px 20px;
+  box-shadow:0 8px 20px var(--shadow);
   color:#000;
-  font-weight:600;
-  cursor:pointer;
 }
 
-/* EMPTY */
-.empty-cart{
-  text-align:center;
-  margin-top:40px;
-  color:var(--muted);
-  display:none;
+.cart-summary h2{font-size:24px; font-weight:700; margin-bottom:15px;}
+.checkout-btn{
+  padding:14px 26px; border:none; border-radius:12px;
+  background: var(--accent); color:#000; font-weight:700;
+  cursor:pointer; font-size:16px; transition:0.2s;
 }
+.checkout-btn:hover{background:#FFD75A;}
 
-/* =========================
-THEME TOGGLE
-========================= */
-.theme-toggle{
-  cursor:pointer;
-}
-
+/* EMPTY CART */
+.empty-cart{text-align:center; margin-top:50px; color:var(--muted); display:none; font-size:18px; font-weight:500;}
 </style>
 </head>
 
@@ -215,38 +121,18 @@ THEME TOGGLE
 <!-- HEADER -->
 <header class="header">
   <div class="header-left">
-    <button onclick="goHome()" class="back-btn">←</button>
+    <button onclick="goHome()" class="back-btn"><i class="fas fa-arrow-left"></i></button>
     <div class="logo">Subuluke</div>
   </div>
-
   <div class="header-right">
     <div class="theme-toggle" onclick="toggleTheme()">
-
-      <svg id="moonIcon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-      </svg>
-
-        <!-- Sun Icon -->
-  <svg id="sunIcon" width="22" height="22" viewBox="0 0 24 24" fill="none"
-       stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-       style="display:none">
-    <circle cx="12" cy="12" r="5"></circle>
-    <line x1="12" y1="1" x2="12" y2="3"></line>
-    <line x1="12" y1="21" x2="12" y2="23"></line>
-    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-    <line x1="1" y1="12" x2="3" y2="12"></line>
-    <line x1="21" y1="12" x2="23" y2="12"></line>
-    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-  </svg>
+      <i id="themeIcon" class="fas fa-moon"></i>
     </div>
   </div>
 </header>
 
 <!-- CART -->
 <div class="cart-page">
-
   <div id="cartItems" class="cart-items"></div>
 
   <div id="emptyCart" class="empty-cart">
@@ -257,134 +143,77 @@ THEME TOGGLE
     <h2>Total: <span id="cartTotal">0</span></h2>
     <button onclick="goCheckout()" class="checkout-btn">Proceed to Checkout</button>
   </div>
-
 </div>
 
 <script>
-
-/* =========================
-THEME
-========================= */
+/* THEME LOGIC */
 function toggleTheme(){
-  document.body.classList.toggle("dark")
-  const isDark = document.body.classList.contains("dark")
-  localStorage.setItem("theme", isDark ? "dark" : "light")
-  updateThemeIcon()
+  document.body.classList.toggle("dark");
+  const isDark=document.body.classList.contains("dark");
+  localStorage.setItem("theme", isDark?"dark":"light");
+  updateThemeIcon();
 }
-
 function updateThemeIcon(){
-  const moon = document.getElementById("moonIcon")
-  const sun = document.getElementById("sunIcon")
-
+  const icon=document.getElementById("themeIcon");
   if(document.body.classList.contains("dark")){
-    moon.style.display = "none"
-    sun.style.display = "block"
+    icon.className="fas fa-sun";
   }else{
-    moon.style.display = "block"
-    sun.style.display = "none"
+    icon.className="fas fa-moon";
   }
 }
+if(localStorage.getItem("theme")==="dark"){document.body.classList.add("dark");}
+updateThemeIcon();
 
-if(localStorage.getItem("theme") === "dark"){
-  document.body.classList.add("dark")
-}
-updateThemeIcon()
+function formatPrice(amount){ return Number(amount).toLocaleString("en-NG"); }
 
-
-// ===== PRICE FORMAT ====
-function formatPrice(amount){
-  return Number(amount).toLocaleString("en-NG")
-}
-
-
-/* =========================
-CART LOGIC
-========================= */
-let cart = JSON.parse(localStorage.getItem("cart")) || []
-
-const cartItems = document.getElementById("cartItems")
-const cartTotal = document.getElementById("cartTotal")
-const emptyCart = document.getElementById("emptyCart")
+/* CART LOGIC */
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
+const cartItems=document.getElementById("cartItems");
+const cartTotal=document.getElementById("cartTotal");
+const emptyCart=document.getElementById("emptyCart");
 
 function renderCart(){
-  cartItems.innerHTML = ""
-
-  if(cart.length === 0){
-    emptyCart.style.display = "block"
-    return
-  }else{
-    emptyCart.style.display = "none"
-  }
-
-  let total = 0
-
+  cartItems.innerHTML="";
+  if(cart.length===0){ emptyCart.style.display="block"; cartTotal.innerText="₦0"; return; }
+  emptyCart.style.display="none";
+  let total=0;
   cart.forEach(item=>{
-    total += item.price * item.qty
-
-    const div = document.createElement("div")
-    div.className = "cart-item"
-
-    div.innerHTML = `
+    total+=item.price*item.qty;
+    const div=document.createElement("div");
+    div.className="cart-item";
+    div.innerHTML=`
       <img src="${item.image}">
       <div class="cart-details">
         <div class="cart-name">${item.name}</div>
         <div class="cart-price">₦${formatPrice(item.price)}</div>
       </div>
-
       <div class="cart-qty">
-        <button onclick="decreaseQty('${item._id}')">-</button>
+        <button onclick="decreaseQty('${item._id}')"><i class="fas fa-minus"></i></button>
         <span>${item.qty}</span>
-        <button onclick="increaseQty('${item._id}')">+</button>
+        <button onclick="increaseQty('${item._id}')"><i class="fas fa-plus"></i></button>
       </div>
-    `
-
-    cartItems.appendChild(div)
-  })
-
-  cartTotal.innerText = `₦${formatPrice(total)}`
+    `;
+    cartItems.appendChild(div);
+  });
+  cartTotal.innerText=`₦${formatPrice(total)}`;
 }
 
 function increaseQty(id){
-  const item = cart.find(i=>i._id === id)
-  if(item){
-    item.qty++
-    saveCart()
-  }
+  const item=cart.find(i=>i._id===id);
+  if(item){ item.qty++; saveCart(); }
 }
-
 function decreaseQty(id){
-  const item = cart.find(i=>i._id === id)
-
-  if(item){
-    item.qty--
-
-    if(item.qty <= 0){
-      cart = cart.filter(i=>i._id !== id)
-    }
-
-    saveCart()
-  }
+  const item=cart.find(i=>i._id===id);
+  if(item){ item.qty--; if(item.qty<=0) cart=cart.filter(i=>i._id!==id); saveCart(); }
 }
+function saveCart(){ localStorage.setItem("cart",JSON.stringify(cart)); renderCart(); }
 
-function saveCart(){
-  localStorage.setItem("cart", JSON.stringify(cart))
-  renderCart()
-}
-
-/* =========================
-NAVIGATION
-========================= */
-function goHome(){
-  window.location.href = "index.html"
-}
-
-function goCheckout(){
-  window.location.href = "checkout.html"
-}
+/* NAVIGATION */
+function goHome(){ window.location.href="index.html"; }
+function goCheckout(){ window.location.href="checkout.html"; }
 
 /* INIT */
-renderCart()
-
+renderCart();
 </script>
 
 </body>
