@@ -3,664 +3,299 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Subuluke Store</title>
-
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
-
 /* =========================
 THEME
 ========================= */
-
-:root{
---bg:#FFF8E7;
---text:#333;
---accent:#E6A520;
---softGold:#FFD77A;
+:root {
+  --bg: #FFF8E7;
+  --text: #333;
+  --accent: #E6A520;
+  --softGold: #FFD77A;
 }
 
-body.dark{
---bg:#0F0F0F;
---text:#F5F5F5;
+body.dark {
+  --bg: #0F0F0F;
+  --text: #F5F5F5;
 }
 
 /* =========================
 BASE
 ========================= */
-
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-}
-
-body{
-font-family:system-ui;
-background:var(--bg);
-color:var(--text);
-}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:"Poppins", system-ui, sans-serif; background:var(--bg); color:var(--text); line-height:1.5; }
 
 /* =========================
 HEADER
 ========================= */
-
-.header{
-position:sticky;
-top:0;
-z-index:1000;
-
-background:rgba(255,255,255,0.1);
-backdrop-filter:blur(14px);
-
-border-bottom:1px solid rgba(255,255,255,0.15);
-}
-
-body.dark .header{
-background:rgba(20,20,20,0.65);
-}
-
-.header-inner{
-max-width:1200px;
-margin:auto;
-padding:14px 20px;
-
-display:flex;
-justify-content:space-between;
-align-items:center;
-}
-
-.logo{
-font-weight:700;
-font-size:20px;
-}
-
-.header-icons{
-display:flex;
-gap:18px;
-align-items:center;
-}
-
-.icon{
-background:none;
-border:none;
-font-size:18px;
-cursor:pointer;
-color:var(--text);
-}
+.header { position:sticky; top:0; z-index:1000; background: rgba(255,255,255,0.1); backdrop-filter:blur(14px); border-bottom:1px solid rgba(255,255,255,0.15); padding:12px 20px; }
+body.dark .header { background: rgba(20,20,20,0.65); }
+.header-inner { max-width:1200px; margin:auto; display:flex; justify-content:space-between; align-items:center; }
+.logo { font-weight:700; font-size:22px; letter-spacing:1px; }
+.header-icons { display:flex; gap:18px; align-items:center; }
+.icon { background:none; border:none; font-size:18px; cursor:pointer; color:var(--text); }
 
 /* =========================
 CATEGORY PILLS
 ========================= */
-
-.category-pills{
-max-width:1200px;
-margin:15px auto;
-
-display:flex;
-gap:10px;
-flex-wrap:wrap;
-padding:0 20px;
-}
-
-.category-pill{
-padding:8px 16px;
-border-radius:999px;
-background:rgba(255,255,255,0.2);
-backdrop-filter:blur(8px);
-cursor:pointer;
-font-size:14px;
-}
-
-.category-pill.active{
-background:var(--accent);
-color:#fff;
-}
+.category-pills { max-width:1200px; margin:20px auto; display:flex; gap:10px; flex-wrap:wrap; padding:0 20px; }
+.category-pill { padding:8px 18px; border-radius:999px; background:rgba(255,255,255,0.15); backdrop-filter:blur(8px); cursor:pointer; font-size:14px; transition: all 0.3s; }
+.category-pill:hover { background: var(--softGold); color:#000; }
+.category-pill.active { background: var(--accent); color:#fff; }
 
 /* =========================
 SIDEBAR
 ========================= */
-
-.sidebar{
-position:fixed;
-top:0;
-left:-260px;
-width:260px;
-height:100%;
-
-background:rgba(255,255,255,0.2);
-backdrop-filter:blur(16px);
-
-padding:20px;
-
-transition:0.4s;
-z-index:1200;
-}
-
-body.dark .sidebar{
-background:rgba(20,20,20,0.6);
-}
-
-.sidebar.open{
-left:0;
-}
-
-.sidebar h3{
-margin-bottom:10px;
-}
-
-.sidebar ul{
-list-style:none;
-}
-
-.sidebar li{
-padding:10px 0;
-cursor:pointer;
-border-bottom:1px solid rgba(255,255,255,0.1);
-}
+.sidebar { position:fixed; top:0; left:-260px; width:260px; height:100%; background:rgba(255,255,255,0.2); backdrop-filter:blur(16px); padding:20px; transition:0.4s; z-index:1200; overflow-y:auto; }
+body.dark .sidebar { background: rgba(20,20,20,0.6); }
+.sidebar.open { left:0; }
+.sidebar h3 { margin-bottom:12px; font-weight:600; letter-spacing:0.5px; }
+.sidebar ul { list-style:none; }
+.sidebar li { padding:10px 0; cursor:pointer; border-bottom:1px solid rgba(255,255,255,0.1); transition:0.2s; }
+.sidebar li:hover { color: var(--accent); }
 
 /* =========================
 PRODUCT GRID
 ========================= */
-
-.products{
-max-width:1200px;
-margin:auto;
-padding:20px;
-
-display:grid;
-grid-template-columns:repeat(4,1fr);
-gap:20px;
-}
-
-/* tablet */
-
-@media(max-width:1024px){
-.products{
-grid-template-columns:repeat(3,1fr);
-}
-}
-
-/* mobile */
-
-@media(max-width:600px){
-.products{
-grid-template-columns:repeat(2,1fr);
-}
-}
+.products { max-width:1200px; margin:auto; padding:20px; display:grid; grid-template-columns:repeat(4,1fr); gap:20px; }
+@media(max-width:1024px){ .products{ grid-template-columns:repeat(3,1fr); } }
+@media(max-width:600px){ .products{ grid-template-columns:repeat(2,1fr); } }
 
 /* =========================
 CARD
 ========================= */
-
-.card{
-
-background:rgba(255,255,255,0.2);
-backdrop-filter:blur(12px);
-
-border-radius:16px;
-padding:12px;
-
-display:flex;
-flex-direction:column;
-gap:10px;
+.product-card {
+  background: rgba(255,255,255,0.2); backdrop-filter:blur(12px); border-radius:18px; padding:14px;
+  display:flex; flex-direction:column; gap:10px; position:relative; transition: transform 0.3s, box-shadow 0.3s;
 }
+body.dark .product-card { background: rgba(20,20,20,0.45); }
+.product-card:hover { transform: translateY(-5px); box-shadow:0 12px 24px rgba(0,0,0,0.15); }
+.product-card img { width:100%; height:200px; object-fit:cover; border-radius:14px; }
+.product-category { font-size:12px; font-weight:500; text-transform:uppercase; color:var(--softGold); }
+.product-name { font-size:16px; font-weight:600; color:var(--text); }
+.price { display:flex; align-items:center; gap:6px; }
+.old-price { text-decoration:line-through; font-size:13px; opacity:0.7; }
+.new-price { font-weight:700; color:var(--accent); }
+.add-cart { margin-top:auto; padding:8px; border:none; border-radius:12px; background:var(--accent); color:#fff; font-weight:600; cursor:pointer; transition: background 0.3s; }
+.add-cart:hover:not(.disabled){ background: var(--softGold); color:#000; }
+.add-cart.disabled{ opacity:0.6; cursor:not-allowed; }
 
-body.dark .card{
-background:rgba(20,20,20,0.45);
-}
-
-.card img{
-width:100%;
-height:180px;
-object-fit:cover;
-border-radius:10px;
-}
-
-.featured{
-position:absolute;
-background:gold;
-color:#000;
-padding:3px 6px;
-font-size:12px;
-border-radius:6px;
-}
-
-.price{
-font-weight:700;
-}
-
-.old-price{
-text-decoration:line-through;
-font-size:13px;
-opacity:0.7;
-}
-
-.add-cart{
-padding:8px;
-border:none;
-border-radius:8px;
-background:var(--accent);
-color:#fff;
-cursor:pointer;
-}
+/* =========================
+BADGES
+========================= */
+.badge { position:absolute; top:12px; left:12px; background:rgba(255,255,255,0.8); color:#000; padding:4px 8px; font-size:11px; font-weight:600; border-radius:8px; }
+.badge.sale { background: var(--accent); color:#fff; }
+.badge.out { background: rgba(255,0,0,0.8); color:#fff; }
 
 /* =========================
 PAGINATION
 ========================= */
-
-.pagination{
-display:flex;
-justify-content:center;
-gap:10px;
-margin:20px;
-}
-
-.page-btn{
-padding:6px 12px;
-border:none;
-cursor:pointer;
-border-radius:6px;
-}
-
+.pagination{ display:flex; justify-content:center; gap:10px; margin:30px 0; }
+.page-btn{ padding:8px 14px; border:none; cursor:pointer; border-radius:8px; background: rgba(255,255,255,0.2); backdrop-filter: blur(8px); transition:0.3s; }
+.page-btn:hover{ background: var(--accent); color: #fff; }
 </style>
 </head>
 
 <body>
 
 <!-- SIDEBAR -->
-
 <div id="sidebar" class="sidebar">
-
-<h3>Categories</h3>
-
-<ul id="sidebarCategories"></ul>
-
+  <h3>Categories</h3>
+  <ul id="sidebarCategories"></ul>
 </div>
 
 <!-- HEADER -->
-
 <header class="header">
-
-<div class="header-inner">
-
-<button class="icon" id="menuBtn">
-<i class="fa-solid fa-bars"></i>
-</button>
-
-<div class="logo">Subuluke</div>
-
-<div class="header-icons">
-
-<a href="cart.html" class="icon">
-<i class="fa-solid fa-cart-shopping"></i>
-</a>
-
-<button class="icon" onclick="toggleTheme()">
-<i class="fa-solid fa-moon" id="moonIcon"></i>
-<i class="fa-solid fa-sun" id="sunIcon" style="display:none"></i>
-</button>
-
-</div>
-
-</div>
-
+  <div class="header-inner">
+    <button class="icon" id="menuBtn"><i class="fa-solid fa-bars"></i></button>
+    <div class="logo">Subuluke</div>
+    <div class="header-icons">
+      <a href="cart.html" class="icon"><i class="fa-solid fa-cart-shopping"></i></a>
+      <button class="icon" onclick="toggleTheme()">
+        <i class="fa-solid fa-moon" id="moonIcon"></i>
+        <i class="fa-solid fa-sun" id="sunIcon" style="display:none"></i>
+      </button>
+    </div>
+  </div>
 </header>
 
 <!-- CATEGORY PILLS -->
-
 <div id="categoryPills" class="category-pills"></div>
 
 <!-- PRODUCTS -->
-
 <div id="products" class="products"></div>
 
 <!-- PAGINATION -->
-
 <div id="pagination" class="pagination"></div>
 
 <script>
-
 /* =========================
-API
+API & STATE
 ========================= */
-
 const API = "https://subuluke.onrender.com"
-
-/* =========================
-STATE
-========================= */
-
-let allProducts = []
-let currentProducts = []
-
-let currentPage = 1
-const productsPerPage = 10
+let allProducts = [], currentProducts = [];
+let currentPage = 1, productsPerPage = 10;
 
 /* =========================
 THEME
 ========================= */
-
 function toggleTheme(){
-
-document.body.classList.toggle("dark")
-
-localStorage.setItem(
-"theme",
-document.body.classList.contains("dark") ? "dark" : "light"
-)
-
-updateThemeIcon()
-
+  document.body.classList.toggle("dark");
+  localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
+  updateThemeIcon();
 }
-
 function updateThemeIcon(){
-
-const moon = document.getElementById("moonIcon")
-const sun = document.getElementById("sunIcon")
-
-if(!moon || !sun) return
-
-if(document.body.classList.contains("dark")){
-moon.style.display="none"
-sun.style.display="inline"
-}else{
-moon.style.display="inline"
-sun.style.display="none"
+  const moon = document.getElementById("moonIcon"), sun = document.getElementById("sunIcon");
+  if(!moon || !sun) return;
+  if(document.body.classList.contains("dark")){ moon.style.display="none"; sun.style.display="inline"; }
+  else{ moon.style.display="inline"; sun.style.display="none"; }
 }
-
-}
-
-if(localStorage.getItem("theme")==="dark"){
-document.body.classList.add("dark")
-}
-
-updateThemeIcon()
+if(localStorage.getItem("theme")==="dark"){ document.body.classList.add("dark"); }
+updateThemeIcon();
 
 /* =========================
 SIDEBAR
 ========================= */
-
-const sidebar = document.getElementById("sidebar")
-
-document.getElementById("menuBtn").onclick = ()=>{
-sidebar.classList.toggle("open")
-}
-
-document.addEventListener("click",e=>{
-if(!sidebar.contains(e.target) && !e.target.closest("#menuBtn")){
-sidebar.classList.remove("open")
-}
-})
+const sidebar = document.getElementById("sidebar");
+document.getElementById("menuBtn").onclick = ()=> sidebar.classList.toggle("open");
+document.addEventListener("click", e=>{
+  if(!sidebar.contains(e.target) && !e.target.closest("#menuBtn")) sidebar.classList.remove("open");
+});
 
 /* =========================
 LOAD PRODUCTS
 ========================= */
-
 async function loadProducts(){
-
-try{
-
-const res = await fetch(API + "/api/products")
-
-allProducts = await res.json()
-
-prepareProducts()
-
-createCategories()
-
-filterProducts("All")
-
-}catch(err){
-
-console.log("Products failed to load",err)
-
-}
-
+  try{
+    const res = await fetch(API + "/api/products");
+    allProducts = await res.json();
+    prepareProducts();
+    createCategories();
+    filterProducts("All");
+  }catch(err){ console.log("Products failed to load",err); }
 }
 
 /* =========================
-PREPARE PRODUCTS
-(featured first)
+PREPARE PRODUCTS (featured first)
 ========================= */
-
 function prepareProducts(){
-
-let featured = allProducts.filter(p => p.featured)
-let others = allProducts.filter(p => !p.featured)
-
-featured = shuffle(featured)
-others = shuffle(others)
-
-allProducts = [...featured, ...others]
-
+  let featured = allProducts.filter(p => p.featured);
+  let others = allProducts.filter(p => !p.featured);
+  allProducts = [...shuffle(featured), ...shuffle(others)];
 }
-
 function shuffle(arr){
-
-for(let i = arr.length - 1; i > 0; i--){
-
-const j = Math.floor(Math.random() * (i + 1))
-
-const temp = arr[i]
-arr[i] = arr[j]
-arr[j] = temp
-
-}
-
-return arr
-
+  for(let i=arr.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
 }
 
 /* =========================
 CREATE CATEGORIES
 ========================= */
-
 function createCategories(){
-
-const pills = document.getElementById("categoryPills")
-const side = document.getElementById("sidebarCategories")
-
-if(!pills || !side) return
-
-const cats = [...new Set(allProducts.map(p=>p.category))]
-
-pills.innerHTML = `
-<div class="category-pill active" onclick="filterProducts('All')">All</div>
-`
-
-side.innerHTML = ""
-
-cats.forEach(cat=>{
-
-pills.innerHTML += `
-<div class="category-pill" onclick="filterProducts('${cat}')">
-${cat}
-</div>
-`
-
-side.innerHTML += `
-<li onclick="filterProducts('${cat}')">${cat}</li>
-`
-
-})
-
+  const pills = document.getElementById("categoryPills");
+  const side = document.getElementById("sidebarCategories");
+  if(!pills || !side) return;
+  const cats = [...new Set(allProducts.map(p=>p.category))];
+  pills.innerHTML = `<div class="category-pill active" onclick="filterProducts('All')">All</div>`;
+  side.innerHTML = "";
+  cats.forEach(cat=>{
+    pills.innerHTML += `<div class="category-pill" onclick="filterProducts('${cat}')">${cat}</div>`;
+    side.innerHTML += `<li onclick="filterProducts('${cat}')">${cat}</li>`;
+  });
 }
 
 /* =========================
 FILTER PRODUCTS
 ========================= */
-
 function filterProducts(category){
-
-currentPage = 1
-
-if(category === "All"){
-currentProducts = allProducts
-}else{
-currentProducts = allProducts.filter(p => p.category === category)
-}
-
-renderProducts(currentProducts)
-
+  currentPage=1;
+  if(category==="All"){ currentProducts=allProducts; } 
+  else{ currentProducts=allProducts.filter(p => p.category===category); }
+  renderProducts(currentProducts);
 }
 
 /* =========================
 RENDER PRODUCTS
 ========================= */
-
 function renderProducts(products){
-
-const container = document.getElementById("products")
-
-if(!container) return
-
-container.innerHTML = ""
-
-const sortedProducts = [...products].sort((a,b)=>{
-return (b.featured === true) - (a.featured === true)
-})
-
-const start = (currentPage - 1) * productsPerPage
-
-const paginatedProducts =
-sortedProducts.slice(start,start + productsPerPage)
-
-paginatedProducts.forEach(p=>{
-
-const out = p.status === "out_of_stall"
-
-const card = document.createElement("div")
-
-card.className = "product-card"
-
-card.innerHTML = `
-
-<div class="product-image">
-
-<img src="${p.mainImage}" loading="lazy">
-
-${p.featured ? '<div class="badge">FEATURED</div>' : ""}
-
-${p.slashPrice>0 ? '<div class="badge sale">SALE</div>' : ""}
-
-${out ? '<div class="badge out">OUT OF STALL</div>' : ""}
-
-</div>
-
-<div class="product-body">
-
-<div class="product-category">${p.category}</div>
-
-<div class="product-name">${p.name}</div>
-
-<div class="price">
-
-${p.slashPrice>0
-? `<span class="old-price">₦${formatPrice(p.slashPrice)}</span>`
-: ""}
-
-<span class="new-price">₦${formatPrice(p.price)}</span>
-
-</div>
-
-<button
-class="add-cart ${out?'disabled':''}"
-${out?'disabled':''}
-onclick="addToCart('${p._id}')"
->
-
-Add to Cart
-
-</button>
-
-</div>
-`
-
-container.appendChild(card)
-
-})
-
-renderPagination(sortedProducts.length)
-
+  const container = document.getElementById("products");
+  if(!container) return;
+  container.innerHTML="";
+  const sortedProducts=[...products].sort((a,b)=>(b.featured===true)-(a.featured===true));
+  const start = (currentPage-1)*productsPerPage;
+  const paginated = sortedProducts.slice(start,start+productsPerPage);
+  paginated.forEach(p=>{
+    const out = p.status==="out_of_stall";
+    const card = document.createElement("div"); card.className="product-card";
+    card.innerHTML=`
+      <div class="product-image">
+        <img src="${p.mainImage}" loading="lazy">
+        ${p.featured?'<div class="badge">FEATURED</div>':''}
+        ${p.slashPrice>0?'<div class="badge sale">SALE</div>':''}
+        ${out?'<div class="badge out">OUT OF STALL</div>':''}
+      </div>
+      <div class="product-body">
+        <div class="product-category">${p.category}</div>
+        <div class="product-name">${p.name}</div>
+        <div class="price">
+          ${p.slashPrice>0?`<span class="old-price">₦${formatPrice(p.slashPrice)}</span>`:''}
+          <span class="new-price">₦${formatPrice(p.price)}</span>
+        </div>
+        <button class="add-cart ${out?'disabled':''}" ${out?'disabled':''} onclick="addToCart('${p._id}')">Add to Cart</button>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+  renderPagination(sortedProducts.length);
 }
 
 /* =========================
 PAGINATION
 ========================= */
-
 function renderPagination(total){
-
-const pages = Math.ceil(total / productsPerPage)
-
-const container = document.getElementById("pagination")
-
-if(!container) return
-
-container.innerHTML = ""
-
-for(let i=1;i<=pages;i++){
-
-const btn = document.createElement("button")
-
-btn.className = "page-btn"
-
-btn.innerText = i
-
-btn.onclick = ()=>goPage(i)
-
-container.appendChild(btn)
-
+  const pages = Math.ceil(total/productsPerPage);
+  const container = document.getElementById("pagination");
+  if(!container) return;
+  container.innerHTML="";
+  for(let i=1;i<=pages;i++){
+    const btn = document.createElement("button");
+    btn.className="page-btn";
+    btn.innerText=i;
+    btn.onclick=()=>goPage(i);
+    container.appendChild(btn);
+  }
 }
-
-}
-
 function goPage(page){
-
-currentPage = page
-
-renderProducts(currentProducts)
-
-window.scrollTo({
-top:0,
-behavior:"smooth"
-})
-
+  currentPage=page;
+  renderProducts(currentProducts);
+  window.scrollTo({top:0,behavior:"smooth"});
 }
 
 /* =========================
 FORMAT PRICE
 ========================= */
-
-function formatPrice(num){
-
-return Number(num).toLocaleString()
-
-}
+function formatPrice(num){ return Number(num).toLocaleString(); }
 
 /* =========================
 CART
 ========================= */
-
 function addToCart(id){
-
-let cart = JSON.parse(localStorage.getItem("cart") || "[]")
-
-cart.push(id)
-
-localStorage.setItem("cart",JSON.stringify(cart))
-
-alert("Added to cart")
-
+  let cart=JSON.parse(localStorage.getItem("cart")||"[]");
+  cart.push(id);
+  localStorage.setItem("cart",JSON.stringify(cart));
+  alert("Added to cart");
 }
 
 /* =========================
 INIT
 ========================= */
-
-loadProducts()
-
+loadProducts();
 </script>
 
 </body>
