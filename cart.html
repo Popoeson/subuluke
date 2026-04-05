@@ -6,41 +6,36 @@
 <title>Cart - Subuluke</title>
 
 <!-- Font Awesome -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-pzwR4T+vJZ5Zj7+8PmF1Jg8kHg1kSxkDixB0vQkTnX1Nc7Ju7xP5zvV8N/1dpb1HhG+Z7y6YbK6bl5W7nsS7Hw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
 
 <style>
 /* ========================= THEME ========================= */
 :root{
   --bg:#FFF8E7;
-  --header:#ffffff;
-  --card:#ffffff;
   --text:#333;
-  --muted:#777;
-  --border:#eee;
   --accent:#E6A520;
   --softGold:#FFD77A;
-  --shadow: rgba(0,0,0,0.12);
 }
 
 body.dark{
   --bg:#0F0F0F;
-  --header:#121212;
-  --card:#1A1A1A;
   --text:#F5F5F5;
-  --muted:#BBBBBB;
-  --border:#2A2A2A;
-  --accent:#E6A520;
-  --softGold:#FFD77A;
-  --shadow: rgba(0,0,0,0.5);
 }
 
 /* ========================= BASE ========================= */
 *{margin:0; padding:0; box-sizing:border-box;}
-body{font-family:system-ui, -apple-system, sans-serif; background:var(--bg); color:var(--text); min-height:100vh; overflow-x:hidden;}
+body{
+  font-family:"Poppins",system-ui,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  line-height:1.5;
+  min-height:100vh;
+  overflow-x:hidden;
+}
 
 /* ========================= GLASSMORPHISM ========================= */
 .glass{
-  background: rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.25);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-radius:14px;
@@ -49,8 +44,8 @@ body{font-family:system-ui, -apple-system, sans-serif; background:var(--bg); col
 
 /* Dark mode glass */
 body.dark .glass{
-  background: rgba(26,26,26,0.4);
-  border:1px solid rgba(255,255,255,0.1);
+  background: rgba(30,30,30,0.5);
+  border:1px solid rgba(255,255,255,0.15);
 }
 
 /* ========================= HEADER ========================= */
@@ -58,45 +53,34 @@ body.dark .glass{
   position:sticky; top:0;
   display:flex; justify-content:space-between; align-items:center;
   padding:0 20px; height:72px;
-  box-shadow:0 4px 10px var(--shadow);
+  box-shadow:0 4px 10px rgba(0,0,0,0.12);
   z-index:1000;
 }
 .header-left, .header-right{display:flex; align-items:center; gap:12px;}
 .logo{font-size:22px; font-weight:700;}
 
-/* Glassmorphism applied */
-.header-left, .header-right{
-  padding:6px 10px;
-  gap:12px;
-}
-.header-left.back-btn-container, .header-right.theme-toggle{
-  border-radius:10px;
-}
-
 /* Back button */
 .back-btn{
-  background: rgba(255,255,255,0.3); /* semi-transparent */
+  background: rgba(255,255,255,0.7);
   backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
   border:none; border-radius:10px;
   width:36px; height:36px;
   display:flex; align-items:center; justify-content:center;
   cursor:pointer; font-size:16px; color:var(--text);
   transition:0.2s;
 }
-body.dark .back-btn{background: rgba(26,26,26,0.5); color:#F5F5F5;}
+body.dark .back-btn{background: rgba(50,50,50,0.8); color:#F5F5F5;}
 .back-btn:hover{background: var(--softGold); color:#000;}
 
 /* Theme toggle button */
 .theme-toggle{
   display:flex; align-items:center; justify-content:center;
-  background: rgba(255,255,255,0.3);
+  background: rgba(255,255,255,0.7);
   backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
   border-radius:10px; padding:6px;
   cursor:pointer; font-size:18px; color:var(--accent); transition:0.2s;
 }
-body.dark .theme-toggle{background: rgba(26,26,26,0.5); color:var(--softGold);}
+body.dark .theme-toggle{background: rgba(50,50,50,0.8); color:var(--softGold);}
 .theme-toggle:hover{color:var(--softGold);}
 
 /* ========================= CART PAGE ========================= */
@@ -107,17 +91,17 @@ body.dark .theme-toggle{background: rgba(26,26,26,0.5); color:var(--softGold);}
 .cart-item{
   display:flex; gap:18px; align-items:center;
   padding:14px; border-radius:16px;
-  background: rgba(255,248,231,0.2);
+  background: rgba(255,248,231,0.35);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border:1px solid rgba(255,255,255,0.25);
   transition: transform 0.25s, box-shadow 0.25s;
 }
 body.dark .cart-item{
-  background: rgba(26,26,26,0.4);
-  border:1px solid rgba(255,255,255,0.1);
+  background: rgba(50,50,50,0.6);
+  border:1px solid rgba(255,255,255,0.15);
 }
-.cart-item:hover{transform: translateY(-3px); box-shadow:0 8px 20px var(--shadow);}
+.cart-item:hover{transform: translateY(-3px); box-shadow:0 8px 20px rgba(0,0,0,0.3);}
 
 .cart-item img{width:70px; height:70px; object-fit:cover; border-radius:12px;}
 .cart-details{flex:1;}
@@ -127,46 +111,47 @@ body.dark .cart-item{
 .cart-qty{display:flex; align-items:center; gap:12px;}
 .cart-qty button{
   width:34px; height:34px; border:none; border-radius:8px;
-  background: rgba(255,248,231,0.4);
+  background: rgba(255,248,231,0.7);
   backdrop-filter: blur(8px);
   display:flex; align-items:center; justify-content:center;
   cursor:pointer; font-weight:600; font-size:14px; color:#000;
   transition:0.2s;
 }
 body.dark .cart-qty button{
-  background: rgba(26,26,26,0.5);
+  background: rgba(50,50,50,0.8);
   color:#F5F5F5;
 }
 .cart-qty button:hover{background: var(--softGold); transform: scale(1.1);}
 .cart-qty span{min-width:20px; text-align:center; display:inline-block; font-weight:500; color: var(--text);}
 
-/* CART SUMMARY - glass & smaller */
+/* CART SUMMARY - glass & readable */
 .cart-summary{
   margin-top:25px;
   text-align:center;
   padding:18px 15px;
   border-radius:14px;
-  background: rgba(255,248,231,0.3);
+  background: rgba(255,248,231,0.45);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border:1px solid rgba(255,255,255,0.25);
-  box-shadow:0 6px 14px var(--shadow);
-  color:#000;
+  box-shadow:0 6px 14px rgba(0,0,0,0.2);
+  color:var(--text);
 }
 body.dark .cart-summary{
-  background: rgba(26,26,26,0.5);
-  border:1px solid rgba(255,255,255,0.1);
+  background: rgba(50,50,50,0.7);
+  border:1px solid rgba(255,255,255,0.15);
+  color:#F5F5F5;
 }
 
 .cart-summary h2{font-size:20px; font-weight:700; margin-bottom:12px;}
 .checkout-btn{
   padding:10px 22px; border:none; border-radius:10px;
-  background: rgba(230,165,32,0.4);
+  background: rgba(230,165,32,0.6);
   backdrop-filter: blur(8px);
   font-weight:700; cursor:pointer; font-size:14px;
   transition:0.2s;
 }
-.checkout-btn:hover{background:#FFD75A;}
+.checkout-btn:hover{background: var(--softGold); color:#000;}
 
 /* EMPTY CART */
 .empty-cart{text-align:center; margin-top:50px; color:var(--muted); display:none; font-size:18px; font-weight:500;}
