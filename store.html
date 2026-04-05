@@ -326,7 +326,17 @@ border-radius:6px;
 API
 ========================= */
 
-const API="https://subuluke.onrender.com"
+const API = "https://subuluke.onrender.com"
+
+/* =========================
+STATE
+========================= */
+
+let allProducts = []
+let currentProducts = []
+
+let currentPage = 1
+const productsPerPage = 10
 
 /* =========================
 THEME
@@ -338,16 +348,19 @@ document.body.classList.toggle("dark")
 
 localStorage.setItem(
 "theme",
-document.body.classList.contains("dark")?"dark":"light"
+document.body.classList.contains("dark") ? "dark" : "light"
 )
 
 updateThemeIcon()
+
 }
 
 function updateThemeIcon(){
 
-const moon=document.getElementById("moonIcon")
-const sun=document.getElementById("sunIcon")
+const moon = document.getElementById("moonIcon")
+const sun = document.getElementById("sunIcon")
+
+if(!moon || !sun) return
 
 if(document.body.classList.contains("dark")){
 moon.style.display="none"
@@ -369,9 +382,9 @@ updateThemeIcon()
 SIDEBAR
 ========================= */
 
-const sidebar=document.getElementById("sidebar")
+const sidebar = document.getElementById("sidebar")
 
-document.getElementById("menuBtn").onclick=()=>{
+document.getElementById("menuBtn").onclick = ()=>{
 sidebar.classList.toggle("open")
 }
 
@@ -382,36 +395,47 @@ sidebar.classList.remove("open")
 })
 
 /* =========================
-PRODUCT LOGIC
+LOAD PRODUCTS
 ========================= */
-
-let products=[]
-let filtered=[]
-let page=1
-const perPage=10
 
 async function loadProducts(){
 
-const res=await fetch(API+"/api/products")
-products=await res.json()
+try{
+
+const res = await fetch(API + "/api/products")
+
+allProducts = await res.json()
 
 prepareProducts()
 
 createCategories()
 
-filterProducts("all")
+filterProducts("All")
+
+}catch(err){
+
+console.log("Products failed to load",err)
+
 }
+
+}
+
+/* =========================
+PREPARE PRODUCTS
+(featured first)
+========================= */
 
 function prepareProducts(){
 
-const featured=products.filter(p=>p.featured)
-const others=products.filter(p=>!p.featured)
-
+let featured = allProducts.filter(p => p.featured)
+let others = allProducts.filter(p => !p.featured)
 
 featured = shuffle(featured)
 others = shuffle(others)
 
-products = [...featured, ...others]
+allProducts = [...featured, ...others]
+
+}
 
 function shuffle(arr){
 
@@ -430,46 +454,55 @@ return arr
 }
 
 /* =========================
-CATEGORIES
+CREATE CATEGORIES
 ========================= */
 
 function createCategories(){
 
-const pills=document.getElementById("categoryPills")
-const side=document.getElementById("sidebarCategories")
+const pills = document.getElementById("categoryPills")
+const side = document.getElementById("sidebarCategories")
 
-const cats=[...new Set(products.map(p=>p.category))]
+if(!pills || !side) return
 
-pills.innerHTML=`<div class="category-pill active" onclick="filterProducts('all')">All</div>`
+const cats = [...new Set(allProducts.map(p=>p.category))]
 
-side.innerHTML=""
+pills.innerHTML = `
+<div class="category-pill active" onclick="filterProducts('All')">All</div>
+`
+
+side.innerHTML = ""
 
 cats.forEach(cat=>{
 
-pills.innerHTML+=`<div class="category-pill" onclick="filterProducts('${cat}')">${cat}</div>`
+pills.innerHTML += `
+<div class="category-pill" onclick="filterProducts('${cat}')">
+${cat}
+</div>
+`
 
-side.innerHTML+=`<li onclick="filterProducts('${cat}')">${cat}</li>`
+side.innerHTML += `
+<li onclick="filterProducts('${cat}')">${cat}</li>
+`
 
 })
 
 }
 
 /* =========================
-FILTER
+FILTER PRODUCTS
 ========================= */
 
-function filterProducts(cat){
+function filterProducts(category){
 
-page=1
+currentPage = 1
 
-if(cat==="all"){
-filtered=products
+if(category === "All"){
+currentProducts = allProducts
 }else{
-filtered=products.filter(p=>p.category===cat)
+currentProducts = allProducts.filter(p => p.category === category)
 }
 
-renderProducts()
-renderPagination()
+renderProducts(currentProducts)
 
 }
 
@@ -477,47 +510,79 @@ renderPagination()
 RENDER PRODUCTS
 ========================= */
 
-function renderProducts(){
+function renderProducts(products){
 
-const container=document.getElementById("products")
+const container = document.getElementById("products")
 
-const start=(page-1)*perPage
-const end=start+perPage
+if(!container) return
 
-const items=filtered.slice(start,end)
+container.innerHTML = ""
 
-container.innerHTML=""
+const sortedProducts = [...products].sort((a,b)=>{
+return (b.featured === true) - (a.featured === true)
+})
 
-items.forEach(p=>{
+const start = (currentPage - 1) * productsPerPage
 
-container.innerHTML+=`
+const paginatedProducts =
+sortedProducts.slice(start,start + productsPerPage)
 
-<div class="card">
+paginatedProducts.forEach(p=>{
 
-<img src="${p.image}">
+const out = p.status === "out_of_stall"
 
-${p.featured?'<div class="featured">Featured</div>':""}
+const card = document.createElement("div")
 
-<h4>${p.name}</h4>
+card.className = "product-card"
 
-<p>${p.description}</p>
+card.innerHTML = `
 
-<div>
+<div class="product-image">
 
-<span class="price">₦${p.price}</span>
-<span class="old-price">₦${p.oldPrice||""}</span>
+<img src="${p.mainImage}" loading="lazy">
+
+${p.featured ? '<div class="badge">FEATURED</div>' : ""}
+
+${p.slashPrice>0 ? '<div class="badge sale">SALE</div>' : ""}
+
+${out ? '<div class="badge out">OUT OF STALL</div>' : ""}
 
 </div>
 
-<button class="add-cart" onclick="addToCart('${p._id}')">
+<div class="product-body">
+
+<div class="product-category">${p.category}</div>
+
+<div class="product-name">${p.name}</div>
+
+<div class="price">
+
+${p.slashPrice>0
+? `<span class="old-price">₦${formatPrice(p.slashPrice)}</span>`
+: ""}
+
+<span class="new-price">₦${formatPrice(p.price)}</span>
+
+</div>
+
+<button
+class="add-cart ${out?'disabled':''}"
+${out?'disabled':''}
+onclick="addToCart('${p._id}')"
+>
+
 Add to Cart
+
 </button>
 
 </div>
-
 `
 
+container.appendChild(card)
+
 })
+
+renderPagination(sortedProducts.length)
 
 }
 
@@ -525,28 +590,52 @@ Add to Cart
 PAGINATION
 ========================= */
 
-function renderPagination(){
+function renderPagination(total){
 
-const pages=Math.ceil(filtered.length/perPage)
+const pages = Math.ceil(total / productsPerPage)
 
-const container=document.getElementById("pagination")
+const container = document.getElementById("pagination")
 
-container.innerHTML=""
+if(!container) return
+
+container.innerHTML = ""
 
 for(let i=1;i<=pages;i++){
 
-container.innerHTML+=`
-<button class="page-btn" onclick="goPage(${i})">${i}</button>
-`
+const btn = document.createElement("button")
+
+btn.className = "page-btn"
+
+btn.innerText = i
+
+btn.onclick = ()=>goPage(i)
+
+container.appendChild(btn)
 
 }
 
 }
 
-function goPage(p){
+function goPage(page){
 
-page=p
-renderProducts()
+currentPage = page
+
+renderProducts(currentProducts)
+
+window.scrollTo({
+top:0,
+behavior:"smooth"
+})
+
+}
+
+/* =========================
+FORMAT PRICE
+========================= */
+
+function formatPrice(num){
+
+return Number(num).toLocaleString()
 
 }
 
@@ -556,7 +645,7 @@ CART
 
 function addToCart(id){
 
-let cart=JSON.parse(localStorage.getItem("cart")||"[]")
+let cart = JSON.parse(localStorage.getItem("cart") || "[]")
 
 cart.push(id)
 
