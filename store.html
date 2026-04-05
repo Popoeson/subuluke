@@ -32,7 +32,8 @@ BASE
 margin:0;
 padding:0;
 box-sizing:border-box;
- 
+}
+
 body{
 font-family:"Poppins",system-ui,sans-serif;
 background:var(--bg);
@@ -43,124 +44,111 @@ line-height:1.5;
 /* =========================
 HEADER
 ========================= */
-.header {
-  position: sticky;
-  top: 0;
-  width: 100%;
-  z-index: 1000;
 
-  background: rgba(255, 255, 255, 0.1); /* light glass effect */
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+.header{
+position:sticky;
+top:0;
+width:100%;
+z-index:1000;
 
-  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-  padding: 8px 20px; /* reduced height */
+background:rgba(255,255,255,0.12);
+backdrop-filter:blur(14px);
+-webkit-backdrop-filter:blur(14px);
 
-  display: flex;
-  justify-content: center; /* center the inner container */
+border-bottom:1px solid rgba(255,255,255,0.2);
+
+padding:10px 20px;
+
+display:flex;
+justify-content:center;
 }
 
 /* Dark mode header */
-body.dark .header {
-  background: rgba(20, 20, 20, 0.65);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+
+body.dark .header{
+background:rgba(20,20,20,0.7);
+border-bottom:1px solid rgba(255,255,255,0.06);
 }
 
-/* Inner container */
-.header-inner {
-  max-width: 1200px;
-  width: 100%;
-  margin: 0 auto;
+.header-inner{
 
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  position: relative; /* makes cart badge position relative to this */
+max-width:1200px;
+width:100%;
+
+display:flex;
+justify-content:space-between;
+align-items:center;
+
 }
 
-/* Logo */
-.logo {
-  font-weight: 700;
-  font-size: 20px; /* slightly smaller */
-  letter-spacing: 1px;
-  color: var(--text); /* uses CSS variable */
+/* =========================
+LOGO
+========================= */
+
+.logo{
+font-weight:700;
+font-size:20px;
+letter-spacing:1px;
+color:var(--text);
 }
 
-/* Dark mode logo */
-body.dark .logo {
-  color: var(--softGold);
-  text-shadow: 0 0 8px rgba(255, 215, 122, 0.35); /* subtle glow */
+body.dark .logo{
+color:var(--softGold);
 }
 
-/* Header icons container */
-.header-icons {
-  display: flex;
-  gap: 18px;
-  align-items: center;
-  position: relative; /* ensures cart-count is positioned relative to its icon */
+/* =========================
+HEADER ICONS
+========================= */
+
+.header-icons{
+display:flex;
+gap:18px;
+align-items:center;
 }
 
-/* Icon buttons */
-.icon {
-  background: none;
-  border: none;
-  font-size: 18px;
-  cursor: pointer;
-  color: var(--text);
-  opacity: 1; /* ALWAYS VISIBLE */
-  transition: all 0.25s ease;
-  position: relative; /* important for absolute cart badge */
+/* ICON BUTTONS */
+
+.icon{
+background:none;
+border:none;
+font-size:18px;
+cursor:pointer;
+color:var(--text);
+transition:.25s;
+position:relative;
 }
 
-/* Hover effects */
-.icon:hover {
-  transform: scale(1.12);
+.icon:hover{
+transform:scale(1.12);
 }
 
-/* Light mode hover */
-body:not(.dark) .icon:hover {
-  color: var(--accent);
+body.dark .icon{
+color:var(--softGold);
 }
 
-/* Dark mode */
-body.dark .icon {
-  color: var(--softGold);
-}
+/* =========================
+CART BADGE
+========================= */
 
-/* Dark mode hover */
-body.dark .icon:hover {
-  color: var(--softGold);
-}
+.cart-count{
+position:absolute;
+top:-4px;
+right:-4px;
 
-/* Mobile tweaks */
-@media (max-width: 768px) {
-  .header-inner {
-    padding: 8px 16px; /* smaller padding for mobile */
-  }
-  .logo {
-    font-size: 18px;
-  }
-  .icon {
-    font-size: 16px;
-  }
-}
+background:red;
+color:#fff;
 
-/* CART BADGE */
-.cart-count {
-  position: absolute;
-  top: -4px;
-  right: -4px;
-  background: red;
-  color: #fff;
-  font-size: 12px;
-  font-weight: 700;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  pointer-events: none; /* badge won't block clicks */
+font-size:11px;
+font-weight:700;
+
+width:18px;
+height:18px;
+
+border-radius:50%;
+
+display:flex;
+align-items:center;
+justify-content:center;
 }
 
 /* =========================
@@ -181,6 +169,18 @@ display:block;
 display:none;
 }
 
+.header-inner{
+padding:0 5px;
+}
+
+.logo{
+font-size:18px;
+}
+
+.icon{
+font-size:16px;
+}
+
 }
 
 /* =========================
@@ -189,7 +189,7 @@ CATEGORY PILLS
 
 .category-pills{
 max-width:1200px;
-margin:10px auto;
+margin:12px auto;
 display:flex;
 gap:10px;
 flex-wrap:wrap;
@@ -199,7 +199,7 @@ padding:0 20px;
 .category-pill{
 padding:8px 18px;
 border-radius:999px;
-background:rgba(255,255,255,0.15);
+background:rgba(255,255,255,0.18);
 backdrop-filter:blur(8px);
 cursor:pointer;
 font-size:14px;
