@@ -584,20 +584,20 @@ document.body.classList.add("dark")
 updateThemeIcon()
 
 /* =========================
-SIDEBAR
+SIDEBAR TOGGLE
 ========================= */
+const sidebar = document.getElementById("sidebar");
 
-const sidebar=document.getElementById("sidebar")
+document.getElementById("menuBtn").onclick = () => {
+  sidebar.classList.toggle("open");
+};
 
-document.getElementById("menuBtn").onclick=()=>{
-sidebar.classList.toggle("open")
-}
+document.addEventListener("click", e => {
+  if (!sidebar.contains(e.target) && !e.target.closest("#menuBtn")) {
+    sidebar.classList.remove("open");
+  }
+});
 
-document.addEventListener("click",e=>{
-if(!sidebar.contains(e.target) && !e.target.closest("#menuBtn")){
-sidebar.classList.remove("open")
-}
-})
 
 /* =========================
 LOAD PRODUCTS
@@ -649,27 +649,39 @@ allProducts = [...featured, ...others]
 /* =========================
 CATEGORIES
 ========================= */
+function createCategories() {
+  const pills = document.getElementById("categoryPills");
+  const side = document.getElementById("sidebarCategories");
 
-function createCategories(){
+  const cats = [...new Set(allProducts.map(p => p.category))];
 
-const pills=document.getElementById("categoryPills")
-const side=document.getElementById("sidebarCategories")
+  /* Clear existing content */
+  pills.innerHTML = "";
+  side.innerHTML = "";
 
-const cats=[...new Set(allProducts.map(p=>p.category))]
+  /* Always create sidebar list items */
+  cats.forEach(cat => {
+    side.innerHTML += `<li onclick="filterProducts('${cat}')">${cat}</li>`;
+  });
 
-pills.innerHTML=`<div class="category-pill active" onclick="filterProducts('All')">All</div>`
+  /* Add "All" pill first */
+  pills.innerHTML = `<div class="category-pill active" onclick="filterProducts('All')">All</div>`;
 
-side.innerHTML=""
-
-cats.forEach(cat=>{
-
-pills.innerHTML+=`<div class="category-pill" onclick="filterProducts('${cat}')">${cat}</div>`
-
-side.innerHTML+=`<li onclick="filterProducts('${cat}')">${cat}</li>`
-
-})
-
+  /* Only add pills if screen is wider than 768px */
+  if (window.innerWidth > 768) {
+    cats.forEach(cat => {
+      pills.innerHTML += `<div class="category-pill" onclick="filterProducts('${cat}')">${cat}</div>`;
+    });
+  }
 }
+
+/* =========================
+RESPONSIVE REPOPULATE
+========================= */
+window.addEventListener("resize", () => {
+  // Rebuild pills when resizing larger than 768px
+  createCategories();
+});
 
 /* =========================
 FILTER PRODUCTS
