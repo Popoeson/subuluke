@@ -552,11 +552,13 @@ SHUFFLE
 
 function shuffle(arr){
 
-for(let i=arr.length-1;i>0;i--){
+for(let i = arr.length - 1; i > 0; i--){
 
-const j=Math.floor(Math.random()*(i+1))
+let j = Math.floor(Math.random() * (i + 1))
 
-[arr[i],arr[j]]=[arr[j],arr[i]]
+let temp = arr[i]
+arr[i] = arr[j]
+arr[j] = temp
 
 }
 
@@ -566,10 +568,10 @@ return arr
 
 function prepareProducts(){
 
-let featured=allProducts.filter(p=>p.featured)
-let others=allProducts.filter(p=>!p.featured)
+let featured = shuffle(allProducts.filter(p=>p.featured))
+let others = shuffle(allProducts.filter(p=>!p.featured))
 
-allProducts=[...shuffle(featured),...shuffle(others)]
+allProducts = [...featured, ...others]
 
 }
 
