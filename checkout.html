@@ -206,14 +206,16 @@ document.getElementById("subtotal").innerText = `₦${formatPrice(subtotal)}`
 document.getElementById("total").innerText = `₦${formatPrice(total)}`
 
 /* ========================= RENDER CART ========================= */
-function renderCart(){
-
+function renderCart() {
   const container = document.getElementById("cartItems")
-  if(!container) return
+  if (!container) return
 
   container.innerHTML = ""
 
+  let subtotal = 0
+
   cart.forEach(item => {
+    subtotal += item.price * item.qty
 
     const div = document.createElement("div")
     div.className = "cart-item"
@@ -226,10 +228,20 @@ function renderCart(){
       </div>
       <div class="cart-price">₦${formatPrice(item.price * item.qty)}</div>
     `
-
     container.appendChild(div)
   })
+
+  const total = subtotal // Add delivery if needed: subtotal + 1500
+
+  // Update summary totals
+  document.getElementById("subtotal").innerText = formatPrice(subtotal)
+  document.getElementById("total").innerText = formatPrice(total)
+
+  // Update mobile sticky total
+  const mobileTotal = document.getElementById("totalMobile")
+  if (mobileTotal) mobileTotal.innerText = formatPrice(total)
 }
+
 
 /* ========================= TOGGLE SUMMARY ========================= */
 function toggleSummary(){
@@ -369,6 +381,7 @@ function showError(message){
 
   errorBox.innerText = message
 }
+
 
 /* ========================= INIT ========================= */
 window.onload = () => {
