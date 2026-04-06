@@ -320,7 +320,7 @@ async function checkPaymentStatus(){
       const data = await res.json()
       if(data.status==="success"){
         localStorage.removeItem("cart")
-        window.location.href="success.html"
+      window.location.href = `success.html?orderId=${data.orderId}`
       }else{
         alert(data.message || "Payment verification failed")
       }
