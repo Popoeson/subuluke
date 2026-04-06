@@ -60,7 +60,9 @@ body.dark .cart-item{border-bottom:1px solid rgba(255,255,255,0.06);}
   .icon{font-size:16px;}
   .sticky-paybar{position:fixed;bottom:0;left:0;width:100%;padding:12px 16px;background:var(--card);backdrop-filter:blur(14px);border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;box-shadow:var(--shadow);z-index:1000;}
   .sticky-paybar .total{font-weight:700;font-size:16px;color:var(--accent);}
-  .sticky-paybar .pay-btn{width:140px;padding:10px;}
+  .sticky-paybar
+ .pay-btn{border:none;border-radius:14px;background:var(--accent);color:#fff;font-weight:600;font-size:15px;cursor:pointer;transition:.25s;box-shadow:0 6px 16px rgba(230,165,32,0.35);}
+.pay-btn:hover{background:var(--softGold);color:#000;transform:translateY(-2px);}
 }
 .pay-card{display:none;} /* Removed top page pay button */
 </style>
