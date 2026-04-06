@@ -417,248 +417,171 @@ Back to Home
 </div>
 
 <script>
-
-/* ================= THEME ================= */
-
+/* ========================= THEME ========================= */
 function toggleTheme(){
-document.body.classList.toggle("dark")
-
-const isDark=document.body.classList.contains("dark")
-
-localStorage.setItem("theme",isDark?"dark":"light")
-
-updateThemeIcon()
+    document.body.classList.toggle("dark")
+    const isDark = document.body.classList.contains("dark")
+    localStorage.setItem("theme", isDark ? "dark" : "light")
+    updateThemeIcon()
 }
 
 function updateThemeIcon(){
-
-const moon=document.getElementById("moonIcon")
-const sun=document.getElementById("sunIcon")
-
-if(!moon||!sun)return
-
-if(document.body.classList.contains("dark")){
-moon.style.display="none"
-sun.style.display="inline-block"
-}else{
-moon.style.display="inline-block"
-sun.style.display="none"
+    const moon = document.getElementById("moonIcon")
+    const sun = document.getElementById("sunIcon")
+    if(!moon || !sun) return
+    if(document.body.classList.contains("dark")){
+        moon.style.display = "none"
+        sun.style.display = "inline-block"
+    } else {
+        moon.style.display = "inline-block"
+        sun.style.display = "none"
+    }
 }
 
+// Load saved theme
+if(localStorage.getItem("theme") === "dark"){
+    document.body.classList.add("dark")
 }
-
-if(localStorage.getItem("theme")==="dark"){
-document.body.classList.add("dark")
-}
-
 updateThemeIcon()
 
 
-/* ================= GLOBAL ORDER ================= */
+/* ========================= GLOBAL ORDER ========================= */
+let order = null
 
-let order=null
-
-
-/* ================= GET ORDER ID ================= */
-
+/* ========================= GET ORDER ID ========================= */
 function getOrderId(){
-const params=new URLSearchParams(window.location.search)
-return params.get("orderId")
+    const params = new URLSearchParams(window.location.search)
+    return params.get("orderId")
 }
 
-
-/* ================= FETCH ORDER ================= */
-
+/* ========================= FETCH ORDER ========================= */
 async function fetchOrder(){
+    const orderId = getOrderId()
+    if(!orderId){
+        showModal("Invalid order")
+        return
+    }
 
-const orderId=getOrderId()
-
-if(!orderId){
-showModal("Invalid order")
-window.location.href="index.html"
-return
+    try {
+        const res = await fetch(`https://subuluke.onrender.com/api/orders/${orderId}`)
+        const data = await res.json()
+        order = data.order
+        renderOrder()
+        localStorage.removeItem("cart")
+    } catch(err){
+        console.error(err)
+        showModal("Error loading order")
+    }
 }
 
-try{
-
-const res=await fetch(`https://subuluke.onrender.com/api/orders/${orderId}`)
-
-const data=await res.json()
-
-order=data.order
-
-renderOrder()
-
-localStorage.removeItem("cart")
-
-}catch(err){
-
-console.error(err)
-
-showModal("Error loading order")
-
-window.location.href="index.html"
-
-}
-
-}
-
-
-/* ================= PRICE FORMAT ================= */
-
+/* ========================= PRICE FORMAT ========================= */
 function formatPrice(amount){
-return Number(amount).toLocaleString("en-NG")
+    return Number(amount).toLocaleString("en-NG")
 }
 
-
-/* ================= RENDER ORDER ================= */
-
+/* ========================= RENDER ORDER ========================= */
 function renderOrder(){
+    document.getElementById("orderId").innerText = "Order ID: " + order.orderId
 
-document.getElementById("orderId").innerText="Order ID: "+order.orderId
+    let html = ""
+    let subtotal = 0
 
-let html=""
-let subtotal=0
+    order.items.forEach(item => {
+        const total = item.price * item.qty
+        subtotal += total
+        html += `
+        <div class="order-item">
+            <img src="${item.image}" class="item-img">
+            <div class="item-info">
+                <div class="item-name">${item.name}</div>
+                <div class="item-meta">
+                    Qty: ${item.qty} • ₦${formatPrice(item.price)}
+                </div>
+            </div>
+            <div class="item-total">
+                ₦${formatPrice(total)}
+            </div>
+        </div>
+        `
+    })
 
-order.items.forEach(item=>{
-
-const total=item.price*item.qty
-subtotal+=total
-
-html+=`
-<div class="order-item">
-<img src="${item.image}" class="item-img">
-
-<div class="item-info">
-<div class="item-name">${item.name}</div>
-<div class="item-meta">
-Qty: ${item.qty} • ₦${formatPrice(item.price)}
-</div>
-</div>
-
-<div class="item-total">
-₦${formatPrice(total)}
-</div>
-</div>
-`
-
-})
-
-document.getElementById("items").innerHTML=html
-
-document.getElementById("subtotal").innerText="₦"+formatPrice(subtotal)
-
-document.getElementById("total").innerText="₦"+formatPrice(order.amount)
-
-document.getElementById("delivery").innerHTML=`
-Name: ${order.customer.name}<br>
-Phone: ${order.customer.phone}<br>
-Address: ${order.customer.address}
-`
-
+    document.getElementById("items").innerHTML = html
+    document.getElementById("subtotal").innerText = "₦" + formatPrice(subtotal)
+    document.getElementById("total").innerText = "₦" + formatPrice(order.amount)
+    document.getElementById("delivery").innerHTML = `
+        Name: ${order.customer.name}<br>
+        Phone: ${order.customer.phone}<br>
+        Address: ${order.customer.address}
+    `
 }
 
-
-/* ================= WHATSAPP ================= */
-
+/* ========================= WHATSAPP ========================= */
 function sendWhatsApp(){
+    if(!order) return
 
-let msg=`🛒 *NEW ORDER — SUBULUKE*\n\n`
+    let msg = `🛒 *NEW ORDER — SUBULUKE*\n\n`
+    msg += `Order ID: ${order.orderId}\n\n`
 
-msg+=`Order ID: ${order.orderId}\n\n`
+    order.items.forEach(i => {
+        msg += `${i.qty}x ${i.name} — ₦${formatPrice(i.price*i.qty)}\n`
+        if(i.image){
+            msg += `Image: ${i.image}\n`
+        }
+        msg += `\n`
+    })
 
-order.items.forEach(i=>{
+    msg += `Total: ₦${formatPrice(order.amount)}\n\n`
+    msg += `Customer:\n${order.customer.name}\n${order.customer.phone}\n${order.customer.address}`
 
-msg+=`${i.qty}x ${i.name} — ₦${formatPrice(i.price*i.qty)}\n`
+    const url = `https://wa.me/2349122054068?text=${encodeURIComponent(msg)}`
+    window.open(url,"_blank")
 
-if(i.image){
-msg+=`Image: ${i.image}\n`
+    localStorage.setItem("whatsapp_sent","true")
+    document.getElementById("whatsappBtn").innerText = "✓ Order Sent to WhatsApp"
+    document.getElementById("whatsappBtn").disabled = true
+    document.getElementById("whatsappStatus").innerText = "✓ Order sent to admin"
 }
 
-msg+=`\n`
-
-})
-
-msg+=`\nTotal: ₦${formatPrice(order.amount)}\n\n`
-
-msg+=`Customer:\n${order.customer.name}\n${order.customer.phone}\n${order.customer.address}`
-
-const url=`https://wa.me/2349122054068?text=${encodeURIComponent(msg)}`
-
-window.open(url,"_blank")
-
-localStorage.setItem("whatsapp_sent","true")
-
-document.getElementById("whatsappBtn").innerHTML="✓ Order Sent to WhatsApp"
-document.getElementById("whatsappBtn").disabled=true
-document.getElementById("whatsappStatus").innerText="✓ Order sent to admin"
-
-/* Allow back navigation now */
-history.replaceState(null, null, location.href)
-
-/* ========== SHOW MODAL ===========*/
+/* ========================= MODAL ========================= */
 function showModal(message){
-
-const modal = document.getElementById("modal")
-const text = document.getElementById("modalText")
-
-text.innerText = message
-
-modal.style.display = "flex"
-
+    const modal = document.getElementById("modal")
+    const text = document.getElementById("modalText")
+    text.innerText = message
+    modal.style.display = "flex"
 }
 
 function closeModal(){
-
-document.getElementById("modal").style.display = "none"
-
+    document.getElementById("modal").style.display = "none"
 }
 
-/* ================= NAV ================= */
-
+/* ========================= NAVIGATION ========================= */
 function goHome(){
-
-if(localStorage.getItem("whatsapp_sent")!=="true"){
-showModal("Please send order to WhatsApp first")
-return
+    if(localStorage.getItem("whatsapp_sent") !== "true"){
+        showModal("Please send order to WhatsApp first")
+        return
+    }
+    localStorage.removeItem("whatsapp_sent")
+    window.location.href = "index.html"
 }
 
-localStorage.removeItem("whatsapp_sent")
-
-window.location.href="index.html"
-
-}
-
-/* ================= BACK BUTTON PROTECTION ================= */
-
-/* Push a fake history state so browser back button triggers popstate */
+/* ========================= BACK BUTTON PROTECTION ========================= */
+// Push fake state to prevent leaving
 history.pushState(null, null, location.href)
 
-/* Detect back navigation (phone back button) */
-window.addEventListener("popstate", function () {
-
-  if(localStorage.getItem("whatsapp_sent") !== "true"){
-
-    // Prevent leaving page
-    history.pushState(null, null, location.href)
-
-    // Show warning modal
-    showModal("⚠️ Please send the order to WhatsApp before leaving this page.")
-
-  }else{
-
-    // If order already sent allow leaving
-    history.back()
-
-  }
-
+// Detect phone or browser back button
+window.addEventListener("popstate", function(){
+    if(localStorage.getItem("whatsapp_sent") !== "true"){
+        // Block leaving
+        history.pushState(null, null, location.href)
+        showModal("⚠️ Please send the order to WhatsApp before leaving this page.")
+    } else {
+        // Allow leaving if sent
+        window.location.href = "index.html"
+    }
 })
 
-
-/* ================= INIT ================= */
-
-window.onload=fetchOrder
-
+/* ========================= INIT ========================= */
+window.onload = fetchOrder
 </script>
 
 </body>
