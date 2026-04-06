@@ -1,291 +1,506 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>SUBULUKE • Hero Images</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Subuluke • Hero Images</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <style>
-/* ===================== THEME ===================== */
+
+/* =========================
+THEME
+========================= */
+
 :root{
-  --bg-main:#F5F0E1;
-  --glass-bg:rgba(255,255,255,0.55);
-  --glass-border:rgba(255,255,255,255,0.35);
-  --glass-dark:rgba(25,25,25,0.55);
-  --text-dark:#2A2A2A;
-  --text-muted:#6F6F6F;
-  --text-light:#fff;
-  --accent-olive:#6B8E23;
-  --blur:blur(18px);
+--bg:#FFF8E7;
+--text:#333;
+--accent:#E6A520;
+--softGold:#FFD77A;
+--card:rgba(255,255,255,0.45);
+--border:rgba(255,255,255,0.35);
+--shadow:0 10px 30px rgba(0,0,0,0.15);
+--muted:#777;
 }
 
-*{margin:0;padding:0;box-sizing:border-box}
+body.dark{
+--bg:#0F0F0F;
+--text:#F5F5F5;
+--card:rgba(20,20,20,0.7);
+--border:rgba(255,255,255,0.08);
+--shadow:0 10px 30px rgba(0,0,0,0.5);
+--muted:#aaa;
+}
+
+/* =========================
+BASE
+========================= */
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
 
 body{
-  min-height:100vh;
-  background:var(--bg-main);
-  font-family:"Inter",sans-serif;
-  color:var(--text-dark);
+font-family:"Poppins",system-ui,sans-serif;
+background:var(--bg);
+color:var(--text);
+min-height:100vh;
 }
 
-/* ===================== LAYOUT ===================== */
+/* =========================
+HEADER
+========================= */
+
+.header{
+position:sticky;
+top:0;
+width:100%;
+z-index:1000;
+
+background:rgba(255,255,255,0.12);
+backdrop-filter:blur(14px);
+-webkit-backdrop-filter:blur(14px);
+
+border-bottom:1px solid rgba(255,255,255,0.2);
+
+padding:12px 20px;
+
+display:flex;
+justify-content:center;
+}
+
+body.dark .header{
+background:rgba(20,20,20,0.7);
+border-bottom:1px solid rgba(255,255,255,0.06);
+}
+
+.header-inner{
+max-width:1200px;
+width:100%;
+
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.logo{
+font-weight:700;
+font-size:20px;
+letter-spacing:1px;
+}
+
+body.dark .logo{
+color:var(--softGold);
+}
+
+.icon-btn{
+background:none;
+border:none;
+font-size:18px;
+cursor:pointer;
+color:var(--text);
+}
+
+body.dark .icon-btn{
+color:var(--softGold);
+}
+
+/* =========================
+CONTAINER
+========================= */
+
 .wrapper{
-  max-width:1100px;
-  margin:auto;
-  padding:28px;
+max-width:1100px;
+margin:auto;
+padding:30px 20px;
 }
 
-/* ===================== TOPBAR ===================== */
-.topbar{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:18px 22px;
-  margin-bottom:28px;
+/* =========================
+CARDS
+========================= */
+
+.card{
+background:var(--card);
+backdrop-filter:blur(14px);
+border-radius:16px;
+padding:22px;
+border:1px solid var(--border);
+box-shadow:var(--shadow);
+margin-bottom:25px;
 }
 
-.topbar strong{
-  font-family:"Playfair Display",serif;
-  letter-spacing:.8px;
+.card h3{
+margin-bottom:16px;
 }
 
-/* ===================== GLASS ===================== */
-.glass{
-  background:var(--glass-bg);
-  backdrop-filter:var(--blur);
-  border:1px solid var(--glass-border);
-  border-radius:22px;
+/* =========================
+FORM
+========================= */
+
+.form-group{
+display:flex;
+flex-direction:column;
+gap:12px;
 }
 
-/* ===================== BUTTON ===================== */
+input[type="file"]{
+padding:10px;
+border-radius:10px;
+border:1px solid var(--border);
+background:rgba(255,255,255,0.5);
+}
+
+body.dark input[type="file"]{
+background:rgba(20,20,20,0.6);
+}
+
+.checkbox{
+display:flex;
+align-items:center;
+gap:8px;
+font-size:14px;
+}
+
+/* =========================
+BUTTONS
+========================= */
+
 .btn{
-  padding:10px 22px;
-  border-radius:999px;
-  border:none;
-  cursor:pointer;
-  background:var(--accent-olive);
-  color:#fff;
-  font-weight:500;
+padding:10px 18px;
+border:none;
+border-radius:10px;
+cursor:pointer;
+font-weight:600;
+background:var(--accent);
+color:#fff;
+transition:.25s;
 }
-.btn.danger{background:#C0392B}
-.btn.muted{background:#ccc;color:#333}
 
-/* ===================== HERO GRID ===================== */
+.btn:hover{
+background:var(--softGold);
+color:#000;
+}
+
+.btn.danger{
+background:#c0392b;
+}
+
+.btn.muted{
+background:#ccc;
+color:#333;
+}
+
+/* =========================
+HERO GRID
+========================= */
+
 .hero-grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
-  gap:18px;
+display:grid;
+grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+gap:18px;
 }
 
 .hero-card{
-  position:relative;
+background:var(--card);
+border-radius:14px;
+padding:10px;
+border:1px solid var(--border);
+backdrop-filter:blur(10px);
 }
 
 .hero-card img{
-  width:100%;
-  height:140px;
-  object-fit:cover;
-  border-radius:16px;
+width:100%;
+height:140px;
+object-fit:cover;
+border-radius:10px;
 }
 
 .hero-badge{
-  position:absolute;
-  top:10px;
-  left:10px;
-  font-size:11px;
-  padding:4px 10px;
-  border-radius:999px;
-  background:var(--accent-olive);
-  color:#fff;
+position:absolute;
+top:8px;
+left:8px;
+font-size:11px;
+padding:4px 8px;
+border-radius:8px;
+background:var(--accent);
+color:white;
 }
 
 .hero-actions{
-  display:flex;
-  gap:6px;
-  margin-top:10px;
+display:flex;
+gap:6px;
+margin-top:10px;
 }
 
-/* ===================== FORM ===================== */
-.form-group{
-  display:flex;
-  flex-direction:column;
-  gap:10px;
+.hero-actions .btn{
+font-size:12px;
+padding:6px 10px;
 }
 
-/* ===================== TOAST ===================== */
+/* =========================
+TOAST
+========================= */
+
 .toast{
-  position:fixed;
-  top:24px;
-  right:24px;
-  padding:14px 22px;
-  border-radius:14px;
-  background:var(--glass-bg);
-  backdrop-filter:var(--blur);
-  border:1px solid var(--glass-border);
-  font-weight:500;
-  z-index:5000;
-  animation:slideIn .3s ease;
+position:fixed;
+top:24px;
+right:24px;
+padding:14px 20px;
+border-radius:12px;
+background:var(--card);
+backdrop-filter:blur(14px);
+border:1px solid var(--border);
+font-weight:500;
+z-index:5000;
+animation:slideIn .3s ease;
 }
-.toast.error{color:#C0392B}
+
+.toast.error{
+color:#c0392b;
+}
 
 @keyframes slideIn{
-  from{transform:translateY(-10px);opacity:0}
-  to{transform:translateY(0);opacity:1}
+from{transform:translateY(-10px);opacity:0}
+to{transform:translateY(0);opacity:1}
 }
 
-/* ===================== LOADING ===================== */
+/* =========================
+LOADING
+========================= */
+
 .loading-overlay{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.45);
-  backdrop-filter:blur(3px);
-  display:none;
-  align-items:center;
-  justify-content:center;
-  z-index:6000;
+position:fixed;
+inset:0;
+background:rgba(0,0,0,.45);
+display:none;
+align-items:center;
+justify-content:center;
+z-index:6000;
 }
 
 .spinner{
-  width:38px;
-  height:38px;
-  border:4px solid rgba(0,0,0,.1);
-  border-top-color:var(--accent-olive);
-  border-radius:50%;
-  animation:spin 1s linear infinite;
+width:40px;
+height:40px;
+border:4px solid rgba(255,255,255,.3);
+border-top-color:var(--accent);
+border-radius:50%;
+animation:spin 1s linear infinite;
 }
 
-@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes spin{
+to{transform:rotate(360deg)}
+}
+
 </style>
 </head>
 
 <body>
 
+<!-- HEADER -->
+<header class="header">
+<div class="header-inner">
+
+<div class="logo">Subuluke Admin</div>
+
+<div>
+<button class="icon-btn" onclick="window.location.href='admin.html'">
+<i class="fas fa-arrow-left"></i>
+</button>
+</div>
+
+</div>
+</header>
+
 <div class="wrapper">
 
-  <!-- TOPBAR -->
-  <div class="topbar glass">
-    <strong>MAISON • Hero Images</strong>
-    <button class="btn muted" onclick="window.location.href='admin.html'">
-      ← Back to Admin
-    </button>
-  </div>
+<!-- UPLOAD CARD -->
+<div class="card">
 
-  <!-- UPLOAD -->
-  <div class="glass" style="padding:24px;margin-bottom:28px">
-    <h3 style="font-family:'Playfair Display',serif;margin-bottom:14px">
-      Upload Hero Image
-    </h3>
+<h3>Upload Hero Image</h3>
 
-    <div class="form-group">
-      <input type="file" id="heroFile" accept="image/*">
-      <label style="display:flex;align-items:center;gap:8px">
-        <input type="checkbox" id="heroActive">
-        Set image as active
-      </label>
-      <button class="btn" onclick="uploadHero()">Upload Image</button>
-    </div>
-  </div>
+<div class="form-group">
 
-  <!-- HERO LIST -->
-  <div class="glass" style="padding:24px">
-    <h3 style="font-family:'Playfair Display',serif;margin-bottom:18px">
-      Hero Images
-    </h3>
+<input type="file" id="heroFile" accept="image/*">
 
-    <div id="heroGrid" class="hero-grid"></div>
-  </div>
+<label class="checkbox">
+<input type="checkbox" id="heroActive">
+Set image as active
+</label>
+
+<button class="btn" onclick="uploadHero()">
+Upload Image
+</button>
+
+</div>
+
+</div>
+
+<!-- HERO LIST -->
+<div class="card">
+
+<h3>Hero Images</h3>
+
+<div id="heroGrid" class="hero-grid"></div>
+
+</div>
 
 </div>
 
 <!-- LOADING -->
 <div class="loading-overlay" id="loading">
-  <div class="spinner"></div>
+<div class="spinner"></div>
 </div>
 
 <script>
-const API_BASE='https://subuluke.onrender.com';
-const loading=document.getElementById('loading');
 
-/* ===================== TOAST ===================== */
+const API_BASE='https://subuluke.onrender.com'
+const loading=document.getElementById('loading')
+
+/* =========================
+TOAST
+========================= */
+
 function toast(msg,type='success'){
-  const t=document.createElement('div');
-  t.className=`toast ${type}`;
-  t.textContent=msg;
-  document.body.appendChild(t);
-  setTimeout(()=>t.remove(),3000);
+
+const t=document.createElement('div')
+t.className=`toast ${type}`
+t.textContent=msg
+
+document.body.appendChild(t)
+
+setTimeout(()=>t.remove(),3000)
+
 }
 
-/* ===================== HERO ===================== */
+/* =========================
+UPLOAD HERO
+========================= */
+
 async function uploadHero(){
-  const file=document.getElementById('heroFile').files[0];
-  if(!file) return toast('Please select an image','error');
 
-  loading.style.display='flex';
+const file=document.getElementById('heroFile').files[0]
 
-  const fd=new FormData();
-  fd.append('image',file);
-  fd.append('isActive',document.getElementById('heroActive').checked);
+if(!file) return toast('Please select an image','error')
 
-  try{
-    await fetch(`${API_BASE}/api/hero-images`,{
-      method:'POST',
-      body:fd
-    });
+loading.style.display='flex'
 
-    toast('Hero image uploaded');
-    document.getElementById('heroFile').value='';
-    document.getElementById('heroActive').checked=false;
-    fetchHeroes();
-  }catch{
-    toast('Upload failed','error');
-  }finally{
-    loading.style.display='none';
-  }
+const fd=new FormData()
+
+fd.append('image',file)
+fd.append('isActive',document.getElementById('heroActive').checked)
+
+try{
+
+await fetch(`${API_BASE}/api/hero-images`,{
+method:'POST',
+body:fd
+})
+
+toast('Hero image uploaded')
+
+document.getElementById('heroFile').value=''
+document.getElementById('heroActive').checked=false
+
+fetchHeroes()
+
+}catch{
+
+toast('Upload failed','error')
+
+}finally{
+
+loading.style.display='none'
+
 }
+
+}
+
+/* =========================
+FETCH HERO IMAGES
+========================= */
 
 async function fetchHeroes(){
-  const res=await fetch(`${API_BASE}/api/hero-images`);
-  const data=await res.json();
-  const grid=document.getElementById('heroGrid');
-  grid.innerHTML='';
 
-  data.forEach(h=>{
-    grid.innerHTML+=`
-      <div class="hero-card">
-        <img src="${h.imageUrl}">
-        ${h.isActive?'<div class="hero-badge">Active</div>':''}
-        <div class="hero-actions">
-          <button class="btn" onclick="toggleHero('${h._id}')">
-            ${h.isActive?'Deactivate':'Activate'}
-          </button>
-          <button class="btn danger" onclick="deleteHero('${h._id}')">
-            Delete
-          </button>
-        </div>
-      </div>
-    `;
-  });
+const res=await fetch(`${API_BASE}/api/hero-images`)
+const data=await res.json()
+
+const grid=document.getElementById('heroGrid')
+
+grid.innerHTML=''
+
+data.forEach(h=>{
+
+grid.innerHTML+=`
+
+<div class="hero-card">
+
+<img src="${h.imageUrl}">
+
+<div class="hero-actions">
+
+<button class="btn" onclick="toggleHero('${h._id}')">
+${h.isActive?'Deactivate':'Activate'}
+</button>
+
+<button class="btn danger" onclick="deleteHero('${h._id}')">
+Delete
+</button>
+
+</div>
+
+</div>
+
+`
+
+})
+
 }
+
+/* =========================
+TOGGLE HERO
+========================= */
 
 async function toggleHero(id){
-  loading.style.display='flex';
-  await fetch(`${API_BASE}/api/hero-images/${id}/toggle`,{method:'PATCH'});
-  loading.style.display='none';
-  fetchHeroes();
+
+loading.style.display='flex'
+
+await fetch(`${API_BASE}/api/hero-images/${id}/toggle`,{
+method:'PATCH'
+})
+
+loading.style.display='none'
+
+fetchHeroes()
+
 }
+
+/* =========================
+DELETE HERO
+========================= */
 
 async function deleteHero(id){
-  if(!confirm('Delete this hero image?')) return;
-  loading.style.display='flex';
-  await fetch(`${API_BASE}/api/hero-images/${id}`,{method:'DELETE'});
-  loading.style.display='none';
-  toast('Hero image deleted');
-  fetchHeroes();
+
+if(!confirm('Delete this hero image?')) return
+
+loading.style.display='flex'
+
+await fetch(`${API_BASE}/api/hero-images/${id}`,{
+method:'DELETE'
+})
+
+loading.style.display='none'
+
+toast('Hero image deleted')
+
+fetchHeroes()
+
 }
 
-fetchHeroes();
+fetchHeroes()
+
 </script>
 
 </body>
