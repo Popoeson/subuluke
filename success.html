@@ -590,12 +590,11 @@ window.open(url,"_blank")
 localStorage.setItem("whatsapp_sent","true")
 
 document.getElementById("whatsappBtn").innerHTML="✓ Order Sent to WhatsApp"
-
 document.getElementById("whatsappBtn").disabled=true
-
 document.getElementById("whatsappStatus").innerText="✓ Order sent to admin"
 
-}
+/* Allow back navigation now */
+history.replaceState(null, null, location.href)
 
 /* ========== SHOW MODAL ===========*/
 function showModal(message){
@@ -629,6 +628,31 @@ localStorage.removeItem("whatsapp_sent")
 window.location.href="index.html"
 
 }
+
+/* ================= BACK BUTTON PROTECTION ================= */
+
+/* Push a fake history state so browser back button triggers popstate */
+history.pushState(null, null, location.href)
+
+/* Detect back navigation (phone back button) */
+window.addEventListener("popstate", function () {
+
+  if(localStorage.getItem("whatsapp_sent") !== "true"){
+
+    // Prevent leaving page
+    history.pushState(null, null, location.href)
+
+    // Show warning modal
+    showModal("⚠️ Please send the order to WhatsApp before leaving this page.")
+
+  }else{
+
+    // If order already sent allow leaving
+    history.back()
+
+  }
+
+})
 
 
 /* ================= INIT ================= */
