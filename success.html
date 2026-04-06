@@ -6,191 +6,207 @@
 
 <title>Order Confirmed | Subuluke</title>
 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
 <style>
 
 /* ========================= THEME ========================= */
-:root {
-  --bg-gradient: linear-gradient(to bottom, #F7E7CE 0%, #FFD77A 100%);
-  --bg: #FFF8E7;
-  --header-gradient: linear-gradient(135deg, #E6A520 0%, #FFD77A 100%);
-  --card: rgba(255,248,231,0.75);
-  --text: #3a2a00;
-  --muted: #777;
-  --border: rgba(255,255,255,0.25);
-  --accent: #E6A520;
+
+:root{
+--bg:#FFF8E7;
+--text:#3a2a00;
+--accent:#E6A520;
+--softGold:#FFD77A;
+--card:rgba(255,255,255,0.45);
+--border:rgba(255,255,255,0.35);
+--shadow:0 10px 30px rgba(0,0,0,0.15);
+--muted:#777;
 }
 
-body.dark {
-  --bg-gradient: linear-gradient(to bottom, #121212 0%, #1A1A1A 100%);
-  --bg: #0F0F0F;
-  --header-gradient: linear-gradient(135deg, #121212 0%, #1A1A1A 100%);
-  --card: rgba(26,26,26,0.7);
-  --text: #F5F5F5;
-  --muted: #BBBBBB;
-  --border: rgba(255,255,255,0.15);
+body.dark{
+--bg:#0F0F0F;
+--text:#F5F5F5;
+--card:rgba(20,20,20,0.7);
+--border:rgba(255,255,255,0.08);
+--shadow:0 10px 30px rgba(0,0,0,0.5);
+--muted:#aaa;
 }
 
-/* ========================= BASE ========================= */
+/* ================= BASE ================= */
+
 *{margin:0;padding:0;box-sizing:border-box;}
 
 body{
-  font-family: system-ui;
-  color: var(--text);
-  background: var(--bg-gradient);
-  background-attachment: fixed;
-  background-size: cover;
-  min-height: 100vh;
+font-family:"Poppins",system-ui;
+background:linear-gradient(to bottom,#F7E7CE,#FFD77A);
+background-attachment:fixed;
+min-height:100vh;
+color:var(--text);
+}
+
+body.dark{
+background:linear-gradient(to bottom,#121212,#1A1A1A);
 }
 
 /* ================= HEADER ================= */
+
 .header{
-  width:100%;
-  height:72px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:0 20px;
-  background: var(--header-gradient);
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:16px 20px;
 }
 
-.logo{font-weight:700;}
+.logo{
+font-weight:700;
+font-size:20px;
+}
 
 .back-btn{
-  border:1px solid var(--border);
-  background:none;
-  padding:6px 10px;
-  border-radius:8px;
-  cursor:pointer;
-  color:var(--text);
+border:none;
+background:var(--card);
+backdrop-filter:blur(10px);
+padding:8px 12px;
+border-radius:8px;
+cursor:pointer;
 }
 
 /* ================= CONTAINER ================= */
+
 .container{
-  max-width:700px;
-  margin:auto;
-  padding:20px;
+max-width:700px;
+margin:auto;
+padding:20px;
 }
 
 /* ================= SUCCESS HERO ================= */
+
 .success-hero{
-  text-align:center;
-  margin-top:20px;
+text-align:center;
+margin-top:20px;
 }
 
 .success-circle{
-  width:80px;
-  height:80px;
-  border-radius:50%;
-  margin:auto;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:40px;
-  font-weight:bold;
-  background:#25D366;
-  color:#fff;
-  box-shadow:0 10px 30px rgba(37,211,102,0.4);
+width:90px;
+height:90px;
+border-radius:50%;
+background:#25D366;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:42px;
+color:white;
+margin:auto;
+box-shadow:0 10px 40px rgba(37,211,102,0.5);
+animation:pop 0.5s ease;
 }
 
-.order-id-box{
-  margin-top:10px;
-  padding:10px;
-  border-radius:10px;
-  background:rgba(0,0,0,0.05);
-  font-weight:600;
+@keyframes pop{
+0%{transform:scale(0.5);opacity:0}
+100%{transform:scale(1);opacity:1}
 }
 
-body.dark .order-id-box{
-  background:rgba(255,255,255,0.08);
+.order-id{
+margin-top:12px;
+font-weight:600;
+background:var(--card);
+display:inline-block;
+padding:8px 14px;
+border-radius:8px;
 }
 
 /* ================= CARD ================= */
+
 .card{
-  background:var(--card);
-  backdrop-filter:blur(12px);
-  border-radius:16px;
-  padding:20px;
-  margin-top:20px;
-  border:1px solid var(--border);
+background:var(--card);
+backdrop-filter:blur(12px);
+border-radius:16px;
+padding:20px;
+margin-top:20px;
+border:1px solid var(--border);
+box-shadow:var(--shadow);
 }
 
 /* ================= ORDER ITEMS ================= */
+
 .order-item{
-  display:flex;
-  align-items:center;
-  gap:12px;
-  padding:12px 0;
-  border-bottom:1px solid rgba(0,0,0,0.08);
+display:flex;
+align-items:center;
+gap:12px;
+padding:12px 0;
+border-bottom:1px solid rgba(0,0,0,0.08);
 }
 
 body.dark .order-item{
-  border-bottom:1px solid rgba(255,255,255,0.08);
+border-bottom:1px solid rgba(255,255,255,0.08);
 }
 
 .item-img{
-  width:55px;
-  height:55px;
-  border-radius:10px;
-  object-fit:cover;
+width:55px;
+height:55px;
+border-radius:10px;
+object-fit:cover;
 }
 
 .item-info{
-  flex:1;
+flex:1;
 }
 
 .item-name{
-  font-weight:600;
+font-weight:600;
 }
 
 .item-meta{
-  font-size:13px;
-  color:var(--muted);
+font-size:13px;
+color:var(--muted);
 }
 
 .item-total{
-  font-weight:700;
+font-weight:700;
 }
 
 /* ================= TOTAL ================= */
+
 .total-box{
-  margin-top:10px;
-  font-size:18px;
-  font-weight:700;
+margin-top:10px;
+font-size:18px;
+font-weight:700;
+color:var(--accent);
 }
 
 /* ================= BUTTONS ================= */
+
 .btn{
-  width:100%;
-  padding:14px;
-  border:none;
-  border-radius:12px;
-  margin-top:12px;
-  font-weight:600;
-  cursor:pointer;
+width:100%;
+padding:14px;
+border:none;
+border-radius:12px;
+margin-top:12px;
+font-weight:600;
+cursor:pointer;
 }
 
 .whatsapp{
-  background:#25D366;
-  color:white;
+background:#25D366;
+color:white;
 }
 
 .home{
-  background:var(--accent);
-  color:white;
+background:var(--accent);
+color:white;
 }
 
-/* ================= WARNING ================= */
 .warning{
-  margin-top:15px;
-  background:#fff3cd;
-  color:#856404;
-  padding:10px;
-  border-radius:8px;
+margin-top:15px;
+background:#fff3cd;
+color:#856404;
+padding:10px;
+border-radius:8px;
 }
 
 body.dark .warning{
-  background:#332701;
-  color:#FFD77A;
+background:#332701;
+color:#FFD77A;
 }
 
 </style>
@@ -199,155 +215,179 @@ body.dark .warning{
 <body>
 
 <header class="header">
-  <button onclick="goHome()" class="back-btn">←</button>
-  <div class="logo">Subuluke</div>
+<button onclick="goHome()" class="back-btn">
+<i class="fas fa-arrow-left"></i>
+</button>
+<div class="logo">Subuluke</div>
 </header>
 
 <div class="container">
 
-  <div class="success-hero">
-    <div class="success-circle">✓</div>
-    <h1>Order Confirmed</h1>
-    <p>Thank you for your patronage 🙏</p>
-    <div id="orderId" class="order-id-box"></div>
-  </div>
+<div class="success-hero">
 
-  <div class="card">
-    <h3>Order Details</h3>
-    <div id="items"></div>
-    <div id="total" class="total-box"></div>
+<div class="success-circle">
+<i class="fas fa-check"></i>
+</div>
 
-    <hr>
+<h1>Order Confirmed</h1>
+<p>Thank you for your patronage 🙏</p>
 
-    <h3>Delivery Info</h3>
-    <p id="delivery"></p>
-  </div>
+<div id="orderId" class="order-id"></div>
 
-  <div class="warning">
-    ⚠️ Please send your order to WhatsApp to ensure it is processed.
-  </div>
+</div>
 
-  <button class="btn whatsapp" onclick="sendWhatsApp()">Send Order to WhatsApp</button>
-  <button class="btn home" onclick="goHome()">Back to Home</button>
+<div class="card">
+
+<h3>Order Details</h3>
+
+<div id="items"></div>
+
+<div id="total" class="total-box"></div>
+
+<hr style="margin:16px 0">
+
+<h3>Delivery Info</h3>
+
+<p id="delivery"></p>
+
+</div>
+
+<div class="warning">
+⚠️ Please send your order to WhatsApp to ensure it is processed.
+</div>
+
+<button class="btn whatsapp" onclick="sendWhatsApp()">
+<i class="fab fa-whatsapp"></i> Send Order to WhatsApp
+</button>
+
+<button class="btn home" onclick="goHome()">
+Back to Home
+</button>
 
 </div>
 
 <script>
 
-/* ================= THEME ================= */
-if(localStorage.getItem("theme")==="dark"){
-  document.body.classList.add("dark")
-}
+let order=null
 
-/* ================= GLOBAL ORDER ================= */
-let order = null
-
-/* ================= GET ORDER ID ================= */
 function getOrderId(){
-  const params = new URLSearchParams(window.location.search)
-  return params.get("orderId")
+const params=new URLSearchParams(window.location.search)
+return params.get("orderId")
 }
 
-/* ================= FETCH ORDER ================= */
 async function fetchOrder(){
 
-  const orderId = getOrderId()
+const orderId=getOrderId()
 
-  if(!orderId){
-    alert("Invalid order")
-    window.location.href = "index.html"
-    return
-  }
-
-  try{
-    const res = await fetch(`https://subuluke.onrender.com/api/orders/${orderId}`)
-    const data = await res.json()
-
-    order = data.order
-    renderOrder()
-
-  }catch(err){
-    alert("Error loading order")
-    window.location.href = "index.html"
-  }
+if(!orderId){
+alert("Invalid order")
+window.location.href="index.html"
+return
 }
 
-// ===== PRICE FORMAT ====
+try{
+
+const res=await fetch(`https://subuluke.onrender.com/api/orders/${orderId}`)
+
+const data=await res.json()
+
+order=data.order
+
+renderOrder()
+
+localStorage.removeItem("cart")
+
+}catch(err){
+
+alert("Error loading order")
+
+window.location.href="index.html"
+
+}
+
+}
+
 function formatPrice(amount){
-  return Number(amount).toLocaleString("en-NG")
+return Number(amount).toLocaleString("en-NG")
 }
 
-/* ================= RENDER ================= */
 function renderOrder(){
 
-  document.getElementById("orderId").innerText = "Order ID: " + order.orderId
+document.getElementById("orderId").innerText="Order ID: "+order.orderId
 
-  let html = ""
+let html=""
 
-  order.items.forEach(item=>{
-    const subtotal = item.price * item.qty
+order.items.forEach(item=>{
 
-    html += `
-      <div class="order-item">
-        <img src="${item.image}" class="item-img">
-        <div class="item-info">
-          <div class="item-name">${item.name}</div>
-          <div class="item-meta">Qty: ${item.qty} • ₦${formatPrice(item.price)}</div>
-        </div>
-        <div class="item-total">₦${formatPrice(subtotal)}</div>
-      </div>
-    `
-  })
+const subtotal=item.price*item.qty
 
-  document.getElementById("items").innerHTML = html
+html+=`
+<div class="order-item">
+<img src="${item.image}" class="item-img">
 
-  document.getElementById("total").innerText = "Total: ₦" + order.amount
+<div class="item-info">
+<div class="item-name">${item.name}</div>
+<div class="item-meta">
+Qty: ${item.qty} • ₦${formatPrice(item.price)}
+</div>
+</div>
 
-  document.getElementById("delivery").innerHTML = `
-    Name: ${order.customer.name}<br>
-    Phone: ${order.customer.phone}<br>
-    Address: ${order.customer.address}
-  `
-}
+<div class="item-total">
+₦${formatPrice(subtotal)}
+</div>
+</div>
+`
 
-/* ================= WHATSAPP ================= */
-function sendWhatsApp(){
-
-  let msg = `🛒 NEW ORDER\n\nOrder ID: ${order.orderId}\n\n`
-
-  order.items.forEach(i=>{
-    msg += `${i.name} (x${i.qty}) - ₦${i.price}\n${i.image}\n\n`
-  })
-
-  msg += `Total: ₦${order.amount}`
-
-  const url = `https://wa.me/2349122054068?text=${encodeURIComponent(msg)}`
-  window.open(url,"_blank")
-
-  localStorage.setItem("whatsapp_sent","true")
-}
-
-/* ================= EXIT BLOCK ================= */
-window.addEventListener("beforeunload", e=>{
-  if(localStorage.getItem("whatsapp_sent")!=="true"){
-    e.preventDefault()
-    e.returnValue=""
-  }
 })
 
-/* ================= NAV ================= */
-function goHome(){
-  if(localStorage.getItem("whatsapp_sent")!=="true"){
-    alert("Please send order to WhatsApp first")
-    return
-  }
+document.getElementById("items").innerHTML=html
 
-  localStorage.removeItem("whatsapp_sent")
-  window.location.href="index.html"
+document.getElementById("total").innerText="Total: ₦"+formatPrice(order.amount)
+
+document.getElementById("delivery").innerHTML=`
+Name: ${order.customer.name}<br>
+Phone: ${order.customer.phone}<br>
+Address: ${order.customer.address}
+`
+
 }
 
-/* ================= INIT ================= */
-window.onload = fetchOrder
+function sendWhatsApp(){
+
+let msg=`🛒 *NEW ORDER — SUBULUKE*\n\n`
+
+msg+=`Order ID: ${order.orderId}\n\n`
+
+order.items.forEach(i=>{
+msg+=`${i.qty}x ${i.name} — ₦${formatPrice(i.price*i.qty)}\n`
+})
+
+msg+=`\nTotal: ₦${formatPrice(order.amount)}\n\n`
+
+msg+=`Customer:\n${order.customer.name}\n${order.customer.phone}\n${order.customer.address}`
+
+const url=`https://wa.me/2349122054068?text=${encodeURIComponent(msg)}`
+
+window.open(url,"_blank")
+
+localStorage.setItem("whatsapp_sent","true")
+
+}
+
+function goHome(){
+
+if(localStorage.getItem("whatsapp_sent")!=="true"){
+alert("Please send order to WhatsApp first")
+return
+}
+
+localStorage.removeItem("whatsapp_sent")
+
+window.location.href="index.html"
+
+}
+
+window.onload=fetchOrder
 
 </script>
 
