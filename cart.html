@@ -264,71 +264,204 @@ body.dark .cart-summary{
 </div>
 
 <script>
-/* THEME LOGIC */
+
+/* =========================
+THEME
+========================= */
+
 function toggleTheme(){
-  document.body.classList.toggle("dark");
-  const isDark=document.body.classList.contains("dark");
-  localStorage.setItem("theme", isDark?"dark":"light");
-  updateThemeIcon();
+
+document.body.classList.toggle("dark")
+
+localStorage.setItem(
+"theme",
+document.body.classList.contains("dark") ? "dark" : "light"
+)
+
+updateThemeIcon()
+
 }
+
 function updateThemeIcon(){
-  const icon=document.getElementById("themeIcon");
-  icon.className=document.body.classList.contains("dark")?"fas fa-sun":"fas fa-moon";
+
+const moon=document.getElementById("moonIcon")
+const sun=document.getElementById("sunIcon")
+
+if(document.body.classList.contains("dark")){
+moon.style.display="none"
+sun.style.display="inline"
+}else{
+moon.style.display="inline"
+sun.style.display="none"
 }
-if(localStorage.getItem("theme")==="dark"){document.body.classList.add("dark");}
-updateThemeIcon();
 
-function formatPrice(amount){ return Number(amount).toLocaleString("en-NG"); }
+}
 
-/* CART LOGIC */
-let cart = JSON.parse(localStorage.getItem("cart")) || [];
-const cartItems=document.getElementById("cartItems");
-const cartTotal=document.getElementById("cartTotal");
-const emptyCart=document.getElementById("emptyCart");
+/* Load saved theme */
+
+if(localStorage.getItem("theme")==="dark"){
+document.body.classList.add("dark")
+}
+
+updateThemeIcon()
+
+
+/* =========================
+PRICE FORMAT
+========================= */
+
+function formatPrice(amount){
+return Number(amount).toLocaleString("en-NG")
+}
+
+
+/* =========================
+CART DATA
+========================= */
+
+let cart = JSON.parse(localStorage.getItem("cart")) || []
+
+const cartItems=document.getElementById("cartItems")
+const cartTotal=document.getElementById("cartTotal")
+const emptyCart=document.getElementById("emptyCart")
+
+
+/* =========================
+RENDER CART
+========================= */
 
 function renderCart(){
-  cartItems.innerHTML="";
-  if(cart.length===0){ emptyCart.style.display="block"; cartTotal.innerText="₦0"; return; }
-  emptyCart.style.display="none";
-  let total=0;
-  cart.forEach(item=>{
-    total+=item.price*item.qty;
-    const div=document.createElement("div");
-    div.className="cart-item glass";
-    div.innerHTML=`
-      <img src="${item.image}">
-      <div class="cart-details">
-        <div class="cart-name">${item.name}</div>
-        <div class="cart-price">₦${formatPrice(item.price)}</div>
-      </div>
-      <div class="cart-qty">
-        <button onclick="decreaseQty('${item._id}')"><i class="fas fa-minus"></i></button>
-        <span>${item.qty}</span>
-        <button onclick="increaseQty('${item._id}')"><i class="fas fa-plus"></i></button>
-      </div>
-    `;
-    cartItems.appendChild(div);
-  });
-  cartTotal.innerText=`₦${formatPrice(total)}`;
+
+cartItems.innerHTML=""
+
+if(cart.length===0){
+
+emptyCart.style.display="block"
+cartTotal.innerText="₦0"
+
+return
+
 }
+
+emptyCart.style.display="none"
+
+let total=0
+
+cart.forEach(item=>{
+
+total+=item.price*item.qty
+
+const div=document.createElement("div")
+
+div.className="cart-item glass"
+
+div.innerHTML=`
+
+<img src="${item.image}">
+
+<div class="cart-details">
+<div class="cart-name">${item.name}</div>
+<div class="cart-price">₦${formatPrice(item.price)}</div>
+</div>
+
+<div class="cart-qty">
+
+<button onclick="decreaseQty('${item._id}')">
+<i class="fa-solid fa-minus"></i>
+</button>
+
+<span>${item.qty}</span>
+
+<button onclick="increaseQty('${item._id}')">
+<i class="fa-solid fa-plus"></i>
+</button>
+
+</div>
+
+`
+
+cartItems.appendChild(div)
+
+})
+
+cartTotal.innerText=`₦${formatPrice(total)}`
+
+}
+
+
+/* =========================
+UPDATE QUANTITY
+========================= */
 
 function increaseQty(id){
-  const item=cart.find(i=>i._id===id);
-  if(item){ item.qty++; saveCart(); }
+
+const item=cart.find(i=>i._id===id)
+
+if(item){
+
+item.qty++
+
+saveCart()
+
 }
+
+}
+
 function decreaseQty(id){
-  const item=cart.find(i=>i._id===id);
-  if(item){ item.qty--; if(item.qty<=0) cart=cart.filter(i=>i._id!==id); saveCart(); }
+
+const item=cart.find(i=>i._id===id)
+
+if(!item) return
+
+item.qty--
+
+if(item.qty<=0){
+
+cart=cart.filter(i=>i._id!==id)
+
 }
-function saveCart(){ localStorage.setItem("cart",JSON.stringify(cart)); renderCart(); }
 
-/* NAVIGATION */
-function goHome(){ window.location.href="index.html"; }
-function goCheckout(){ window.location.href="checkout.html"; }
+saveCart()
 
-/* INIT */
-renderCart();
+}
+
+
+/* =========================
+SAVE CART
+========================= */
+
+function saveCart(){
+
+localStorage.setItem("cart",JSON.stringify(cart))
+
+renderCart()
+
+}
+
+
+/* =========================
+NAVIGATION
+========================= */
+
+function goHome(){
+
+window.location.href="index.html"
+
+}
+
+function goCheckout(){
+
+window.location.href="checkout.html"
+
+}
+
+
+/* =========================
+INIT
+========================= */
+
+renderCart()
+
 </script>
-
 </body>
 </html>
