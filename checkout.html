@@ -31,6 +31,7 @@ body.dark{
 }
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:"Poppins",system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.5;min-height:100vh;}
+
 /* =========================
 HEADER
 ========================= */
@@ -72,9 +73,6 @@ body.dark .cart-item{border-bottom:1px solid rgba(255,255,255,0.06);}
 /* =========================
 PAY BUTTON & CARD
 ========================= */
-.pay-card{display:flex;justify-content:center;padding:16px;border-radius:16px;background:var(--card);border:1px solid var(--border);backdrop-filter:blur(14px);box-shadow:var(--shadow);margin-top:20px;}
-.pay-btn{width:260px;padding:14px;border:none;border-radius:14px;background:var(--accent);color:#fff;font-weight:600;font-size:15px;cursor:pointer;transition:.25s;box-shadow:0 6px 16px rgba(230,165,32,0.35);}
-.pay-btn:hover{background:var(--softGold);color:#000;transform:translateY(-2px);}
 .loader{text-align:center;margin-top:20px;font-size:14px;color:var(--accent);display:none;}
 
 /* =========================
@@ -88,6 +86,8 @@ MOBILE STICKY PAY BAR
   .sticky-paybar .total{font-weight:700;font-size:16px;color:var(--accent);}
   .sticky-paybar .pay-btn{width:140px;padding:10px;}
 }
+.pay-btn{border:none;border-radius:14px;background:var(--accent);color:#fff;font-weight:600;font-size:15px;cursor:pointer;transition:.25s;box-shadow:0 6px 16px rgba(230,165,32,0.35);}
+.pay-btn:hover{background:var(--softGold);color:#000;transform:translateY(-2px);}
 </style>
 </head>
 <body>
@@ -99,7 +99,10 @@ MOBILE STICKY PAY BAR
     <div class="logo">Subuluke</div>
   </div>
   <div class="header-right">
-    <button class="icon" onclick="toggleTheme()"><i class="fas fa-moon"></i></button>
+    <button class="icon" onclick="toggleTheme()">
+      <i class="fas fa-moon" id="moonIcon"></i>
+      <i class="fas fa-sun" id="sunIcon" style="display:none"></i>
+    </button>
   </div>
 </header>
 
@@ -145,11 +148,6 @@ MOBILE STICKY PAY BAR
     </div>
   </div>
 
-  <!-- PAY BUTTON CARD -->
-  <div class="pay-card">
-    <button class="pay-btn" onclick="pay()">Proceed to Payment</button>
-  </div>
-
   <div class="loader" id="loader">Checking payment...</div>
 
 </div>
@@ -157,23 +155,21 @@ MOBILE STICKY PAY BAR
 <!-- MOBILE STICKY PAY BAR -->
 <div class="sticky-paybar">
   <div class="total">₦<span id="totalMobile">0</span></div>
-  <button class="pay-btn" onclick="pay()">Pay</button>
+  <button class="pay-btn" onclick="pay()">Proceed to Payment</button>
 </div>
 
 <script>
-
 /* ========================= THEME ========================= */
 function toggleTheme(){
   document.body.classList.toggle("dark")
-  const isDark = document.body.classList.contains("dark")
-  localStorage.setItem("theme", isDark ? "dark" : "light")
+  localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light")
   updateThemeIcon()
 }
 
 function updateThemeIcon(){
   const moon = document.getElementById("moonIcon")
   const sun = document.getElementById("sunIcon")
-
+  if(!moon || !sun) return
   if(document.body.classList.contains("dark")){
     moon.style.display = "none"
     sun.style.display = "block"
@@ -188,69 +184,44 @@ if(localStorage.getItem("theme") === "dark"){
 }
 updateThemeIcon()
 
-// ===== PRICE FORMAT ====
-function formatPrice(amount){
-  return Number(amount).toLocaleString("en-NG")
-}
-
-
 /* ========================= CART ========================= */
 let cart = JSON.parse(localStorage.getItem("cart")) || []
 
-let subtotal = cart.reduce((sum,i)=>sum + i.price * i.qty,0)
-//let delivery = 1500
-//let total = subtotal + delivery
-let total = subtotal
-
-document.getElementById("subtotal").innerText = `₦${formatPrice(subtotal)}`
-document.getElementById("total").innerText = `₦${formatPrice(total)}`
-
-/* ========================= RENDER CART ========================= */
 function renderCart() {
   const container = document.getElementById("cartItems")
   if (!container) return
 
   container.innerHTML = ""
-
   let subtotal = 0
 
   cart.forEach(item => {
     subtotal += item.price * item.qty
-
     const div = document.createElement("div")
     div.className = "cart-item"
-
     div.innerHTML = `
       <img src="${item.image}" alt="${item.name}">
       <div class="cart-details">
         <p>${item.name}</p>
         <small>Qty: ${item.qty}</small>
       </div>
-      <div class="cart-price">₦${formatPrice(item.price * item.qty)}</div>
+      <div class="cart-price">₦${Number(item.price * item.qty).toLocaleString("en-NG")}</div>
     `
     container.appendChild(div)
   })
 
-  const total = subtotal // Add delivery if needed: subtotal + 1500
+  const total = subtotal + 1500 // delivery fee
+  document.getElementById("subtotal").innerText = subtotal.toLocaleString("en-NG")
+  document.getElementById("total").innerText = total.toLocaleString("en-NG")
 
-  // Update summary totals
-  document.getElementById("subtotal").innerText = formatPrice(subtotal)
-  document.getElementById("total").innerText = formatPrice(total)
-
-  // Update mobile sticky total
   const mobileTotal = document.getElementById("totalMobile")
-  if (mobileTotal) mobileTotal.innerText = formatPrice(total)
+  if(mobileTotal) mobileTotal.innerText = total.toLocaleString("en-NG")
 }
-
 
 /* ========================= TOGGLE SUMMARY ========================= */
 function toggleSummary(){
-
   const content = document.getElementById("summaryContent")
   const icon = document.getElementById("toggleIcon")
-
   if(!content) return
-
   if(content.style.display === "none" || content.style.display === ""){
     content.style.display = "block"
     icon.innerText = "▲"
@@ -262,7 +233,6 @@ function toggleSummary(){
 
 /* ========================= PAYMENT ========================= */
 async function pay(){
-
   const name = document.getElementById("name").value
   const email = document.getElementById("email").value
   const phone = document.getElementById("phone").value
@@ -281,112 +251,29 @@ async function pay(){
   document.getElementById("loader").style.display = "block"
 
   try{
+    const subtotal = cart.reduce((sum,i)=>sum + i.price * i.qty,0)
+    const total = subtotal + 1500
 
     const res = await fetch("https://subuluke.onrender.com/api/paystack/initialize",{
       method:"POST",
-      headers:{
-        "Content-Type":"application/json"
-      },
+      headers:{"Content-Type":"application/json"},
       body: JSON.stringify({
         email,
-        amount: total * 100,
-        metadata:{
-          name,
-          email,
-          phone,
-          address,
-          items: cart
-        }
+        amount: total*100,
+        metadata:{name,email,phone,address,items:cart}
       })
     })
 
     const data = await res.json()
-
     if(data.authorization_url){
       window.location.href = data.authorization_url
     }else{
       alert("Payment initialization failed")
     }
-
   }catch(err){
     console.error(err)
     alert("Something went wrong")
   }
-}
-
-/* ========================= VERIFY ========================= */
-async function verifyPayment(reference){
-
-  document.getElementById("loader").style.display = "block"
-
-  try{
-    const res = await fetch(`https://subuluke.onrender.com/api/paystack/verify/${reference}`)
-    const data = await res.json()
-
-    if(data.status === "success"){
-
-      // ✅ CLEAR CART
-      localStorage.removeItem("cart")
-
-      // 🔥 REDIRECT WITH ORDER ID (IMPORTANT)
-      window.location.href = `success.html?orderId=${data.orderId}`
-
-    }else{
-      showError("Payment was not successful. Please try again.")
-    }
-
-  }catch(err){
-    console.error(err)
-    showError("Could not verify payment. Try again.")
-  }
-}
-
-/* ========================= HANDLE REDIRECT ========================= */
-function checkPaymentStatus(){
-
-  const params = new URLSearchParams(window.location.search)
-
-  const reference = params.get("reference") || params.get("trxref")
-  const status = params.get("status")
-
-  if(reference){
-    if(status === "failed"){
-      showError("Transaction failed or was cancelled.")
-      return
-    }
-
-    verifyPayment(reference)
-  }
-}
-
-/* ========================= ERROR UI ========================= */
-function showError(message){
-
-  document.getElementById("loader").style.display = "none"
-
-  let errorBox = document.getElementById("errorBox")
-
-  if(!errorBox){
-    errorBox = document.createElement("div")
-    errorBox.id = "errorBox"
-    errorBox.style.marginTop = "15px"
-    errorBox.style.padding = "12px"
-    errorBox.style.borderRadius = "8px"
-    errorBox.style.background = "#ffdddd"
-    errorBox.style.color = "#900"
-    errorBox.style.fontWeight = "500"
-
-    document.querySelector(".checkout").appendChild(errorBox)
-  }
-
-  errorBox.innerText = message
-}
-
-
-/* ========================= INIT ========================= */
-window.onload = () => {
-  checkPaymentStatus()
-  renderCart()
 }
 
 /* ========================= NAV ========================= */
@@ -394,6 +281,10 @@ function goBack(){
   window.location.href = "cart.html"
 }
 
+/* ========================= INIT ========================= */
+window.onload = () => {
+  renderCart()
+}
 </script>
 </body>
 </html>
