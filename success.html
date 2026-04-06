@@ -284,7 +284,44 @@ background:#332701;
 color:#FFD77A;
 }
 
+/* =========================
+MODAL
+========================= */
+
+.modal{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.45);
+display:none;
+align-items:center;
+justify-content:center;
+z-index:2000;
+}
+
+.modal-content{
+background:var(--card);
+backdrop-filter:blur(10px);
+padding:25px;
+border-radius:12px;
+max-width:320px;
+text-align:center;
+box-shadow:var(--shadow);
+}
+
+.modal-content button{
+margin-top:15px;
+padding:10px 20px;
+border:none;
+border-radius:8px;
+background:var(--accent);
+color:white;
+cursor:pointer;
+}
 </style>
+
 </head>
 
 <body>
@@ -372,6 +409,12 @@ Back to Home
 
 </div>
 
+<div id="modal" class="modal">
+  <div class="modal-content">
+    <p id="modalText"></p>
+    <button onclick="closeModal()">OK</button>
+  </div>
+</div>
 
 <script>
 
@@ -431,7 +474,7 @@ async function fetchOrder(){
 const orderId=getOrderId()
 
 if(!orderId){
-alert("Invalid order")
+showModal("Invalid order")
 window.location.href="index.html"
 return
 }
@@ -452,7 +495,7 @@ localStorage.removeItem("cart")
 
 console.error(err)
 
-alert("Error loading order")
+showModal("Error loading order")
 
 window.location.href="index.html"
 
@@ -525,7 +568,15 @@ let msg=`🛒 *NEW ORDER — SUBULUKE*\n\n`
 msg+=`Order ID: ${order.orderId}\n\n`
 
 order.items.forEach(i=>{
+
 msg+=`${i.qty}x ${i.name} — ₦${formatPrice(i.price*i.qty)}\n`
+
+if(i.image){
+msg+=`Image: ${i.image}\n`
+}
+
+msg+=`\n`
+
 })
 
 msg+=`\nTotal: ₦${formatPrice(order.amount)}\n\n`
@@ -546,22 +597,23 @@ document.getElementById("whatsappStatus").innerText="✓ Order sent to admin"
 
 }
 
+/* ========== SHOW MODAL ===========*/
+function showModal(message){
 
-/* ================= NAV ================= */
+const modal = document.getElementById("modal")
+const text = document.getElementById("modalText")
 
-function goHome(){
+text.innerText = message
 
-if(localStorage.getItem("whatsapp_sent")!=="true"){
-alert("Please send order to WhatsApp first")
-return
-}
-
-localStorage.removeItem("whatsapp_sent")
-
-window.location.href="index.html"
+modal.style.display = "flex"
 
 }
 
+function closeModal(){
+
+document.getElementById("modal").style.display = "none"
+
+}
 
 /* ================= INIT ================= */
 
