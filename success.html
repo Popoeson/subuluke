@@ -13,13 +13,12 @@
 /* =========================
 THEME
 ========================= */
-
 :root{
 --bg:#FFF8E7;
 --text:#333;
 --accent:#E6A520;
 --softGold:#FFD77A;
---card:rgba(255,255,255,0.35);
+--card:rgba(255,255,255,0.45);
 --border:rgba(255,255,255,0.35);
 --shadow:0 10px 30px rgba(0,0,0,0.15);
 --muted:#777;
@@ -28,9 +27,9 @@ THEME
 body.dark{
 --bg:#0F0F0F;
 --text:#F5F5F5;
---card:rgba(20,20,20,0.65);
---border:rgba(255,255,255,0.1);
---shadow:0 10px 30px rgba(0,0,0,0.45);
+--card:rgba(20,20,20,0.7);
+--border:rgba(255,255,255,0.08);
+--shadow:0 10px 30px rgba(0,0,0,0.5);
 --muted:#aaa;
 }
 
@@ -49,7 +48,6 @@ font-family:"Poppins",system-ui,sans-serif;
 background:var(--bg);
 color:var(--text);
 line-height:1.5;
-min-height:100vh;
 }
 
 /* =========================
@@ -87,29 +85,10 @@ justify-content:space-between;
 align-items:center;
 }
 
-/* =========================
-LOGO
-========================= */
-
 .logo{
 font-weight:700;
 font-size:20px;
 letter-spacing:1px;
-color:var(--text);
-}
-
-body.dark .logo{
-color:var(--softGold);
-}
-
-/* =========================
-HEADER ICONS
-========================= */
-
-.header-icons{
-display:flex;
-gap:18px;
-align-items:center;
 }
 
 .icon{
@@ -118,15 +97,6 @@ border:none;
 font-size:18px;
 cursor:pointer;
 color:var(--text);
-transition:.25s;
-}
-
-.icon:hover{
-transform:scale(1.12);
-}
-
-body.dark .icon{
-color:var(--softGold);
 }
 
 /* =========================
@@ -134,7 +104,7 @@ CONTAINER
 ========================= */
 
 .container{
-max-width:720px;
+max-width:700px;
 margin:auto;
 padding:30px 20px;
 }
@@ -145,7 +115,7 @@ SUCCESS HERO
 
 .success-hero{
 text-align:center;
-margin-top:20px;
+margin-bottom:20px;
 }
 
 .success-circle{
@@ -156,25 +126,40 @@ background:#25D366;
 display:flex;
 align-items:center;
 justify-content:center;
-font-size:42px;
+font-size:40px;
 color:white;
 margin:auto;
-box-shadow:0 10px 40px rgba(37,211,102,0.5);
-animation:pop .4s ease;
+box-shadow:0 10px 40px rgba(37,211,102,0.4);
+animation:pop .5s ease;
 }
 
 @keyframes pop{
-0%{transform:scale(.6);opacity:0}
+0%{transform:scale(.5);opacity:0}
 100%{transform:scale(1);opacity:1}
 }
 
 .order-id{
-margin-top:12px;
+margin-top:10px;
 font-weight:600;
 background:var(--card);
+display:inline-block;
 padding:8px 14px;
 border-radius:8px;
-display:inline-block;
+}
+
+/* =========================
+STATUS
+========================= */
+
+.status{
+margin-top:15px;
+font-size:14px;
+color:var(--muted);
+}
+
+.status span{
+display:block;
+margin-top:4px;
 }
 
 /* =========================
@@ -183,7 +168,7 @@ CARD
 
 .card{
 background:var(--card);
-backdrop-filter:blur(14px);
+backdrop-filter:blur(12px);
 border-radius:16px;
 padding:20px;
 margin-top:20px;
@@ -232,14 +217,25 @@ font-weight:700;
 }
 
 /* =========================
-TOTAL
+PRICE SUMMARY
 ========================= */
 
-.total-box{
-margin-top:10px;
-font-size:18px;
+.summary{
+margin-top:12px;
+font-size:14px;
+}
+
+.summary-row{
+display:flex;
+justify-content:space-between;
+margin-top:6px;
+}
+
+.summary-total{
 font-weight:700;
+font-size:18px;
 color:var(--accent);
+margin-top:8px;
 }
 
 /* =========================
@@ -254,11 +250,6 @@ border-radius:12px;
 margin-top:12px;
 font-weight:600;
 cursor:pointer;
-transition:.25s;
-}
-
-.btn:hover{
-transform:translateY(-2px);
 }
 
 .whatsapp{
@@ -270,6 +261,15 @@ color:white;
 background:var(--accent);
 color:white;
 }
+
+.btn:disabled{
+opacity:.6;
+cursor:not-allowed;
+}
+
+/* =========================
+WARNING
+========================= */
 
 .warning{
 margin-top:15px;
@@ -290,16 +290,9 @@ color:#FFD77A;
 <body>
 
 <header class="header">
-
 <div class="header-inner">
 
-<button onclick="goHome()" class="icon">
-<i class="fas fa-arrow-left"></i>
-</button>
-
 <div class="logo">Subuluke</div>
-
-<div class="header-icons">
 
 <button class="icon" onclick="toggleTheme()">
 <i class="fas fa-moon" id="moonIcon"></i>
@@ -307,10 +300,8 @@ color:#FFD77A;
 </button>
 
 </div>
-
-</div>
-
 </header>
+
 
 <div class="container">
 
@@ -320,12 +311,19 @@ color:#FFD77A;
 <i class="fas fa-check"></i>
 </div>
 
-<h1>Order Confirmed</h1>
+<h1>Payment Successful</h1>
+
 <p>Thank you for your patronage 🙏</p>
 
 <div id="orderId" class="order-id"></div>
 
+<div class="status">
+<span>✓ Payment confirmed</span>
+<span id="whatsappStatus">⚠ Awaiting WhatsApp confirmation</span>
 </div>
+
+</div>
+
 
 <div class="card">
 
@@ -333,7 +331,24 @@ color:#FFD77A;
 
 <div id="items"></div>
 
-<div id="total" class="total-box"></div>
+<div class="summary">
+
+<div class="summary-row">
+<span>Subtotal</span>
+<span id="subtotal"></span>
+</div>
+
+<div class="summary-row">
+<span>Delivery</span>
+<span>₦1,500</span>
+</div>
+
+<div class="summary-row summary-total">
+<span>Total</span>
+<span id="total"></span>
+</div>
+
+</div>
 
 <hr style="margin:16px 0">
 
@@ -344,10 +359,10 @@ color:#FFD77A;
 </div>
 
 <div class="warning">
-⚠️ Please send your order to WhatsApp to ensure it is processed.
+⚠ Please send your order to WhatsApp so it can be processed.
 </div>
 
-<button class="btn whatsapp" onclick="sendWhatsApp()">
+<button id="whatsappBtn" class="btn whatsapp" onclick="sendWhatsApp()">
 <i class="fab fa-whatsapp"></i> Send Order to WhatsApp
 </button>
 
@@ -357,7 +372,10 @@ Back to Home
 
 </div>
 
+
 <script>
+
+/* ================= THEME ================= */
 
 function toggleTheme(){
 document.body.classList.toggle("dark")
@@ -374,7 +392,7 @@ function updateThemeIcon(){
 const moon=document.getElementById("moonIcon")
 const sun=document.getElementById("sunIcon")
 
-if(!moon || !sun) return
+if(!moon||!sun)return
 
 if(document.body.classList.contains("dark")){
 moon.style.display="none"
@@ -383,6 +401,7 @@ sun.style.display="inline-block"
 moon.style.display="inline-block"
 sun.style.display="none"
 }
+
 }
 
 if(localStorage.getItem("theme")==="dark"){
@@ -391,12 +410,21 @@ document.body.classList.add("dark")
 
 updateThemeIcon()
 
+
+/* ================= GLOBAL ORDER ================= */
+
 let order=null
+
+
+/* ================= GET ORDER ID ================= */
 
 function getOrderId(){
 const params=new URLSearchParams(window.location.search)
 return params.get("orderId")
 }
+
+
+/* ================= FETCH ORDER ================= */
 
 async function fetchOrder(){
 
@@ -422,6 +450,8 @@ localStorage.removeItem("cart")
 
 }catch(err){
 
+console.error(err)
+
 alert("Error loading order")
 
 window.location.href="index.html"
@@ -430,19 +460,27 @@ window.location.href="index.html"
 
 }
 
+
+/* ================= PRICE FORMAT ================= */
+
 function formatPrice(amount){
 return Number(amount).toLocaleString("en-NG")
 }
+
+
+/* ================= RENDER ORDER ================= */
 
 function renderOrder(){
 
 document.getElementById("orderId").innerText="Order ID: "+order.orderId
 
 let html=""
+let subtotal=0
 
 order.items.forEach(item=>{
 
-const subtotal=item.price*item.qty
+const total=item.price*item.qty
+subtotal+=total
 
 html+=`
 <div class="order-item">
@@ -456,7 +494,7 @@ Qty: ${item.qty} • ₦${formatPrice(item.price)}
 </div>
 
 <div class="item-total">
-₦${formatPrice(subtotal)}
+₦${formatPrice(total)}
 </div>
 </div>
 `
@@ -465,7 +503,9 @@ Qty: ${item.qty} • ₦${formatPrice(item.price)}
 
 document.getElementById("items").innerHTML=html
 
-document.getElementById("total").innerText="Total: ₦"+formatPrice(order.amount)
+document.getElementById("subtotal").innerText="₦"+formatPrice(subtotal)
+
+document.getElementById("total").innerText="₦"+formatPrice(order.amount)
 
 document.getElementById("delivery").innerHTML=`
 Name: ${order.customer.name}<br>
@@ -474,6 +514,9 @@ Address: ${order.customer.address}
 `
 
 }
+
+
+/* ================= WHATSAPP ================= */
 
 function sendWhatsApp(){
 
@@ -495,7 +538,16 @@ window.open(url,"_blank")
 
 localStorage.setItem("whatsapp_sent","true")
 
+document.getElementById("whatsappBtn").innerHTML="✓ Order Sent to WhatsApp"
+
+document.getElementById("whatsappBtn").disabled=true
+
+document.getElementById("whatsappStatus").innerText="✓ Order sent to admin"
+
 }
+
+
+/* ================= NAV ================= */
 
 function goHome(){
 
@@ -509,6 +561,9 @@ localStorage.removeItem("whatsapp_sent")
 window.location.href="index.html"
 
 }
+
+
+/* ================= INIT ================= */
 
 window.onload=fetchOrder
 
