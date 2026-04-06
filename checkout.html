@@ -5,12 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Checkout - Subuluke</title>
 <script src="https://js.paystack.co/v1/inline.js"></script>
-<!-- Font Awesome -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
-/* =========================
-THEME & BASE
-========================= */
 :root{
   --bg:#FFF8E7;
   --text:#333;
@@ -31,11 +27,7 @@ body.dark{
 }
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:"Poppins",system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.5;min-height:100vh;}
-
-/* =========================
-HEADER
-========================= */
-.header{position:sticky;top:0;width:100%;z-index:1000;background:rgba(255,255,255,0.12);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,255,255,0.2);padding:10px 20px;display:flex;justify-content:space-between;align-items:center;}
+.header{position:sticky;top:0;width:100%;z-index:1000;background:rgba(255,255,255,0.12);backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,255,255,0.2);padding:10px 20px;display:flex;justify-content:space-between;align-items:center;}
 body.dark .header{background:rgba(20,20,20,0.7);border-bottom:1px solid rgba(255,255,255,0.06);}
 .header-left{display:flex;align-items:center;gap:12px;}
 .header-right{display:flex;align-items:center;}
@@ -44,20 +36,12 @@ body.dark .logo{color:var(--softGold);}
 .icon,.back-btn{background:none;border:none;font-size:18px;cursor:pointer;color:var(--text);transition:.25s;}
 .icon:hover{transform:scale(1.12);}
 body.dark .icon,.back-btn{color:var(--softGold);}
-
-/* =========================
-PAGE & FORM
-========================= */
 .checkout{max-width:720px;margin:auto;padding:30px 20px;}
 .form{display:flex;flex-direction:column;gap:12px;background:var(--card);padding:20px;border-radius:16px;border:1px solid var(--border);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:var(--shadow);}
 .form label{font-size:14px;font-weight:500;margin-bottom:4px;}
 .form input{padding:12px 14px;border-radius:10px;border:1px solid var(--border);background:rgba(255,255,255,0.4);font-size:14px;color:var(--text);outline:none;transition:.25s;}
 body.dark .form input{background:rgba(20,20,20,0.5);}
 .form input:focus{border:1px solid var(--accent);box-shadow:0 0 0 2px rgba(230,165,32,0.15);}
-
-/* =========================
-SUMMARY CARD
-========================= */
 .summary{margin-top:22px;background:var(--card);padding:20px;border-radius:16px;border:1px solid var(--border);backdrop-filter:blur(14px);box-shadow:var(--shadow);}
 .summary-header{display:flex;justify-content:space-between;align-items:center;cursor:pointer;font-weight:600;margin-bottom:12px;font-size:15px;}
 .summary-content{display:none;}
@@ -69,15 +53,7 @@ body.dark .cart-item{border-bottom:1px solid rgba(255,255,255,0.06);}
 .cart-details{flex:1;}
 .cart-details p{font-size:14px;}
 .cart-price{font-weight:600;font-size:14px;color:var(--accent);}
-
-/* =========================
-PAY BUTTON & CARD
-========================= */
 .loader{text-align:center;margin-top:20px;font-size:14px;color:var(--accent);display:none;}
-
-/* =========================
-MOBILE STICKY PAY BAR
-========================= */
 @media(max-width:768px){
   .checkout{padding:20px 16px;}
   .logo{font-size:18px;}
@@ -86,45 +62,33 @@ MOBILE STICKY PAY BAR
   .sticky-paybar .total{font-weight:700;font-size:16px;color:var(--accent);}
   .sticky-paybar .pay-btn{width:140px;padding:10px;}
 }
-.pay-btn{border:none;border-radius:14px;background:var(--accent);color:#fff;font-weight:600;font-size:15px;cursor:pointer;transition:.25s;box-shadow:0 6px 16px rgba(230,165,32,0.35);}
-.pay-btn:hover{background:var(--softGold);color:#000;transform:translateY(-2px);}
+.pay-card{display:none;} /* Removed top page pay button */
 </style>
 </head>
 <body>
 
-<!-- HEADER -->
 <header class="header">
   <div class="header-left">
     <button onclick="goBack()" class="back-btn"><i class="fas fa-arrow-left"></i></button>
     <div class="logo">Subuluke</div>
   </div>
   <div class="header-right">
-    <button class="icon" onclick="toggleTheme()">
-      <i class="fas fa-moon" id="moonIcon"></i>
-      <i class="fas fa-sun" id="sunIcon" style="display:none"></i>
-    </button>
+    <button class="icon" onclick="toggleTheme()"><i class="fas fa-moon" id="moonIcon"></i><i class="fas fa-sun" id="sunIcon" style="display:none"></i></button>
   </div>
 </header>
 
-<!-- PAGE -->
 <div class="checkout">
-
-  <!-- FORM -->
   <div class="form">
     <label for="name">Full Name</label>
     <input id="name" placeholder="Enter your full name">
-
     <label for="email">Email</label>
     <input id="email" placeholder="Enter your email">
-
     <label for="phone">Phone Number</label>
     <input id="phone" placeholder="Enter your phone number">
-
     <label for="address">Delivery Address</label>
     <input id="address" placeholder="Enter your delivery address">
   </div>
 
-  <!-- SUMMARY -->
   <div class="summary">
     <div class="summary-header" onclick="toggleSummary()">
       <span>Order Summary</span>
@@ -133,28 +97,17 @@ MOBILE STICKY PAY BAR
     <div id="summaryContent" class="summary-content">
       <div id="cartItems"></div>
       <hr style="margin:12px 0; opacity:0.2">
-      <div class="row">
-        <span>Subtotal</span>
-        <span>₦<span id="subtotal">0</span></span>
-      </div>
-      <div class="row">
-        <span>Delivery</span>
-        <span>₦1500</span>
-      </div>
-      <div class="row total">
-        <span>Total</span>
-        <span>₦<span id="total">0</span></span>
-      </div>
+      <div class="row"><span>Subtotal</span><span>₦<span id="subtotal">0</span></span></div>
+      <div class="row"><span>Delivery</span><span>₦1500</span></div>
+      <div class="row total"><span>Total</span><span>₦<span id="total">0</span></span></div>
     </div>
   </div>
 
   <div class="loader" id="loader">Checking payment...</div>
-
 </div>
 
-<!-- MOBILE STICKY PAY BAR -->
 <div class="sticky-paybar">
-  <div class="total">Total: ₦<span id="totalMobile">0</span></div>
+  <div class="total">₦<span id="totalMobile">0</span></div>
   <button class="pay-btn" onclick="pay()">Proceed to Payment</button>
 </div>
 
@@ -165,7 +118,6 @@ function toggleTheme(){
   localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light")
   updateThemeIcon()
 }
-
 function updateThemeIcon(){
   const moon = document.getElementById("moonIcon")
   const sun = document.getElementById("sunIcon")
@@ -178,57 +130,36 @@ function updateThemeIcon(){
     sun.style.display = "none"
   }
 }
-
-if(localStorage.getItem("theme") === "dark"){
-  document.body.classList.add("dark")
-}
+if(localStorage.getItem("theme")==="dark") document.body.classList.add("dark")
 updateThemeIcon()
 
 /* ========================= CART ========================= */
 let cart = JSON.parse(localStorage.getItem("cart")) || []
-
-function renderCart() {
+function renderCart(){
   const container = document.getElementById("cartItems")
-  if (!container) return
-
-  container.innerHTML = ""
+  if(!container) return
+  container.innerHTML=""
   let subtotal = 0
-
-  cart.forEach(item => {
+  cart.forEach(item=>{
     subtotal += item.price * item.qty
     const div = document.createElement("div")
     div.className = "cart-item"
-    div.innerHTML = `
-      <img src="${item.image}" alt="${item.name}">
-      <div class="cart-details">
-        <p>${item.name}</p>
-        <small>Qty: ${item.qty}</small>
-      </div>
-      <div class="cart-price">₦${Number(item.price * item.qty).toLocaleString("en-NG")}</div>
-    `
+    div.innerHTML = `<img src="${item.image}" alt="${item.name}"><div class="cart-details"><p>${item.name}</p><small>Qty: ${item.qty}</small></div><div class="cart-price">₦${Number(item.price*item.qty).toLocaleString("en-NG")}</div>`
     container.appendChild(div)
   })
-
-  const total = subtotal + 1500 // delivery fee
-  document.getElementById("subtotal").innerText = subtotal.toLocaleString("en-NG")
-  document.getElementById("total").innerText = total.toLocaleString("en-NG")
-
-  const mobileTotal = document.getElementById("totalMobile")
-  if(mobileTotal) mobileTotal.innerText = total.toLocaleString("en-NG")
+  const total = subtotal+1500
+  document.getElementById("subtotal").innerText=subtotal.toLocaleString("en-NG")
+  document.getElementById("total").innerText=total.toLocaleString("en-NG")
+  const mobileTotal=document.getElementById("totalMobile")
+  if(mobileTotal) mobileTotal.innerText=total.toLocaleString("en-NG")
 }
 
 /* ========================= TOGGLE SUMMARY ========================= */
 function toggleSummary(){
-  const content = document.getElementById("summaryContent")
-  const icon = document.getElementById("toggleIcon")
+  const content=document.getElementById("summaryContent")
+  const icon=document.getElementById("toggleIcon")
   if(!content) return
-  if(content.style.display === "none" || content.style.display === ""){
-    content.style.display = "block"
-    icon.innerText = "▲"
-  }else{
-    content.style.display = "none"
-    icon.innerText = "▼"
-  }
+  if(content.style.display==="" || content.style.display==="none"){content.style.display="block"; icon.innerText="▲"}else{content.style.display="none"; icon.innerText="▼"}
 }
 
 /* ========================= PAYMENT ========================= */
@@ -237,54 +168,52 @@ async function pay(){
   const email = document.getElementById("email").value
   const phone = document.getElementById("phone").value
   const address = document.getElementById("address").value
-
-  if(!name || !email || !phone || !address){
-    alert("Please fill all fields")
-    return
-  }
-
-  if(cart.length === 0){
-    alert("Cart is empty")
-    return
-  }
-
-  document.getElementById("loader").style.display = "block"
-
+  if(!name||!email||!phone||!address){alert("Please fill all fields");return}
+  if(cart.length===0){alert("Cart is empty");return}
+  document.getElementById("loader").style.display="block"
   try{
-    const subtotal = cart.reduce((sum,i)=>sum + i.price * i.qty,0)
-    const total = subtotal + 1500
-
-    const res = await fetch("https://subuluke.onrender.com/api/paystack/initialize",{
+    const subtotal=cart.reduce((sum,i)=>sum+i.price*i.qty,0)
+    const total=subtotal+1500
+    const res=await fetch("https://subuluke.onrender.com/api/paystack/initialize",{
       method:"POST",
       headers:{"Content-Type":"application/json"},
-      body: JSON.stringify({
-        email,
-        amount: total*100,
-        metadata:{name,email,phone,address,items:cart}
-      })
+      body:JSON.stringify({email,amount:total*100,metadata:{name,email,phone,address,items:cart}})
     })
-
-    const data = await res.json()
+    const data=await res.json()
     if(data.authorization_url){
+      // redirect to Paystack
       window.location.href = data.authorization_url
     }else{
       alert("Payment initialization failed")
     }
-  }catch(err){
-    console.error(err)
-    alert("Something went wrong")
+  }catch(err){console.error(err);alert("Something went wrong")}
+}
+
+/* ========================= HANDLE REDIRECT ========================= */
+async function checkPaymentStatus(){
+  const params = new URLSearchParams(window.location.search)
+  const reference = params.get("reference") || params.get("trxref")
+  const status = params.get("status")
+  if(reference){
+    if(status==="failed"){alert("Transaction failed or was cancelled."); return}
+    try{
+      const res = await fetch(`https://subuluke.onrender.com/api/paystack/verify/${reference}`)
+      const data = await res.json()
+      if(data.status==="success"){
+        localStorage.removeItem("cart")
+        window.location.href="success.html"
+      }else{
+        alert(data.message || "Payment verification failed")
+      }
+    }catch(err){console.error(err); alert("Error verifying payment")}
   }
 }
 
 /* ========================= NAV ========================= */
-function goBack(){
-  window.location.href = "cart.html"
-}
+function goBack(){window.location.href="cart.html"}
 
 /* ========================= INIT ========================= */
-window.onload = () => {
-  renderCart()
-}
+window.onload=()=>{renderCart(); checkPaymentStatus()}
 </script>
 </body>
 </html>
