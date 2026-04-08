@@ -545,6 +545,30 @@ app.post("/api/paystack/initialize", paymentLimiter, async (req, res) => {
   }
 });
 
+/* ======= CALCULATE PRODUCT AMOUNT =======*/
+app.post("/api/cart/calc", async (req, res) => {
+  try {
+    const { items } = req.body;
+    if (!items || !items.length) return res.json({ subtotal: 0, total: 0 });
+
+    const productIds = items.map(i => i.productId);
+    const products = await Product.find({ _id: { $in: productIds } });
+
+    let subtotal = 0;
+    for (const item of items) {
+      const product = products.find(p => p._id.toString() === item.productId);
+      if (product) subtotal += product.price * item.qty;
+    }
+    const deliveryFee = 1500;
+    const total = subtotal + deliveryFee;
+
+    res.json({ subtotal, total });
+  } catch (err) {
+    console.error(err);
+    res.json({ subtotal: 0, total: 0 });
+  }
+});
+
 /* =====================
    VERIFY PAYMENT
 ===================== */
