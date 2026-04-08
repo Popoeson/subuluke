@@ -446,54 +446,37 @@ app.delete("/api/hero-images/:id",async(req,res)=>{
 ===================== */
 
 app.post("/api/paystack/initialize", paymentLimiter, async (req, res) => {
-
   try {
-
     const { email, items, customer } = req.body;
 
-    if (!email || !items || items.length === 0) {
+    if (!email || !items || !items.length) {
       return res.status(400).json({ error: "Email and cart items are required" });
     }
 
-    // =========================
-    // FETCH PRODUCTS FROM DB
-    // =========================
-
+    // Fetch products from DB
     const productIds = items.map(i => i.productId);
-
-    const products = await Product.find({
-      _id: { $in: productIds }
-    });
+    const products = await Product.find({ _id: { $in: productIds } });
 
     if (!products.length) {
       return res.status(400).json({ error: "Invalid products in cart" });
     }
 
-    // =========================
-    // CALCULATE TOTAL SECURELY
-    // =========================
-
+    // Calculate totals securely
     let subtotal = 0;
     const orderItems = [];
 
     for (const cartItem of items) {
-
-      const product = products.find(
-        p => p._id.toString() === cartItem.productId
-      );
-
+      const product = products.find(p => p._id.toString() === cartItem.productId);
       if (!product) {
         return res.status(400).json({ error: "Product not found" });
       }
 
       const qty = Number(cartItem.qty);
-
       if (!qty || qty <= 0 || qty > 20) {
         return res.status(400).json({ error: "Invalid quantity" });
       }
 
       const itemTotal = product.price * qty;
-
       subtotal += itemTotal;
 
       orderItems.push({
@@ -501,92 +484,66 @@ app.post("/api/paystack/initialize", paymentLimiter, async (req, res) => {
         name: product.name,
         image: product.mainImage,
         price: product.price,
-        qty
+        qty,
       });
-
     }
-
-    // =========================
-    // DELIVERY FEE
-    // =========================
 
     const deliveryFee = 1500;
     const total = subtotal + deliveryFee;
 
-    // =========================
-    // INITIALIZE PAYSTACK
-    // =========================
-
+    // Initialize Paystack transaction
     const response = await axios.post(
       "https://api.paystack.co/transaction/initialize",
       {
         email,
-        amount: total * 100,
+        amount: total * 100, // in kobo
         metadata: {
-          name: customer?.name,
-          phone: customer?.phone
+          customer,
+          items: orderItems,
         },
-        callback_url: "https://subuluke.vercel.app/checkout.html"
+        callback_url: "https://subuluke.vercel.app/checkout.html",
       },
       {
         headers: {
           Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
-          "Content-Type": "application/json"
-        }
+          "Content-Type": "application/json",
+        },
       }
     );
 
     const reference = response.data.data.reference;
 
-    // =========================
-    // CREATE PENDING ORDER
-    // =========================
-
+    // Save order as pending
     const newOrder = new Order({
-
       orderId: `ORD-${Date.now()}`,
       reference,
-
       customer: {
         name: customer?.name,
         email,
         phone: customer?.phone,
         address: customer?.address,
         nearestBustop: customer?.nearestBustop,
-        deliveryMode: customer?.deliveryMode
+        deliveryMode: customer?.deliveryMode,
       },
-
       items: orderItems,
       amount: total,
-      status: "pending"
-
+      status: "pending",
     });
 
     await newOrder.save();
 
-    // =========================
-    // RETURN PAYSTACK URL
-    // =========================
-
     res.json({
       authorization_url: response.data.data.authorization_url,
       reference,
-      publicKey: process.env.PAYSTACK_PUBLIC_KEY
+      publicKey: process.env.PAYSTACK_PUBLIC_KEY,
+      subtotal,
+      total,
     });
-
   } catch (error) {
-
-    console.error(
-      "Paystack Initialize Error:",
-      error.response?.data || error.message
-    );
-
+    console.error("Paystack Initialize Error:", error.response?.data || error.message);
     res.status(500).json({ error: "Payment initialization failed" });
-
   }
-
 });
-
 
 /* =====================
    VERIFY PAYMENT
