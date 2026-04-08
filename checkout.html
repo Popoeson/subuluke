@@ -273,152 +273,195 @@ Secure payment powered by Paystack
 
 <script>
 /* ========================= THEME ========================= */
-function toggleTheme(){
-  document.body.classList.toggle("dark")
-  localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light")
-  updateThemeIcon()
+function toggleTheme() {
+  document.body.classList.toggle("dark");
+  localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
+  updateThemeIcon();
 }
-function updateThemeIcon(){
-  const moon = document.getElementById("moonIcon")
-  const sun = document.getElementById("sunIcon")
-  if(!moon || !sun) return
-  if(document.body.classList.contains("dark")){
-    moon.style.display="none"
-    sun.style.display="block"
-  }else{
-    moon.style.display="block"
-    sun.style.display="none"
+function updateThemeIcon() {
+  const moon = document.getElementById("moonIcon");
+  const sun = document.getElementById("sunIcon");
+  if (!moon || !sun) return;
+  if (document.body.classList.contains("dark")) {
+    moon.style.display = "none";
+    sun.style.display = "block";
+  } else {
+    moon.style.display = "block";
+    sun.style.display = "none";
   }
 }
-if(localStorage.getItem("theme")==="dark") document.body.classList.add("dark")
-updateThemeIcon()
+if (localStorage.getItem("theme") === "dark") document.body.classList.add("dark");
+updateThemeIcon();
 
 /* ========================= CART ========================= */
-let cart = JSON.parse(localStorage.getItem("cart")) || []
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-function renderCart(){
-  const container = document.getElementById("cartItems")
-  if(!container) return
-  container.innerHTML=""
+async function renderCart() {
+  const container = document.getElementById("cartItems");
+  if (!container) return;
+  container.innerHTML = "";
 
-  cart.forEach(item=>{
-    const div = document.createElement("div")
-    div.className = "cart-item"
-    div.innerHTML = `<img src="${item.image}" alt="${item.name}"><div class="cart-details"><p>${item.name}</p><small>Qty: ${item.qty}</small></div><div class="cart-price">₦${Number(item.price*item.qty).toLocaleString("en-NG")}</div>`
-    container.appendChild(div)
-  })
+  if (!cart.length) {
+    container.innerHTML = "<p>Your cart is empty</p>";
+    document.getElementById("subtotal").innerText = "0";
+    document.getElementById("total").innerText = "0";
+    return;
+  }
+
+  // Fetch backend-calculated totals
+  let subtotal = 0;
+  let total = 0;
+
+  try {
+    const res = await fetch("https://subuluke.onrender.com/api/cart/calc", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ items: cart }),
+    });
+    const data = await res.json();
+    subtotal = data.subtotal || 0;
+    total = data.total || 0;
+  } catch (err) {
+    console.error("Cart calculation failed:", err);
+  }
+
+  cart.forEach(item => {
+    const div = document.createElement("div");
+    div.className = "cart-item";
+    div.innerHTML = `<img src="${item.image}" alt="${item.name}">
+      <div class="cart-details"><p>${item.name}</p><small>Qty: ${item.qty}</small></div>
+      <div class="cart-price">₦${(item.price * item.qty).toLocaleString("en-NG")}</div>`;
+    container.appendChild(div);
+  });
+
+  document.getElementById("subtotal").innerText = subtotal.toLocaleString("en-NG");
+  document.getElementById("total").innerText = total.toLocaleString("en-NG");
+  const mobileTotal = document.getElementById("totalMobile");
+  if (mobileTotal) mobileTotal.innerText = total.toLocaleString("en-NG");
 }
 
 /* ========================= TOGGLE SUMMARY ========================= */
-function toggleSummary(){
-  const content=document.getElementById("summaryContent")
-  const icon=document.getElementById("toggleIcon")
-  if(!content) return
-  if(content.style.display==="" || content.style.display==="none"){content.style.display="block"; icon.innerText="▲"}else{content.style.display="none"; icon.innerText="▼"}
+function toggleSummary() {
+  const content = document.getElementById("summaryContent");
+  const icon = document.getElementById("toggleIcon");
+  if (!content) return;
+  if (content.style.display === "" || content.style.display === "none") {
+    content.style.display = "block";
+    icon.innerText = "▲";
+  } else {
+    content.style.display = "none";
+    icon.innerText = "▼";
+  }
 }
 
 /* ========================= PAYMENT ========================= */
-let paymentProcessing = false
-let lastClickTime = 0
+let paymentProcessing = false;
+let lastClickTime = 0;
 
-async function pay(){
+async function pay() {
+  const now = Date.now();
+  if (now - lastClickTime < 2000) return; // 2-second frontend limit
+  lastClickTime = now;
 
-  const now = Date.now()
+  if (paymentProcessing) return;
+  paymentProcessing = true;
 
-  /* Frontend rate limit (2 seconds) */
-  if(now - lastClickTime < 2000) return
-  lastClickTime = now
+  const payBtn = document.getElementById("payBtn");
+  payBtn.innerText = "Processing...";
+  payBtn.classList.add("processing");
+  payBtn.disabled = true;
 
-  if(paymentProcessing) return
-  paymentProcessing = true
+  const name = document.getElementById("name").value;
+  const email = document.getElementById("email").value;
+  const phone = document.getElementById("phone").value;
+  const address = document.getElementById("address").value;
 
-  const payBtn = document.getElementById("payBtn")
-  payBtn.innerText = "Processing..."
-  payBtn.classList.add("processing")
-  payBtn.disabled = true
-
-  const name = document.getElementById("name").value
-  const email = document.getElementById("email").value
-  const phone = document.getElementById("phone").value
-  const address = document.getElementById("address").value
-
-  if(!name || !email || !phone || !address){
-    alert("Please fill all fields")
-    resetPayButton()
-    return
+  if (!name || !email || !phone || !address) {
+    alert("Please fill all fields");
+    resetPayButton();
+    return;
   }
 
-  if(cart.length === 0){
-    alert("Cart is empty")
-    resetPayButton()
-    return
+  if (cart.length === 0) {
+    alert("Cart is empty");
+    resetPayButton();
+    return;
   }
 
-  document.getElementById("loader").style.display = "block"
+  document.getElementById("loader").style.display = "block";
 
-  try{
-    /* Send items and customer info only. Backend calculates totals */
-    const res = await fetch("https://subuluke.onrender.com/api/paystack/initialize",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({
+  try {
+    const res = await fetch("https://subuluke.onrender.com/api/paystack/initialize", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
         email,
         customer: { name, email, phone, address },
-        items: cart
-      })
-    })
+        items: cart,
+      }),
+    });
 
-    const data = await res.json()
+    const data = await res.json();
 
-    if(data.authorization_url){
-      /* redirect to Paystack */
-      window.location.href = data.authorization_url
+    if (data.authorization_url) {
+      window.location.href = data.authorization_url;
     } else {
-      alert("Payment initialization failed")
-      resetPayButton()
+      alert(data.error || "Payment initialization failed");
+      resetPayButton();
     }
-
-  }catch(err){
-    console.error(err)
-    alert("Something went wrong")
-    resetPayButton()
+  } catch (err) {
+    console.error(err);
+    alert("Something went wrong");
+    resetPayButton();
   }
 }
 
 /* ========================= RESET BUTTON ========================= */
-function resetPayButton(){
-  const payBtn = document.getElementById("payBtn")
-  payBtn.innerText = "Proceed to Payment"
-  payBtn.classList.remove("processing")
-  payBtn.disabled = false
-  paymentProcessing = false
+function resetPayButton() {
+  const payBtn = document.getElementById("payBtn");
+  payBtn.innerText = "Proceed to Payment";
+  payBtn.classList.remove("processing");
+  payBtn.disabled = false;
+  paymentProcessing = false;
 }
 
 /* ========================= HANDLE REDIRECT ========================= */
-async function checkPaymentStatus(){
-  const params = new URLSearchParams(window.location.search)
-  const reference = params.get("reference") || params.get("trxref")
-  const status = params.get("status")
-  if(reference){
-    if(status==="failed"){alert("Transaction failed or was cancelled."); return}
-    try{
-      const res = await fetch(`https://subuluke.onrender.com/api/paystack/verify/${reference}`)
-      const data = await res.json()
-      if(data.status==="success"){
-        localStorage.removeItem("cart")
-        window.location.href = `success.html?orderId=${data.orderId}`
+async function checkPaymentStatus() {
+  const params = new URLSearchParams(window.location.search);
+  const reference = params.get("reference") || params.get("trxref");
+  const status = params.get("status");
+
+  if (reference) {
+    if (status === "failed") {
+      alert("Transaction failed or was cancelled.");
+      return;
+    }
+    try {
+      const res = await fetch(`https://subuluke.onrender.com/api/paystack/verify/${reference}`);
+      const data = await res.json();
+      if (data.status === "success") {
+        localStorage.removeItem("cart");
+        window.location.href = `success.html?orderId=${data.orderId}`;
       } else {
-        alert(data.message || "Payment verification failed")
+        alert(data.message || "Payment verification failed");
       }
-    }catch(err){console.error(err); alert("Error verifying payment")}
+    } catch (err) {
+      console.error(err);
+      alert("Error verifying payment");
+    }
   }
 }
 
 /* ========================= NAV ========================= */
-function goBack(){window.location.href="cart.html"}
+function goBack() {
+  window.location.href = "cart.html";
+}
 
 /* ========================= INIT ========================= */
-window.onload = ()=>{renderCart(); checkPaymentStatus()}
+window.onload = () => {
+  renderCart();
+  checkPaymentStatus();
+};
 </script>
 </body>
 </html>
