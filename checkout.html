@@ -283,11 +283,11 @@ function updateThemeIcon(){
   const sun = document.getElementById("sunIcon")
   if(!moon || !sun) return
   if(document.body.classList.contains("dark")){
-    moon.style.display = "none"
-    sun.style.display = "block"
+    moon.style.display="none"
+    sun.style.display="block"
   }else{
-    moon.style.display = "block"
-    sun.style.display = "none"
+    moon.style.display="block"
+    sun.style.display="none"
   }
 }
 if(localStorage.getItem("theme")==="dark") document.body.classList.add("dark")
@@ -295,23 +295,18 @@ updateThemeIcon()
 
 /* ========================= CART ========================= */
 let cart = JSON.parse(localStorage.getItem("cart")) || []
+
 function renderCart(){
   const container = document.getElementById("cartItems")
   if(!container) return
   container.innerHTML=""
-  let subtotal = 0
+
   cart.forEach(item=>{
-    subtotal += item.price * item.qty
     const div = document.createElement("div")
     div.className = "cart-item"
     div.innerHTML = `<img src="${item.image}" alt="${item.name}"><div class="cart-details"><p>${item.name}</p><small>Qty: ${item.qty}</small></div><div class="cart-price">₦${Number(item.price*item.qty).toLocaleString("en-NG")}</div>`
     container.appendChild(div)
   })
-  const total = subtotal+1500
-  document.getElementById("subtotal").innerText=subtotal.toLocaleString("en-NG")
-  document.getElementById("total").innerText=total.toLocaleString("en-NG")
-  const mobileTotal=document.getElementById("totalMobile")
-  if(mobileTotal) mobileTotal.innerText=total.toLocaleString("en-NG")
 }
 
 /* ========================= TOGGLE SUMMARY ========================= */
@@ -323,7 +318,6 @@ function toggleSummary(){
 }
 
 /* ========================= PAYMENT ========================= */
-
 let paymentProcessing = false
 let lastClickTime = 0
 
@@ -332,18 +326,13 @@ async function pay(){
   const now = Date.now()
 
   /* Frontend rate limit (2 seconds) */
-  if(now - lastClickTime < 2000){
-    return
-  }
-
+  if(now - lastClickTime < 2000) return
   lastClickTime = now
 
   if(paymentProcessing) return
   paymentProcessing = true
 
   const payBtn = document.getElementById("payBtn")
-
-  /* change button state */
   payBtn.innerText = "Processing..."
   payBtn.classList.add("processing")
   payBtn.disabled = true
@@ -355,14 +344,12 @@ async function pay(){
 
   if(!name || !email || !phone || !address){
     alert("Please fill all fields")
-
     resetPayButton()
     return
   }
 
   if(cart.length === 0){
     alert("Cart is empty")
-
     resetPayButton()
     return
   }
@@ -370,64 +357,41 @@ async function pay(){
   document.getElementById("loader").style.display = "block"
 
   try{
-
-    const subtotal = cart.reduce((sum,i)=>sum + i.price * i.qty,0)
-    const total = subtotal + 1500
-
+    /* Send items and customer info only. Backend calculates totals */
     const res = await fetch("https://subuluke.onrender.com/api/paystack/initialize",{
       method:"POST",
-      headers:{
-        "Content-Type":"application/json"
-      },
+      headers:{"Content-Type":"application/json"},
       body:JSON.stringify({
         email,
-        amount: total * 100,
-        metadata:{
-          name,
-          email,
-          phone,
-          address,
-          items: cart
-        }
+        customer: { name, email, phone, address },
+        items: cart
       })
     })
 
     const data = await res.json()
 
     if(data.authorization_url){
-
       /* redirect to Paystack */
       window.location.href = data.authorization_url
-
-    }else{
-
+    } else {
       alert("Payment initialization failed")
       resetPayButton()
-
     }
 
   }catch(err){
-
     console.error(err)
     alert("Something went wrong")
     resetPayButton()
-
   }
 }
 
-
 /* ========================= RESET BUTTON ========================= */
-
 function resetPayButton(){
-
   const payBtn = document.getElementById("payBtn")
-
   payBtn.innerText = "Proceed to Payment"
   payBtn.classList.remove("processing")
   payBtn.disabled = false
-
   paymentProcessing = false
-
 }
 
 /* ========================= HANDLE REDIRECT ========================= */
@@ -442,8 +406,8 @@ async function checkPaymentStatus(){
       const data = await res.json()
       if(data.status==="success"){
         localStorage.removeItem("cart")
-      window.location.href = `success.html?orderId=${data.orderId}`
-      }else{
+        window.location.href = `success.html?orderId=${data.orderId}`
+      } else {
         alert(data.message || "Payment verification failed")
       }
     }catch(err){console.error(err); alert("Error verifying payment")}
@@ -454,7 +418,7 @@ async function checkPaymentStatus(){
 function goBack(){window.location.href="cart.html"}
 
 /* ========================= INIT ========================= */
-window.onload=()=>{renderCart(); checkPaymentStatus()}
+window.onload = ()=>{renderCart(); checkPaymentStatus()}
 </script>
 </body>
 </html>
