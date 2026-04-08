@@ -806,276 +806,170 @@ THEME
 ========================= */
 
 function toggleTheme(){
-
   document.body.classList.toggle("dark")
-
   localStorage.setItem(
     "theme",
     document.body.classList.contains("dark") ? "dark" : "light"
   )
-
   updateThemeIcon()
 }
 
 function updateThemeIcon(){
-
   const moon = document.getElementById("moonIcon")
   const sun = document.getElementById("sunIcon")
-
   if(document.body.classList.contains("dark")){
-    moon.style.display = "none"
-    sun.style.display = "inline"
+    moon.style.display="none"
+    sun.style.display="inline"
   }else{
-    moon.style.display = "inline"
-    sun.style.display = "none"
+    moon.style.display="inline"
+    sun.style.display="none"
   }
 }
 
 if(localStorage.getItem("theme") === "dark"){
   document.body.classList.add("dark")
 }
-
 updateThemeIcon()
-
 
 /* =========================
 SIDEBAR TOGGLE
 ========================= */
 
 const sidebar = document.getElementById("sidebar")
-
-document.getElementById("menuBtn").onclick = () => {
-  sidebar.classList.toggle("open")
-}
+document.getElementById("menuBtn").onclick = () => sidebar.classList.toggle("open")
 
 document.addEventListener("click", e => {
-
   if(!sidebar.contains(e.target) && !e.target.closest("#menuBtn")){
     sidebar.classList.remove("open")
   }
-
 })
-
 
 /* =========================
 LOAD PRODUCTS
 ========================= */
 
 async function loadProducts(){
-
   const res = await fetch(API + "/api/products")
-
   allProducts = await res.json()
-
   prepareProducts()
-
   createCategories()
-
   filterProducts("All")
-
 }
-
 
 /* =========================
 SHUFFLE PRODUCTS
 ========================= */
 
 function shuffle(arr){
-
   for(let i = arr.length - 1; i > 0; i--){
-
     let j = Math.floor(Math.random() * (i + 1))
-
     ;[arr[i], arr[j]] = [arr[j], arr[i]]
-
   }
-
   return arr
 }
 
 function prepareProducts(){
-
   let featured = shuffle(allProducts.filter(p => p.featured))
   let others = shuffle(allProducts.filter(p => !p.featured))
-
   allProducts = [...featured, ...others]
-
 }
-
 
 /* =========================
 CATEGORIES
 ========================= */
 
 function createCategories(){
-
   const pills = document.getElementById("categoryPills")
   const side = document.getElementById("sidebarCategories")
-
   const cats = [...new Set(allProducts.map(p => p.category))]
 
   pills.innerHTML = ""
   side.innerHTML = ""
 
   /* Sidebar categories */
-
   cats.forEach(cat => {
-    side.innerHTML += `
-      <li onclick="filterProducts('${cat}')">${cat}</li>
-    `
+    side.innerHTML += `<li onclick="filterProducts('${cat}')">${cat}</li>`
   })
 
   /* Desktop pills */
-
   if(window.innerWidth > 768){
-
-    pills.innerHTML = `
-      <div class="category-pill active"
-      onclick="filterProducts('All')">All</div>
-    `
-
+    pills.innerHTML = `<div class="category-pill active" onclick="filterProducts('All')">All</div>`
     cats.forEach(cat => {
-
-      pills.innerHTML += `
-        <div class="category-pill"
-        onclick="filterProducts('${cat}')">${cat}</div>
-      `
-
+      pills.innerHTML += `<div class="category-pill" onclick="filterProducts('${cat}')">${cat}</div>`
     })
-
   }
-
 }
 
 window.addEventListener("resize", createCategories)
-
 
 /* =========================
 FILTER PRODUCTS
 ========================= */
 
 function filterProducts(category){
-
   currentPage = 1
-
-  if(category === "All"){
-    currentProducts = allProducts
-  }else{
-    currentProducts = allProducts.filter(p => p.category === category)
-  }
-
+  currentProducts = category === "All" ? allProducts : allProducts.filter(p => p.category === category)
   renderProducts(currentProducts)
-
   window.scrollTo({top:0, behavior:"smooth"})
-
   sidebar.classList.remove("open")
-
 }
-
 
 /* =========================
 RENDER PRODUCTS
 ========================= */
 
 function renderProducts(products){
-
   const container = document.getElementById("products")
-
   container.innerHTML = ""
 
   const start = (currentPage - 1) * productsPerPage
-
   const paginated = products.slice(start, start + productsPerPage)
 
   paginated.forEach(p => {
-
     const out = p.status === "out_of_stall"
-
     const card = document.createElement("div")
-
     card.className = "product-card"
-
     card.innerHTML = `
-
-      <img src="${p.mainImage}"
-      onclick="openImageModal('${p.mainImage}')">
-
+      <img src="${p.mainImage}" onclick="openImageModal('${p.mainImage}')">
       ${p.featured ? '<div class="badge">⭐</div>' : ''}
-
       ${p.slashPrice > 0 ? '<div class="badge sale">SALE</div>' : ''}
-
       ${out ? '<div class="badge out">OUT OF STALL</div>' : ''}
-
       <div class="product-category">${p.category}</div>
-
       <div class="product-name">${p.name}</div>
-
       <div class="price">
-
-        ${p.slashPrice > 0 ?
-        `<span class="old-price">₦${Number(p.slashPrice).toLocaleString()}</span>`
-        : ''}
-
+        ${p.slashPrice > 0 ? `<span class="old-price">₦${Number(p.slashPrice).toLocaleString()}</span>` : ''}
         <span class="new-price">₦${Number(p.price).toLocaleString()}</span>
-
       </div>
-
-      <button class="add-cart ${out ? 'disabled' : ''}"
-      ${out ? 'disabled' : ''}
-      onclick="addToCart('${p._id}')">
-
-      Add to Cart
-
-      </button>
+      <button class="add-cart ${out ? 'disabled' : ''}" ${out ? 'disabled' : ''} onclick="addToCart('${p._id}')">Add to Cart</button>
     `
-
     container.appendChild(card)
-
   })
 
   renderPagination(products.length)
-
 }
-
 
 /* =========================
 PAGINATION
 ========================= */
 
 function renderPagination(total){
-
   const pages = Math.ceil(total / productsPerPage)
-
   const container = document.getElementById("pagination")
-
   container.innerHTML = ""
-
   for(let i = 1; i <= pages; i++){
-
     const btn = document.createElement("button")
-
     btn.className = "page-btn"
-
     btn.innerText = i
-
     btn.onclick = () => goPage(i)
-
     container.appendChild(btn)
-
   }
-
 }
 
 function goPage(page){
-
   currentPage = page
-
   renderProducts(currentProducts)
-
   window.scrollTo({top:0, behavior:"smooth"})
-
 }
-
 
 /* =========================
 CART
@@ -1084,127 +978,83 @@ CART
 let cart = JSON.parse(localStorage.getItem("cart")) || []
 
 function saveCart(){
-
   localStorage.setItem("cart", JSON.stringify(cart))
-
   updateCartCount()
-
 }
 
+// ✅ Updated: send _id as productId for backend compatibility
 function addToCart(id){
-
   const product = allProducts.find(p => p._id == id)
-
   if(!product) return
 
   const existing = cart.find(item => item._id == id)
-
   if(existing){
-
     existing.qty += 1
-
   }else{
-
     cart.push({
       _id: product._id,
+      productId: product._id, // added for backend
       name: product.name,
       price: product.price,
       image: product.mainImage,
       qty: 1
     })
-
   }
 
   saveCart()
-
   showToast("Item added to cart")
-
 }
 
 function updateCartCount(){
-
   const count = cart.reduce((sum, item) => sum + item.qty, 0)
-
   const badge = document.getElementById("cartCount")
-
   if(count === 0){
-
     badge.style.display = "none"
-
   }else{
-
     badge.style.display = "flex"
-
     badge.innerText = count
-
   }
-
 }
-
 
 /* =========================
 TOAST
 ========================= */
 
 function showToast(msg){
-
   const toast = document.getElementById("toast")
-
   toast.innerText = msg
-
   toast.style.display = "block"
-
-  setTimeout(() => {
-    toast.style.display = "none"
-  }, 2000)
-
+  setTimeout(() => { toast.style.display = "none" }, 2000)
 }
-
 
 /* =========================
 IMAGE MODAL
 ========================= */
 
 function openImageModal(src){
-
   const modal = document.getElementById("imageModal")
   const img = document.getElementById("modalImage")
-
   img.src = src
-
   modal.classList.add("show")
-
 }
 
 document.getElementById("imageModal").addEventListener("click", function(e){
-
-  if(e.target.id === "imageModal"){
-    this.classList.remove("show")
-  }
-
+  if(e.target.id === "imageModal") this.classList.remove("show")
 })
-
 
 /* =========================
 BACK TO TOP
 ========================= */
 
 document.getElementById("backToTop")?.addEventListener("click", () => {
-
-  window.scrollTo({
-    top:0,
-    behavior:"smooth"
-  })
-
+  window.scrollTo({top:0, behavior:"smooth"})
 })
-
 
 /* =========================
 INIT
 ========================= */
 
 updateCartCount()
-
 loadProducts()
 
 </script>
